@@ -1,0 +1,81 @@
+#docker-compose.dev.yml
+# version: '3.8'
+
+services:
+    hardhat-node:
+        image: ghcr.io/foundry-rs/foundry:latest
+        command: anvil -p ${HH_PORT} -a 10
+        ports:
+            - ${HH_PORT}:${HH_PORT}
+    database:
+        image: postgres:16-alpine
+        environment:
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_DB: ${DB_NAME}
+            POSTGRES_USER: ${DB_USERNAME}
+        volumes:
+            - db_data:/var/lib/postgresql/data
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+
+    redis:
+        image: redis:7-alpine
+        volumes:
+            - cache_data:/data
+        healthcheck:
+            test: ["CMD", "redis-cli","ping"]
+
+    backend:
+        build:
+          context: ./backend
+          dockerfile: Dockerfile
+          target: development
+        depends_on: ['database', 'redis']
+        environment:
+            - NODE_ENV=development
+        volumes:
+            - ${PWD}/backend:/app
+        ports:
+            - ${SERVER_PORT}:${SERVER_PORT}
+        container_name: ${SERVER_HOST}
+        # command: ["npm", "run", "start:debug"]
+        env_file:
+            - .env
+        healthcheck:
+            test: ["CMD-SHELL", "curl --fail http://localhost:8080/"]
+
+    frontend:
+        build:
+          context: ./frontend
+          dockerfile: Dockerfile
+          target: development
+        depends_on: ['backend']
+        volumes:
+          - ./frontend/node_modules:/app/node_modules
+          - ./frontend/.next:/app/.next
+          - ${PWD}/frontend:/app
+        ports:
+            - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+        # command: ["npm", "run", "dev"]
+        env_file:
+            - .env
+        healthcheck:
+            test: ["CMD-SHELL", "curl --fail http://localhost/"]
+
+    nginx2:
+        image: nginx:1.19.8-alpine
+        restart: always
+        build:
+          context: ./nginx2
+          dockerfile: Dockerfile
+        container_name: ${NGINX_HOST}
+        env_file: 
+         - .env
+        ports:
+          - ${NGINX_PORT}:${NGINX_PORT}
+    
+volumes:
+    db_data:
+    cache_data:
+    node_modules:
+    next:

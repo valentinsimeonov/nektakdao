@@ -1,0 +1,26 @@
+{
+  "name": "contracts",
+  "version": "1.0.0",
+  "description": "Nektak DAO contracts",
+  "scripts": {
+    "compile": "hardhat compile",
+    "typechain": "typechain --target ethers-v5 --out-dir typechain 'artifacts/**/*.json'",
+    "build:all": "npm run compile && npm run typechain",
+    "test": "hardhat test",
+    "clean": "rm -rf cache artifacts typechain"
+  },
+  "devDependencies": {
+    "hardhat": "^2.16.0",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "ethers": "^5.7.2",
+    "typechain": "^8.3.2",
+    "@typechain/ethers-v5": "^10.2.0",
+    "typescript": "^5.2.2",
+    "ts-node": "^10.9.1",
+    "chai": "^4.3.7",
+    "dotenv": "^16.3.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

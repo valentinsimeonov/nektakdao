@@ -1,0 +1,14 @@
+node_modules
+cache
+artifacts
+typechain
+*.log
+.env
+.env.*
+!.env.example
+dist
+build
+coverage
+.git
+.gitignore
+README.md

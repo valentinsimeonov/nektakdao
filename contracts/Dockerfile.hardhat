@@ -1,0 +1,45 @@
+# Base image
+FROM node:18.20.4-bullseye-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git build-essential python3 curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root dev user
+RUN useradd -m dev && mkdir -p /home/dev/.npm-global && chown -R dev:dev /home/dev
+
+# Set working directory
+WORKDIR /project/contracts
+
+# Copy package files first for caching
+COPY package.json package-lock.json ./
+
+# CRITICAL: Install exact versions without modifications
+# Clean install with exact versions from package-lock.json
+RUN npm ci --legacy-peer-deps
+
+# Verify hardhat version
+RUN npx hardhat --version
+
+# Create cache/artifacts directories 
+RUN mkdir -p cache artifacts typechain
+
+# Copy the rest of the project (excluding node_modules via .dockerignore)
+COPY . .
+
+# Ensure all directories are writable by dev user
+RUN chown -R dev:dev /project/contracts
+
+# Switch to non-root user
+USER dev
+
+# Set npm global path
+ENV NPM_CONFIG_PREFIX=/home/dev/.npm-global
+ENV PATH=/home/dev/.npm-global/bin:$PATH
+
+# Default entrypoint
+ENTRYPOINT ["bash", "-lc"]
+CMD ["tail -f /dev/null"]

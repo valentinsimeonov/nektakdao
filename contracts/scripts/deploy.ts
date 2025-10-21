@@ -1,3 +1,5 @@
+//contracts/scripts/deploy.ts
+
 import fs from "fs";
 import path from "path";
 import hre from "hardhat";
@@ -13,7 +15,7 @@ dotenv.config();
  * - Edit CONFIG below to match your contract names and desired deployment parameters.
  * - Replace placeholder addresses (e.g., TREASURY_ADDRESS) with your Safe or deployer.
  * - This script does not attempt to verify contracts on block explorers (you can run hardhat-etherscan verify separately).
- */
+*/
 
 const OUTPUT_DIR = path.join(__dirname, "..", "deployments");
 if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });

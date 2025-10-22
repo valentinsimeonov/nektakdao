@@ -1,3 +1,4 @@
+//contracts.tsconfig.json
 
 {
   "compilerOptions": {
@@ -10,5 +11,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true
   },
-  "include": ["./scripts", "./test", "./typechain", "./hardhat.config.ts", "scripts/deploy.ts"]
+  "include": ["./scripts", "./test", "./typechain", "hardhat.config.ts", "scripts/deploy.ts"]
 }
+
+

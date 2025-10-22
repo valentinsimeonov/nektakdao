@@ -15,6 +15,7 @@ services:
       - hardhat_cache:/project/contracts/cache
       - hardhat_artifacts:/project/contracts/artifacts
       - hardhat_typechain:/project/contracts/typechain
+      - ./contracts/deployments:/project/contracts/deployments:rw
     tty: true
     stdin_open: true
     environment:

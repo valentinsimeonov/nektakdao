@@ -1,12 +1,32 @@
 
 //contracts/hardhat.config.ts
 
-import { HardhatUserConfig } from "hardhat/config";
+import { HardhatUserConfig as HHConfigBase } from "hardhat/config";
 import "@nomiclabs/hardhat-ethers";
 import "@typechain/hardhat";
 import * as dotenv from "dotenv";
-
+// import "@nomicfoundation/hardhat-verify";
+import "@nomiclabs/hardhat-etherscan";
 dotenv.config();
+
+
+
+type EtherscanConfig = {
+  // apiKey?: string | { [network: string]: string };
+  base_sepolia?: string | { [network: string]: string };
+  base?: string | { [network: string]: string };
+
+  customChains?: Array<{
+    network: string;
+    chainId: number;
+    urls: { apiURL: string; browserURL: string };
+  }>;
+};
+
+type HardhatUserConfig = HHConfigBase & { etherscan?: EtherscanConfig };
+
+
+
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -16,8 +36,7 @@ const config: HardhatUserConfig = {
         enabled: true,
         runs: 200,
       },
-      // Ignore EVM version warning for 0.8.20
-      evmVersion: "paris", // Use Paris instead of default to avoid issues
+      evmVersion: "paris",
     },
   },
   networks: {
@@ -31,14 +50,37 @@ const config: HardhatUserConfig = {
     },
     base_sepolia: {
       url: process.env.BASE_SEPOLIA_RPC_URL || "https://sepolia.base.org",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      accounts: process.env.DEPLOYER_PRIVATE_KEY ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
       chainId: 84532,
     },
     base_mainnet: {
       url: process.env.BASE_MAINNET_RPC_URL || "https://mainnet.base.org",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      accounts: process.env.DEPLOYER_PRIVATE_KEY ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
       chainId: 8453,
     },
+  },
+  etherscan: {
+    // apiKey: process.env.ETHERSCAN_KEY,
+    base_sepolia: process.env.ETHERSCAN_KEY || "",
+    base: process.env.ETHERSCAN_KEY || "",
+    customChains: [
+      {
+        network: "base_sepolia",
+        chainId: 84532,
+        urls: {
+          apiURL: "https://api-sepolia.basescan.org/api",
+          browserURL: "https://sepolia.basescan.org",
+        },
+      },
+      {
+        network: "base_mainnet",
+        chainId: 8453,
+        urls: {
+          apiURL: "https://api.basescan.org/api",
+          browserURL: "https://basescan.org",
+        },
+      },
+    ],
   },
   paths: {
     sources: "./contracts",

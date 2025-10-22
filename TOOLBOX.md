@@ -25,3 +25,9 @@ npx hardhat test --show-stack-traces
 
 
 
+### Deploy!
+
+npx hardhat compile
+npx hardhat run scripts/deploy.ts --network base_sepolia
+
+

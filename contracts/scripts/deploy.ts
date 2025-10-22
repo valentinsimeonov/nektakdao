@@ -1,224 +1,233 @@
-//contracts/scripts/deploy.ts
-
+// contracts/scripts/deploy.ts
 import fs from "fs";
 import path from "path";
 import hre from "hardhat";
-import { BigNumber } from "ethers";
+import { Contract } from "ethers";
 import dotenv from "dotenv";
 dotenv.config();
 
 /**
- * Deployment scaffold for Nektak DAO (Hardhat + ethers v5)
+ * Robust TypeScript deployment script for Nektak DAO
  *
- * NOTES:
- * - This script expects compiled contract artifacts in `artifacts/` (run `npx hardhat compile` first).
- * - Edit CONFIG below to match your contract names and desired deployment parameters.
- * - Replace placeholder addresses (e.g., TREASURY_ADDRESS) with your Safe or deployer.
- * - This script does not attempt to verify contracts on block explorers (you can run hardhat-etherscan verify separately).
-*/
+ * Usage:
+ *  npx hardhat run scripts/deploy.ts --network base_sepolia
+ *
+ * Required env variables:
+ *  - DEPLOYER_PRIVATE_KEY (0x... format)
+ *  - ETHERSCAN_KEY (optional, for verification)
+ *  - BASE_SEPOLIA_RPC_URL
+ *  - TREASURY_ADDRESS (optional)
+ */
 
-const OUTPUT_DIR = path.join(__dirname, "..", "deployments");
-if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+type BigNumberish = any;
 
-const CONFIG = {
-  // Contract names as they appear in your solidity source (Factory names)
-  tokenName: "NektakToken", // change if your contract name differs
-  governorName: "NektakGovernor", // change if your Governor contract name differs
-  timelockName: "TimelockController", // usually OpenZeppelin TimelockController
-  vestingName: "Vesting", // optional vesting contract name
+interface Allocation { to: string; amount: BigNumberish; }
+interface DeploymentConfig {
+  tokenName: string; governorName: string; timelockName: string; vestingName: string;
+  tokenConstructor: { name: string; symbol: string; initialSupply: BigNumberish; };
+  timelockMinDelaySeconds: number; timelockProposers: string[]; timelockExecutors: string[];
+  TREASURY_ADDRESS: string | null; initialAllocations: Allocation[]; deployerAssignTo: string | null;
+}
 
-  // Token constructor args
+const OUTPUT_DIR = (() => {
+  const p = path.join(__dirname, "..", "deployments");
+  try {
+    if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
+    return p;
+  } catch {
+    const fallback = "/tmp/nektakdao-deployments";
+    if (!fs.existsSync(fallback)) fs.mkdirSync(fallback, { recursive: true });
+    console.warn("[deploy] Warning: cannot create deployments/ in repo - using", fallback);
+    return fallback;
+  }
+})();
+
+const CONFIG: DeploymentConfig = {
+  tokenName: "NektakToken",
+  governorName: "NektakGovernor",
+  timelockName: "TimelockController",
+  vestingName: "Vesting",
   tokenConstructor: {
     name: "Nektak Token",
     symbol: "NKT",
-    // optional: initial supply minted by constructor (most ERC20Votes do NOT mint in constructor)
-    initialSupply: hre.ethers.utils.parseUnits("100000000", 18) // example 100M
+    initialSupply: hre.ethers.utils.parseUnits("100000000", 18),
   },
-
-  // Timelock parameters
-  timelockMinDelaySeconds: 48 * 3600, // 48 hours default; use 7*24*3600 for upgrades
-  timelockProposers: [], // to be filled with governor address after deploy
-  timelockExecutors: ["0x0000000000000000000000000000000000000000"], // address(0) -> allow anyone execute (common pattern)
-
-  // Treasury address (preferably Gnosis Safe address)
-  TREASURY_ADDRESS: process.env.TREASURY_ADDRESS || null, // set in .env or replace
-
-  // Initial distribution (example, fill with real addresses for your team/treasury)
-  initialAllocations: [
-    // { to: "0x...", amount: hre.ethers.utils.parseUnits("40000000", 18) } // treasury 40M example
-  ],
-
-  // Optional: if you want the deployer to be a temporary multisig or owner
-  deployerAssignTo: process.env.DEPLOYER_ADDRESS || null
+  timelockMinDelaySeconds: 48 * 3600,
+  timelockProposers: [],
+  timelockExecutors: ["0x0000000000000000000000000000000000000000"],
+  TREASURY_ADDRESS: process.env.TREASURY_ADDRESS ? process.env.TREASURY_ADDRESS : null,
+  initialAllocations: [],
+  deployerAssignTo: process.env.DEPLOYER_ADDRESS || null,
 };
 
-async function main() {
-  const [deployer] = await hre.ethers.getSigners();
-  console.log("Deploying with account:", deployer.address);
-  const balance = await deployer.getBalance();
-  console.log("Deployer ETH balance:", hre.ethers.utils.formatEther(balance));
+type ContractInfo = { address: string };
+
+async function main(): Promise<void> {
+  // ENSURE we have at least one signer available
+  const signers = await hre.ethers.getSigners();
+  if (!signers || signers.length === 0) {
+    throw new Error(
+      "[deploy] No signers available. For external networks, ensure DEPLOYER_PRIVATE_KEY is set in .env and hardhat.config.ts uses it in the network.accounts."
+    );
+  }
+  const deployer = signers[0];
+  console.log("[deploy] Deploying with account:", deployer.address);
+
+  const bal = await deployer.getBalance();
+  console.log("[deploy] Deployer balance (ETH):", hre.ethers.utils.formatEther(bal));
 
   const network = hre.network.name;
-  console.log("Network:", network);
+  console.log("[deploy] Network:", network);
 
-  const deployments: Record<string, any> = {
-    network,
-    timestamp: new Date().toISOString(),
-    deployer: deployer.address,
-    contracts: {}
+  const deployments: {
+    network: string; timestamp: string; deployer: string; contracts: Record<string, ContractInfo | undefined>;
+  } = {
+    network, timestamp: new Date().toISOString(), deployer: deployer.address, contracts: {}
   };
 
-  // 1) Deploy Token (ERC20Votes)
-  console.log("\n1) Deploying Token...");
+  // 1) Token
+  console.log("\n[1] Deploying Token:", CONFIG.tokenName);
   const TokenFactory = await hre.ethers.getContractFactory(CONFIG.tokenName);
-  // If your token contract constructor expects (name, symbol) only, adapt below:
-  let token;
+  let token: Contract;
   try {
     token = await TokenFactory.deploy(CONFIG.tokenConstructor.name, CONFIG.tokenConstructor.symbol);
+    await token.deployed();
   } catch (err) {
-    // fallback if token constructor takes initial supply
+    console.log("[deploy] Fallback: trying constructor with initialSupply...");
     token = await TokenFactory.deploy(
       CONFIG.tokenConstructor.name,
       CONFIG.tokenConstructor.symbol,
       CONFIG.tokenConstructor.initialSupply
     );
+    await token.deployed();
   }
-  await token.deployed();
-  console.log(`${CONFIG.tokenName} deployed at:`, token.address);
+  console.log(`[1] ${CONFIG.tokenName} deployed at: ${token.address}`);
   deployments.contracts[CONFIG.tokenName] = { address: token.address };
 
-  // 1b) Optionally mint initial allocations if your token has a mint function and token owner is deployer
-  if (CONFIG.initialAllocations && CONFIG.initialAllocations.length > 0) {
-    console.log("Minting initial allocations...");
+  // Optional initial allocations (mint)
+  if (Array.isArray(CONFIG.initialAllocations) && CONFIG.initialAllocations.length > 0) {
+    console.log("[1b] Minting initial allocations...");
     for (const alloc of CONFIG.initialAllocations) {
       const tx = await token.mint(alloc.to, alloc.amount);
       await tx.wait();
-      console.log(`  minted ${alloc.to} -> ${hre.ethers.utils.formatUnits(alloc.amount, 18)}`);
+      console.log(`  minted ${hre.ethers.utils.formatUnits(alloc.amount, 18)} to ${alloc.to}`);
     }
   } else {
-    console.log("No initial allocations configured in script. Use governance to mint later if token is mintable.");
+    console.log("[1b] No initial allocations configured.");
   }
 
-  // 2) Deploy TimelockController
-  console.log("\n2) Deploying TimelockController...");
+  // 2) Timelock
+  console.log("\n[2] Deploying TimelockController:", CONFIG.timelockName);
   const TimelockFactory = await hre.ethers.getContractFactory(CONFIG.timelockName);
-  // timelock constructor: (minDelay, proposers[], executors[])
-  const timelock = await TimelockFactory.deploy(
+  const timelock: Contract = await TimelockFactory.deploy(
     CONFIG.timelockMinDelaySeconds,
     CONFIG.timelockProposers,
     CONFIG.timelockExecutors
   );
   await timelock.deployed();
-  console.log(`${CONFIG.timelockName} deployed at:`, timelock.address);
+  console.log(`[2] ${CONFIG.timelockName} deployed at: ${timelock.address}`);
   deployments.contracts[CONFIG.timelockName] = { address: timelock.address };
 
-  // 3) Deploy Governor
-  console.log("\n3) Deploying Governor...");
+  // 3) Governor
+  console.log("\n[3] Deploying Governor:", CONFIG.governorName);
   const GovernorFactory = await hre.ethers.getContractFactory(CONFIG.governorName);
-
-  /**
-   * NOTE: OpenZeppelin's Governor constructors vary depending on your implementation.
-   * Common pattern:
-   *   new Governor(name, tokenAddress, votingDelay, votingPeriod, proposalThreshold)
-   *
-   * If your Governor takes a Timelock address, pass it accordingly. Update args below to match your governor's constructor.
-   */
-  let governor;
-  try {
-    // attempt: Governor(name, token.address, timelock.address)
-    governor = await GovernorFactory.deploy(CONFIG.governorName, token.address, timelock.address);
-  } catch (err) {
-    // fallback: try a simpler constructor (token only)
-    governor = await GovernorFactory.deploy(token.address);
-  }
+  const governor: Contract = await GovernorFactory.deploy(token.address, timelock.address);
   await governor.deployed();
-  console.log(`${CONFIG.governorName} deployed at:`, governor.address);
+  console.log(`[3] ${CONFIG.governorName} deployed at: ${governor.address}`);
   deployments.contracts[CONFIG.governorName] = { address: governor.address };
 
-  // 4) Set Timelock proposers/executors to Governor if desired
-  // If your Timelock requires giving proposer/executor roles explicitly, do so here.
+  // 4) Configure Timelock roles
+  console.log("\n[4] Configuring timelock roles...");
   try {
     const PROPOSER_ROLE = await timelock.PROPOSER_ROLE();
     const EXECUTOR_ROLE = await timelock.EXECUTOR_ROLE();
-    const ADMIN_ROLE = await timelock.TIMELOCK_ADMIN_ROLE ? await timelock.TIMELOCK_ADMIN_ROLE() : null;
+    const TIMELOCK_ADMIN_ROLE = await timelock.TIMELOCK_ADMIN_ROLE();
+    console.log("[4] fetched roles:", { PROPOSER_ROLE, EXECUTOR_ROLE, TIMELOCK_ADMIN_ROLE });
 
-    console.log("Timelock roles read:", {
-      PROPOSER_ROLE,
-      EXECUTOR_ROLE,
-      ADMIN_ROLE
-    });
-
-    // Grant PROPOSER to governor
     const grantTx = await timelock.grantRole(PROPOSER_ROLE, governor.address);
     await grantTx.wait();
-    console.log("Granted PROPOSER role to Governor.");
-
-    // Optionally grant EXECUTOR to address(0) or particular addresses (already set in constructor)
-  } catch (err) {
-    console.log("Warning: could not auto-configure timelock roles (check timelock implementation). Err:", err.message || err);
+    console.log("[4] Granted PROPOSER_ROLE to governor");
+  } catch (err: any) {
+    console.warn("[4] Warning: could not fully configure timelock roles:", err?.message || err);
   }
 
-  // 5) Vesting contract (optional)
+  // 5) Vesting (optional)
   try {
-    console.log("\n5) Deploying Vesting contract (optional)...");
+    console.log("\n[5] Deploying Vesting (optional) ...");
     const VestFactory = await hre.ethers.getContractFactory(CONFIG.vestingName);
-    const vest = await VestFactory.deploy(token.address /* add vesting constructor args if needed */);
+    const vest: Contract = await VestFactory.deploy(token.address);
     await vest.deployed();
-    console.log(`${CONFIG.vestingName} deployed at:`, vest.address);
+    console.log(`[5] ${CONFIG.vestingName} deployed at: ${vest.address}`);
     deployments.contracts[CONFIG.vestingName] = { address: vest.address };
-  } catch (err) {
-    console.log("No vesting deployed (skipped). If you want a vesting contract, update the script to pass constructor args. Err:", err.message || err);
+  } catch (err: any) {
+    console.log("[5] Vesting skipped or not present:", err?.message || err);
   }
 
-  // 6) Transfer token ownership to timelock (if token is Ownable)
+  // 6) Transfer token ownership to timelock (if Ownable)
   try {
+    console.log("\n[6] Transferring token ownership to timelock (if supported)...");
     if (typeof token.transferOwnership === "function") {
-      console.log("Transferring token ownership to timelock...");
       const tx = await token.transferOwnership(timelock.address);
       await tx.wait();
-      console.log("Token ownership transferred to Timelock.");
+      console.log("[6] Token ownership transferred to timelock");
     } else {
-      console.log("Token has no transferOwnership() - perhaps not Ownable.");
+      console.log("[6] Token contract has no transferOwnership() - skipping");
     }
-  } catch (err) {
-    console.log("Token ownership transfer skipped or failed (safe to ignore if not applicable). Err:", err.message || err);
+  } catch (err: any) {
+    console.log("[6] Token ownership transfer skipped or failed:", err?.message || err);
   }
 
-  // 7) Optionally, transfer treasury allocations to TREASURY_ADDRESS
+  // 7) TREASURY handling
   if (CONFIG.TREASURY_ADDRESS) {
-    try {
-      console.log(`\n7) Transferring initial treasury tokens to ${CONFIG.TREASURY_ADDRESS} (if any)...`);
-      // compute balance of this deployer or minted supply - adjust as needed
-      // Example: send X tokens (here we do nothing by default)
-      // await token.transfer(CONFIG.TREASURY_ADDRESS, someAmount);
-      console.log("No auto-transfer implemented; implement as needed in script.");
-    } catch (err) {
-      console.log("Treasury transfer attempt failed:", err.message || err);
-    }
+    console.log(`\n[7] TREASURY_ADDRESS provided: ${CONFIG.TREASURY_ADDRESS}`);
+    // No auto-transfer by default. If you want one, uncomment lines below and set amount.
+    // await token.transfer(CONFIG.TREASURY_ADDRESS, hre.ethers.utils.parseUnits("1000", 18));
+  } else {
+    console.log("\n[7] No TREASURY_ADDRESS provided; skipping treasury transfers.");
   }
 
-  // 8) Persist deployment info
-  const OUT_PATH = path.join(OUTPUT_DIR, `${network}.json`);
-  fs.writeFileSync(OUT_PATH, JSON.stringify(deployments, null, 2));
-  console.log("\nDeployment summary written to:", OUT_PATH);
+  // Save summary
+  const outPath = path.join(OUTPUT_DIR, `${network}.json`);
+  try {
+    fs.writeFileSync(outPath, JSON.stringify(deployments, null, 2));
+    console.log("\n[deploy] Deployment summary written to:", outPath);
+  } catch (err: any) {
+    console.warn("[deploy] Could not write deployments file:", err?.message || err);
+    console.log("[deploy] Summary:", JSON.stringify(deployments, null, 2));
+  }
 
-  console.log("\nAll done. Contracts deployed:");
+  // Final summary table
+  console.log("\n" + "=".repeat(60));
+  console.log("DEPLOYMENT COMPLETE");
+  console.log("=".repeat(60));
   console.table(
-    Object.entries(deployments.contracts).map(([name, meta]) => ({
-      contract: name,
-      address: meta.address
+    Object.entries(deployments.contracts).map(([name, info]) => ({
+      Contract: name,
+      Address: info?.address ?? "not deployed",
     }))
   );
 
-  console.log("\nNext steps:");
-  console.log(" - Verify contracts on block explorer (hardhat-etherscan plugin).");
-  console.log(" - Add addresses to docs/deployments.md and frontend env.");
-  console.log(" - If using a Safe treasury, update TREASURY_ADDRESS and fund the Safe.");
+  // Verify hints
+  console.log("\nSuggested verify commands:");
+  console.log(`  npx hardhat verify --network ${network} ${token.address} "${CONFIG.tokenConstructor.name}" "${CONFIG.tokenConstructor.symbol}"`);
+  console.log(
+    `  npx hardhat verify --network ${network} ${timelock.address} ${CONFIG.timelockMinDelaySeconds} "[]" '["0x0000000000000000000000000000000000000000"]'`
+  );
+  console.log(`  npx hardhat verify --network ${network} ${governor.address} ${token.address} ${timelock.address}`);
 }
 
 main()
   .then(() => process.exit(0))
-  .catch((error) => {
-    console.error("Deployment script error:", error);
+  .catch((err: any) => {
+    console.error("\n" + "=".repeat(60));
+    console.error("DEPLOYMENT FAILED");
+    console.error("=".repeat(60));
+    console.error(err);
     process.exit(1);
   });
+
+
+
+
+
+  

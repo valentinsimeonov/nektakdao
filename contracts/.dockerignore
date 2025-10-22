@@ -4,9 +4,6 @@ cache
 artifacts
 typechain
 *.log
-.env
-.env.*
-!.env.example
 dist
 build
 coverage

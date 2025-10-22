@@ -1,7 +1,8 @@
-//contracts/governor.test.js
+//contracts/test/governor.test.js
 
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
+
 
 describe("Nektak Governor end-to-end", function () {
   let Token, token;
@@ -31,11 +32,19 @@ describe("Nektak Governor end-to-end", function () {
     await token.connect(proposer).delegate(proposer.address);
     await token.connect(voter).delegate(voter.address);
 
+
+
+
     // Deploy Timelock
     Timelock = await ethers.getContractFactory("TimelockController");
     const minDelay = 1; // small for tests; normally 48*3600
-    timelock = await Timelock.connect(deployer).deploy(minDelay, [], []);
+    const ZERO = ethers.constants.AddressZero;
+    timelock = await Timelock.connect(deployer).deploy(minDelay, [], [ZERO], deployer.address);
     await timelock.deployed();
+
+
+
+
 
     // Deploy Governor
     Governor = await ethers.getContractFactory("NektakGovernor");
@@ -93,6 +102,12 @@ describe("Nektak Governor end-to-end", function () {
 
     // Check box value
     const value = await box.retrieve();
-    expect(value).to.equal(42);
+    expect(value.toNumber()).to.equal(42);
+
+    
   });
 });
+
+
+
+

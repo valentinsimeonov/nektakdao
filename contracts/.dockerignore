@@ -1,3 +1,4 @@
+
 node_modules
 cache
 artifacts
@@ -12,3 +13,5 @@ coverage
 .git
 .gitignore
 README.md
+*.backup
+package-lock.json.backup

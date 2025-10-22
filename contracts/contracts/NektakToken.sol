@@ -1,11 +1,21 @@
 // SPDX-License-Identifier: MIT
+//contracts/contracts/NektakToken.sol
+
+//TEST CONTRACT
+
+
+
 pragma solidity ^0.8.20;
 
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+
+
 /// @notice ERC20 token with voting capabilities (ERC20Votes)
-contract NektakToken is ERC20Votes, Ownable {
+contract NektakToken is ERC20, ERC20Permit, ERC20Votes, Ownable {
     constructor(string memory name, string memory symbol) ERC20(name, symbol) ERC20Permit(name) {
         // initial supply intentionally zero. Mint via admin or governance.
     }
@@ -31,4 +41,3 @@ contract NektakToken is ERC20Votes, Ownable {
 
 
 
-//TEST CONTRACT TO RUN HARDHAT

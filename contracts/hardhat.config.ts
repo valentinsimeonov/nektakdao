@@ -1,8 +1,5 @@
 
-
-
-
-
+//contracts/hardhat.config.ts
 
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomiclabs/hardhat-ethers";
@@ -63,33 +60,3 @@ export default config;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import { HardhatUserConfig } from "hardhat/config";
-// import "@nomiclabs/hardhat-ethers";
-// import "dotenv/config";
-
-// const config: HardhatUserConfig = {
-//   solidity: { compilers: [{ version: "0.8.20" }] },
-//   networks: {
-//     hardhat: {}
-//     // add Base/testnets via env when ready, e.g.
-//     // base: { url: process.env.BASE_RPC_URL, accounts: [process.env.DEPLOYER_PRIVATE_KEY] }
-//   }
-// };
-
-// export default config;

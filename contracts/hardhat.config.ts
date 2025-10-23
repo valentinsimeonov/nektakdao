@@ -1,32 +1,11 @@
-
-//contracts/hardhat.config.ts
-
-import { HardhatUserConfig as HHConfigBase } from "hardhat/config";
+import { HardhatUserConfig } from "hardhat/config";
 import "@nomiclabs/hardhat-ethers";
+// import "@nomiclabs/hardhat-etherscan";
 import "@typechain/hardhat";
 import * as dotenv from "dotenv";
-// import "@nomicfoundation/hardhat-verify";
-import "@nomiclabs/hardhat-etherscan";
+import "@nomicfoundation/hardhat-verify";
+
 dotenv.config();
-
-
-
-type EtherscanConfig = {
-  // apiKey?: string | { [network: string]: string };
-  base_sepolia?: string | { [network: string]: string };
-  base?: string | { [network: string]: string };
-
-  customChains?: Array<{
-    network: string;
-    chainId: number;
-    urls: { apiURL: string; browserURL: string };
-  }>;
-};
-
-type HardhatUserConfig = HHConfigBase & { etherscan?: EtherscanConfig };
-
-
-
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -59,16 +38,17 @@ const config: HardhatUserConfig = {
       chainId: 8453,
     },
   },
+  // Using Etherscan V2 API - single API key for all chains
   etherscan: {
-    // apiKey: process.env.ETHERSCAN_KEY,
-    base_sepolia: process.env.ETHERSCAN_KEY || "",
-    base: process.env.ETHERSCAN_KEY || "",
+    // Use your Etherscan API key for all chains (V2 unified API)
+    apiKey: process.env.ETHERSCAN_API_KEY || "",
     customChains: [
       {
         network: "base_sepolia",
         chainId: 84532,
         urls: {
-          apiURL: "https://api-sepolia.basescan.org/api",
+          // Etherscan V2 API endpoint for Base Sepolia
+          apiURL: "https://api.etherscan.io/v2/api?chainid=84532",
           browserURL: "https://sepolia.basescan.org",
         },
       },
@@ -76,7 +56,8 @@ const config: HardhatUserConfig = {
         network: "base_mainnet",
         chainId: 8453,
         urls: {
-          apiURL: "https://api.basescan.org/api",
+          // Etherscan V2 API endpoint for Base Mainnet
+          apiURL: "https://api.etherscan.io/v2/api?chainid=8453",
           browserURL: "https://basescan.org",
         },
       },
@@ -98,7 +79,3 @@ const config: HardhatUserConfig = {
 };
 
 export default config;
-
-
-
-

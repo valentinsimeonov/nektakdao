@@ -300,7 +300,7 @@ async function main(): Promise<void> {
     }))
   );
 
-  console.log("\n📝 Contract Verification Commands:\n");
+  console.log("\n Contract Verification Commands:\n");
   console.log(`Token:`);
   console.log(`  npx hardhat verify --network ${network} ${token.address} "${CONFIG.tokenConstructor.name}" "${CONFIG.tokenConstructor.symbol}"\n`);
   
@@ -316,7 +316,7 @@ async function main(): Promise<void> {
   }
 
   console.log("=".repeat(70));
-  console.log("✅ All deployments complete! Next steps:");
+  console.log("All deployments complete! Next steps:");
   console.log("  1. Verify contracts on BaseScan (commands above)");
   console.log("  2. Save addresses to documentation");
   console.log("  3. Test governance flow");
@@ -327,7 +327,7 @@ main()
   .then(() => process.exit(0))
   .catch((err: any) => {
     console.error("\n" + "=".repeat(70));
-    console.error("❌ DEPLOYMENT FAILED");
+    console.error("DEPLOYMENT FAILED");
     console.error("=".repeat(70));
     console.error(err);
     process.exit(1);
@@ -336,4 +336,3 @@ main()
 
 
 
-  

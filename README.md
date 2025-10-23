@@ -43,26 +43,112 @@ We will add Work Score + Cycles/Time Multiplier on later iterations for easier b
 Basically we are simplyging the app in the beginning, then add everything we need
 
 
-### Step 1
+### Artistic Approach :)
 
-Project Structure
-- Github Repo
-- Github Khan ban
-
-High-level governance model
-
-Tokenomics
-
-Architecture
-
-Deployment Steps
+Let's compare the DAO with a Building.
+The Local environment is the Building, the Blockchain is the City and the road to the City is the Deployment.
+Then we need to make the Building(Local Environment) and a small path(Deployment) towards the City(Blockchain).
+Once we got the narrow path we will make it bigger into a road and then a Highway.
 
 
 
 
 
-If we compare the DAO to a Highway through the Jungle that takes us from A to B, and we say that the easiest way for us to build that highway is to make first a small, narrow path from A to B, and then once the first small path has been built enlarge the path to become a road and then finally a highway.
-If we compare the DAO to this path/road/highway, and we say that point A is our Local Environment and point B is the actual Deployment then we need to make the Local Environment and then deploy some silly Hello World Contract.
+### Sprint 1
+
+#### 1. Project Structure
+   
+    Github Repo
+
+    Github Khan ban
+
+#### 2. Reasearch & Documentation
+
+    Governance 
+
+    Tokenomics
+
+    Architecture
+
+    Deployment Steps
+
+
+
+#### 3. Local Environment
+
+    File Structure
+
+    Docker Compose Network
+
+
+
+#### 4. Deployment Steps
+
+    Github Actions
+
+    Hardhat Deploy and Verify
+
+
+
+Backlog from Sprint 1              
+Github Actions  --- Most probably will use existing from Nektak Portal - tailored for Docker Hub and AWS
+
+Github Khan Ban  --- Move to Sprint 2
+
+
+
+
+### Artistic Approach :)
+
+We got the Building(Local Environment) and the Path(Deployment) towards the City(Blokchain).
+Now we need to work on how the Building Interacts(Contracts) with the City and how the Building Interacts(Frontend) with the People who are using it.
+
+
+### Sprint 2
+
+#### 0. Backlog
+
+    Github Khan Ban
+
+#### 1. Contracts - Implement more of governance model
+    
+    Governor, Timelock, Token, Vesting.
+ 
+    Add events, admin controls, tests (unit & property), and gas profiling.
+
+    Tokenomics: total supply, distribution, delegation rules.
+
+    Voting parameters: voting delay, voting period (blocks/time), proposal threshold, quorum numerator.
+
+    Timelock delay (seconds) and custom roles
+        
+    Upgradeability strategy: self-upgradeable G2overnor? or immutable + new Governor to migrate?
+
+
+#### 2. Security & testing - Minimal for Sprint 2(maybe leave as backend if Contracts take too long), more on later Sprints
+
+    Unit tests (Hardhat + Waffle/Chai).
+
+    Integration tests Propose, Vote, Queue, Execute
+
+
+#### 3. Frontend (in parallel with Contracts)
+
+    Proposals Dashboard
+
+    Connect to testnet contracts first.
+    
+    Connect wallet, delegate, propose, view proposals, vote, queue/execute.
+
+    Wire subgraph later to provide historical queries.
+
+#### 4. Infra & deployment
+
+    Hardhat deploy scripts, verification automation, CI integration.
+
+    Subgraph + TheGraph setup.
+
+    Multisig / Safe treasury + bridging paths.
 
 
 
@@ -70,21 +156,6 @@ If we compare the DAO to this path/road/highway, and we say that point A is our 
 
 
 
-1. Local Environment
-
-File Structure
-
-Docker Compose Network
-
-
-
-
-
-2. Deployment Steps
-
-Github Actions
-
-Hardhat 
 
 
 

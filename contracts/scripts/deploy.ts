@@ -7,23 +7,29 @@ import dotenv from "dotenv";
 dotenv.config();
 
 /**
- * Deploy script (fixed Timelock constructor)
- *
+ * Deploy script for Nektak DAO with proper nonce management
+ * 
  * Usage:
  *   npx hardhat run scripts/deploy.ts --network base_sepolia
- *
- * Ensure contracts/.env contains DEPLOYER_PRIVATE_KEY, BASE_SEPOLIA_RPC_URL, etc.
  */
 
 type BigNumberish = any;
 
-interface Allocation { to: string; amount: BigNumberish; }
+interface Allocation { 
+  to: string; 
+  amount: BigNumberish; 
+}
+
 interface DeploymentConfig {
   tokenName: string;
   governorName: string;
   timelockName: string;
   vestingName: string;
-  tokenConstructor: { name: string; symbol: string; initialSupply: BigNumberish; };
+  tokenConstructor: { 
+    name: string; 
+    symbol: string; 
+    initialSupply: BigNumberish; 
+  };
   timelockMinDelaySeconds: number;
   timelockProposers: string[];
   timelockExecutors: string[];
@@ -55,22 +61,47 @@ const CONFIG: DeploymentConfig = {
     symbol: "NKT",
     initialSupply: hre.ethers.utils.parseUnits("100000000", 18),
   },
-  // For testnets you can set a small delay (e.g. 1) — for production use >= 2 days
+  // For testnets: 1 second, For production: 172800 (48 hours)
   timelockMinDelaySeconds: 1,
-  timelockProposers: [], // will grant proposer role to governor below
+  timelockProposers: [],
   timelockExecutors: ["0x0000000000000000000000000000000000000000"],
-  TREASURY_ADDRESS: process.env.TREASURY_ADDRESS ? process.env.TREASURY_ADDRESS : null,
+  TREASURY_ADDRESS: process.env.TREASURY_ADDRESS || null,
   initialAllocations: [],
   deployerAssignTo: process.env.DEPLOYER_ADDRESS || null,
 };
 
 type ContractInfo = { address: string };
 
+// Helper function to get gas settings
+async function getGasSettings() {
+  const feeData = await hre.ethers.provider.getFeeData();
+  const defaultPriority = feeData.maxPriorityFeePerGas ?? hre.ethers.utils.parseUnits("1", "gwei");
+  const defaultMaxFee = feeData.maxFeePerGas ?? hre.ethers.utils.parseUnits("50", "gwei");
+  
+  return {
+    maxPriorityFeePerGas: feeData.maxPriorityFeePerGas
+      ? feeData.maxPriorityFeePerGas.mul(12).div(10)
+      : defaultPriority,
+    maxFeePerGas: feeData.maxFeePerGas
+      ? feeData.maxFeePerGas.mul(12).div(10)
+      : defaultMaxFee,
+  };
+}
+
+// Helper to wait between deployments
+async function waitForConfirmation(contract: Contract, confirmations: number = 1) {
+  console.log(`[deploy] Waiting for ${confirmations} confirmation(s)...`);
+  await contract.deployTransaction.wait(confirmations);
+  // Add small delay to let nonce sync
+  await new Promise(resolve => setTimeout(resolve, 2000));
+}
+
 async function main(): Promise<void> {
   const signers = await hre.ethers.getSigners();
   if (!signers || signers.length === 0) {
     throw new Error("[deploy] No signers available. Check DEPLOYER_PRIVATE_KEY and hardhat.config.ts");
   }
+  
   const deployer = signers[0];
   console.log("[deploy] Deploying with account:", deployer.address);
 
@@ -78,9 +109,9 @@ async function main(): Promise<void> {
   const balance = hre.ethers.utils.formatEther(balBn);
   console.log("[deploy] Deployer balance (ETH):", balance);
 
-  const MIN_BALANCE_ETH = 0.0005; // adjust if necessary
+  const MIN_BALANCE_ETH = 0.0005;
   if (parseFloat(balance) < MIN_BALANCE_ETH) {
-    throw new Error(`[deploy] Aborting: deployer balance ${balance} ETH < ${MIN_BALANCE_ETH} ETH. Fund the account and retry.`);
+    throw new Error(`[deploy] Insufficient balance: ${balance} ETH < ${MIN_BALANCE_ETH} ETH`);
   }
 
   const network = hre.network.name;
@@ -98,111 +129,170 @@ async function main(): Promise<void> {
     contracts: {}
   };
 
-  // 1) Token
+  // Get gas settings once for all deployments
+  const gasSettings = await getGasSettings();
+  console.log("[deploy] Gas settings:", {
+    maxPriorityFeePerGas: hre.ethers.utils.formatUnits(gasSettings.maxPriorityFeePerGas, "gwei"),
+    maxFeePerGas: hre.ethers.utils.formatUnits(gasSettings.maxFeePerGas, "gwei"),
+  });
+
+  // ===== 1) Deploy Token =====
   console.log("\n[1] Deploying Token:", CONFIG.tokenName);
   const TokenFactory = await hre.ethers.getContractFactory(CONFIG.tokenName);
   let token: Contract;
+  
   try {
-    token = await TokenFactory.deploy(CONFIG.tokenConstructor.name, CONFIG.tokenConstructor.symbol);
-    await token.deployed();
+    const tokenNonce = await deployer.getTransactionCount("pending");
+    console.log(`[1] Using nonce: ${tokenNonce}`);
+    
+    token = await TokenFactory.deploy(
+      CONFIG.tokenConstructor.name,
+      CONFIG.tokenConstructor.symbol,
+      {
+        nonce: tokenNonce,
+        ...gasSettings,
+      }
+    );
+    
+    console.log(`[1] Token deployment transaction sent: ${token.deployTransaction.hash}`);
+    await waitForConfirmation(token, 1);
+    console.log(`[1] ${CONFIG.tokenName} deployed at: ${token.address}`);
+    
   } catch (err: any) {
-    console.error("[deploy] Token deploy failed:", err?.message || err);
+    console.error("[1] Token deploy failed:", err?.message || err);
     throw err;
   }
-  console.log(`[1] ${CONFIG.tokenName} deployed at: ${token.address}`);
+  
   deployments.contracts[CONFIG.tokenName] = { address: token.address };
 
-  // 2) TimelockController — NOTE: pass admin (4th arg)
+  // ===== 2) Deploy TimelockController =====
   console.log("\n[2] Deploying TimelockController:", CONFIG.timelockName);
   const TimelockFactory = await hre.ethers.getContractFactory(CONFIG.timelockName);
   let timelock: Contract;
+  
   try {
-    // *** IMPORTANT FIX: add deployer.address as the admin (4th arg)
+    const timelockNonce = await deployer.getTransactionCount("pending");
+    console.log(`[2] Using nonce: ${timelockNonce}`);
+    
     timelock = await TimelockFactory.deploy(
       CONFIG.timelockMinDelaySeconds,
       CONFIG.timelockProposers,
       CONFIG.timelockExecutors,
-      deployer.address // admin — commonly deployer during bootstrap
+      deployer.address, // admin
+      {
+        nonce: timelockNonce,
+        ...gasSettings,
+      }
     );
-    await timelock.deployed();
+    
+    console.log(`[2] Timelock deployment transaction sent: ${timelock.deployTransaction.hash}`);
+    await waitForConfirmation(timelock, 1);
+    console.log(`[2] ${CONFIG.timelockName} deployed at: ${timelock.address}`);
+    
   } catch (err: any) {
-    console.error("[deploy] Timelock deploy failed:", err?.message || err);
+    console.error("[2] Timelock deploy failed:", err?.message || err);
     throw err;
   }
-  console.log(`[2] ${CONFIG.timelockName} deployed at: ${timelock.address}`);
+  
   deployments.contracts[CONFIG.timelockName] = { address: timelock.address };
 
-  // 3) Governor (token, timelock)
+  // ===== 3) Deploy Governor =====
   console.log("\n[3] Deploying Governor:", CONFIG.governorName);
   const GovernorFactory = await hre.ethers.getContractFactory(CONFIG.governorName);
   let governor: Contract;
+  
   try {
-    governor = await GovernorFactory.deploy(token.address, timelock.address);
-    await governor.deployed();
+    const governorNonce = await deployer.getTransactionCount("pending");
+    console.log(`[3] Using nonce: ${governorNonce}`);
+    
+    governor = await GovernorFactory.deploy(
+      token.address,
+      timelock.address,
+      {
+        nonce: governorNonce,
+        ...gasSettings,
+      }
+    );
+    
+    console.log(`[3] Governor deployment transaction sent: ${governor.deployTransaction.hash}`);
+    await waitForConfirmation(governor, 1);
+    console.log(`[3] ${CONFIG.governorName} deployed at: ${governor.address}`);
+    
   } catch (err: any) {
-    console.error("[deploy] Governor deploy failed:", err?.message || err);
+    console.error("[3] Governor deploy failed:", err?.message || err);
     throw err;
   }
-  console.log(`[3] ${CONFIG.governorName} deployed at: ${governor.address}`);
+  
   deployments.contracts[CONFIG.governorName] = { address: governor.address };
 
-  // 4) Configure timelock roles: grant PROPOSER_ROLE to governor
-  console.log("\n[4] Granting PROPOSER_ROLE to governor...");
+  // ===== 4) Configure Timelock Roles =====
+  console.log("\n[4] Configuring Timelock roles...");
   try {
     const PROPOSER_ROLE = await timelock.PROPOSER_ROLE();
-    const grantTx = await timelock.grantRole(PROPOSER_ROLE, governor.address);
+    const currentNonce = await deployer.getTransactionCount("pending");
+    
+    const grantTx = await timelock.grantRole(PROPOSER_ROLE, governor.address, {
+      nonce: currentNonce,
+      ...gasSettings,
+    });
     await grantTx.wait();
-    console.log("[4] Granted PROPOSER_ROLE to governor");
+    console.log("[4] ✓ Granted PROPOSER_ROLE to Governor");
   } catch (err: any) {
     console.warn("[4] Warning: could not grant proposer role:", err?.message || err);
   }
 
-  // 5) Optional Vesting
+  // ===== 5) Optional: Deploy Vesting =====
   try {
-    console.log("\n[5] Trying to deploy Vesting (if present) ...");
+    console.log("\n[5] Deploying Vesting contract...");
     const VestFactory = await hre.ethers.getContractFactory(CONFIG.vestingName);
-    const vest = await VestFactory.deploy(token.address);
-    await vest.deployed();
+    const vestNonce = await deployer.getTransactionCount("pending");
+    
+    const vest = await VestFactory.deploy(token.address, {
+      nonce: vestNonce,
+      ...gasSettings,
+    });
+    await waitForConfirmation(vest, 1);
+    
     console.log(`[5] ${CONFIG.vestingName} deployed at: ${vest.address}`);
     deployments.contracts[CONFIG.vestingName] = { address: vest.address };
-  } catch {
-    console.log("[5] No vesting deployed (skipped).");
+  } catch (err: any) {
+    console.log("[5] Vesting deployment skipped:", err?.message || err);
   }
 
-  // 6) Transfer token ownership to timelock (if Ownable)
+  // ===== 6) Transfer Token Ownership =====
   try {
-    console.log("\n[6] Trying to transfer token ownership to timelock...");
+    console.log("\n[6] Transferring token ownership to Timelock...");
     if (typeof (token as any).transferOwnership === "function") {
-      const tx = await (token as any).transferOwnership(timelock.address);
+      const currentNonce = await deployer.getTransactionCount("pending");
+      const tx = await (token as any).transferOwnership(timelock.address, {
+        nonce: currentNonce,
+        ...gasSettings,
+      });
       await tx.wait();
-      console.log("[6] Token ownership transferred to timelock");
+      console.log("[6] ✓ Token ownership transferred to Timelock");
     } else {
-      console.log("[6] Token contract doesn't have transferOwnership() - skipping");
+      console.log("[6] Token doesn't have transferOwnership() - skipping");
     }
   } catch (err: any) {
-    console.warn("[6] Token ownership transfer failed/skipped:", err?.message || err);
+    console.warn("[6] Token ownership transfer failed:", err?.message || err);
   }
 
-  // 7) TREASURY note
-  if (CONFIG.TREASURY_ADDRESS) {
-    console.log(`\n[7] TREASURY_ADDRESS provided: ${CONFIG.TREASURY_ADDRESS}`);
-  } else {
-    console.log("\n[7] No TREASURY_ADDRESS provided; skipping transfers.");
-  }
-
-  // Save summary
+  // ===== 7) Save Deployment Info =====
   const outPath = path.join(OUTPUT_DIR, `${network}.json`);
   try {
     fs.writeFileSync(outPath, JSON.stringify(deployments, null, 2));
-    console.log("\n[deploy] Deployment summary written to:", outPath);
+    console.log("\n[deploy] ✓ Deployment summary saved:", outPath);
   } catch (err: any) {
-    console.warn("[deploy] Could not write deployments file:", err?.message || err);
-    console.log("[deploy] Summary:", JSON.stringify(deployments, null, 2));
+    console.warn("[deploy] Could not write file:", err?.message || err);
+    console.log("\n[deploy] Deployment data:");
+    console.log(JSON.stringify(deployments, null, 2));
   }
 
-  console.log("\n" + "=".repeat(60));
-  console.log("DEPLOYMENT COMPLETE");
-  console.log("=".repeat(60));
+  // ===== Summary =====
+  console.log("\n" + "=".repeat(70));
+  console.log("                    DEPLOYMENT SUCCESSFUL");
+  console.log("=".repeat(70));
+  
   console.table(
     Object.entries(deployments.contracts).map(([name, info]) => ({
       Contract: name,
@@ -210,18 +300,35 @@ async function main(): Promise<void> {
     }))
   );
 
-  console.log("\nVerify hints:");
-  console.log(`  npx hardhat verify --network ${network} ${token.address} "${CONFIG.tokenConstructor.name}" "${CONFIG.tokenConstructor.symbol}"`);
-  console.log(`  npx hardhat verify --network ${network} ${timelock.address} ${CONFIG.timelockMinDelaySeconds} "[]" '["0x0000000000000000000000000000000000000000"]'`);
-  console.log(`  npx hardhat verify --network ${network} ${governor.address} ${token.address} ${timelock.address}`);
+  console.log("\n📝 Contract Verification Commands:\n");
+  console.log(`Token:`);
+  console.log(`  npx hardhat verify --network ${network} ${token.address} "${CONFIG.tokenConstructor.name}" "${CONFIG.tokenConstructor.symbol}"\n`);
+  
+  console.log(`Timelock:`);
+  console.log(`  npx hardhat verify --network ${network} ${timelock.address} ${CONFIG.timelockMinDelaySeconds} "[]" '["0x0000000000000000000000000000000000000000"]' "${deployer.address}"\n`);
+  
+  console.log(`Governor:`);
+  console.log(`  npx hardhat verify --network ${network} ${governor.address} ${token.address} ${timelock.address}\n`);
+
+  if (deployments.contracts[CONFIG.vestingName]) {
+    console.log(`Vesting:`);
+    console.log(`  npx hardhat verify --network ${network} ${deployments.contracts[CONFIG.vestingName]?.address} ${token.address}\n`);
+  }
+
+  console.log("=".repeat(70));
+  console.log("✅ All deployments complete! Next steps:");
+  console.log("  1. Verify contracts on BaseScan (commands above)");
+  console.log("  2. Save addresses to documentation");
+  console.log("  3. Test governance flow");
+  console.log("=".repeat(70));
 }
 
 main()
   .then(() => process.exit(0))
   .catch((err: any) => {
-    console.error("\n" + "=".repeat(60));
-    console.error("DEPLOYMENT FAILED");
-    console.error("=".repeat(60));
+    console.error("\n" + "=".repeat(70));
+    console.error("❌ DEPLOYMENT FAILED");
+    console.error("=".repeat(70));
     console.error(err);
     process.exit(1);
   });

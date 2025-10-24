@@ -110,6 +110,12 @@ Now we need to work on how the Building Interacts(Contracts) with the City and h
 
     Github Khan Ban
 
+
+#### ADDED. Gnosis Safe
+
+    Safe Wallet (Gnosis Safe) MultiSig Wallet
+
+
 #### 1. Contracts - Implement more of governance model
     
     Governor, Timelock, Token, Vesting.

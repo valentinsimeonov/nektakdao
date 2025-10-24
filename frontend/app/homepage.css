@@ -1,0 +1,901 @@
+
+.HomePageMain{
+	/* border: 1px solid red; */
+
+	width: 100vw;
+	height: 100vh;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+
+
+	background-color: rgba(var(--bg));
+	
+}
+
+
+  .HomePageNavBarContainer{
+	/* border: 1px solid rgb(255, 240, 35); */
+	
+	height: 6vh;
+	width: 100vw;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+
+
+
+  .HomePageMaincolum{
+	/* border: 1px solid rgb(0, 26, 255); */
+
+	width: 100vw;
+	height: 94vh;
+
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+
+	overflow-y: auto;
+	overflow-x: hidden;
+
+	scrollbar-width: thin;
+	scrollbar-color: rgba(var(--accent)) transparent;
+
+}
+
+::-webkit-scrollbar {
+width: 5px;
+}
+
+::-webkit-scrollbar-track {
+background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+background: rgb(49, 57, 63);
+}
+
+
+
+
+
+
+
+
+
+
+  .HomePageLogorow{
+	/* border: 1px solid rgb(255, 216, 216); */
+	
+	width: 93vw;
+	height: 18vh;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+	box-shadow: 0 2px 2px -2px rgba(var(--fg-title));
+
+  }
+
+  .HomePageLogorowimg {
+	/* border: 1px solid rgb(131, 255, 131); */
+
+	width: 15vw;
+	height: 17vh;
+	object-fit: contain;
+  }
+
+  .HomePageTitlerow{
+	/* border: 1px solid rgba(var(--fg-title)); */
+
+	border-right: transparent;
+	border-left: transparent;
+	
+
+	width: 93vw;
+	height: 10vh;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+
+	/* box-shadow: 0 0 0 1px rgba(var(--fg-title)); */
+
+	box-shadow: 0 2px 2px -2px rgba(var(--fg-title));
+  }
+
+  .HomePageTitlerow span {
+	/* border: 1px solid rgb(238, 255, 0); */
+
+	color: rgba(var(--fg));
+	font-weight: 600;
+	font-size: 2rem;
+	font-family: 'Oswald', sans-serif;
+	/*  */
+
+  }
+ 
+  
+
+
+  .HomePageMottorow{
+	/* border: 1px solid rgba(var(--fg-title)); */
+	
+	border-right: transparent;
+	border-left: transparent;
+
+	width: 93vw;
+	height: 5vh;
+
+	padding: 0.2%;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+	/* box-shadow: 0 0 0 1px rgba(var(--fg-title)); */
+
+	box-shadow: 0 2px 2px -2px rgba(var(--fg-title));
+
+  }
+
+  .HomePageMottorow span {
+	/* border: 1px solid rgb(238, 255, 0); */
+
+	color: rgba(var(--fg));
+	
+	font-weight: 200;
+	font-size: 1rem;
+
+  }
+
+
+  .HomePageSystemsrow1{
+	/* border: 1px solid rgb(179, 255, 0); */
+
+	width: 93vw;
+	height: 80vh;
+
+	padding-top: 8vh;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: center;
+  }
+
+
+
+  .HomePageSystemsrow2{
+	/* border: 1px solid rgb(179, 255, 0); */
+
+	width: 93vw;
+	height: 80vh;
+
+	padding-top: 8vh;
+	padding-bottom: 8vh;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: center;
+  }
+
+
+  .HomePageSystem1column{
+	/* border: 1px solid rgb(255, 58, 58); */
+
+	width: 30vw;
+	height: 50vh;
+
+	border-radius: 2%;
+	padding: 1%;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	
+	background-color: rgba(var(--primary));
+	/* box-shadow: 0 0 0 1px rgba(var(--border-low)); */
+
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.096);
+
+
+  }
+
+
+
+  .HomePageSystem1column:hover {
+	background-color: rgba(var(--accent));
+  }
+
+
+  .HomePageMissionspan {
+	/* border: 1px solid rgb(47, 0, 255); */
+
+	width: 28vw;
+
+	color: rgba(var(--fg));
+	
+	font-weight: 250;
+	font-size: 1rem;
+
+	/* margin-right: 1%; */
+	padding: 2%;
+  }
+
+
+
+
+  .System1Contentrow{
+	/* border: 1px solid rgb(143, 14, 255); */
+	background-color: rgba(var(--objects));
+
+	width: 28vw;
+	height: 50vh;
+	border-radius: 2%;
+	padding: 4%;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+
+	overflow-y: auto;
+	overflow-x: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: rgba(var(--accent)) transparent;
+
+}
+
+::-webkit-scrollbar {
+width: 5px;
+}
+
+::-webkit-scrollbar-track {
+background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+background: rgb(49, 57, 63);
+}
+
+
+
+
+.System1Contentrow span {
+	/* border: 1px solid rgb(255, 130, 14); */
+
+	width: 26vw;
+
+	color: rgba(var(--fg));
+	
+	font-weight: 250;
+	font-size: 1rem;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.System2Contentrow{
+	/* border: 1px solid rgb(143, 14, 255); */
+
+	width: 28vw;
+	height: 50vh;
+	border-radius: 2%;
+	padding: 4%;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+
+	overflow-y: auto;
+	overflow-x: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: rgba(var(--accent)) transparent;
+
+	background-color: rgba(var(--objects));
+}
+
+::-webkit-scrollbar {
+width: 5px;
+}
+
+::-webkit-scrollbar-track {
+background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+background: rgb(49, 57, 63);
+}
+
+
+
+
+/* .System2Contentrow span {
+	border: 1px solid rgb(255, 130, 14);
+
+	width: 26vw;
+
+	color: rgba(var(--fg));
+	
+	font-weight: 250;
+	font-size: 1rem;
+
+} */
+
+
+
+
+
+.System2Contentspan1  {
+	border: 0.5px solid rgba(204, 196, 196, 0.322);
+
+	border-top: transparent;
+	border-left: transparent;
+	border-right: transparent;
+
+	width: 26vw;
+
+	color: rgba(var(--fg));
+	
+	font-weight: 250;
+	font-size: 1rem;
+
+	/* opacity: 1; */
+}
+
+
+
+
+
+.System2Contentspan2  {
+	/* border: 1px solid rgb(255, 130, 14); */
+
+	width: 26vw;
+
+	color: rgba(var(--fg));
+	
+	font-weight: 250;
+	font-size: 1rem;
+
+	/* margin-right: 1%; */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .HomepageMultiModuleContainer {
+	/* border: 1px solid rgb(35, 255, 244); */
+
+    position: fixed;
+    top: 16vh;
+    right: 0;
+
+	width: 32vw;
+    height: 84vh;
+	
+    z-index: 1000;
+    transform: translateX(100%);
+    animation: slideIn 0.5s forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media (max-width: 768px){
+
+
+	.HomePageMain{
+		/* border: 1px solid red; */
+	
+		height: auto;
+	
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+	
+
+	  
+	
+	
+
+	  .HomePageMottorow span {
+		/* border: 1px solid rgb(238, 255, 0); */
+	
+
+		font-size: 0.8rem;
+	
+	  }
+	
+	
+	.HomePageSystemsrow1{
+		/* border: 1px solid rgb(179, 255, 0); */
+	
+		height: auto;
+	
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: center;
+
+
+		padding-top: 4vh;
+		padding-bottom: 0vh;
+
+	  }
+
+	.HomePageSystemsrow2{
+		/* border: 1px solid rgb(0, 153, 255); */
+	
+		height: auto;
+	
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: center;
+
+		padding-top: 0vh;
+		padding-bottom: 8vh;
+	  }
+	
+	
+	  .HomePageSystem1column{
+		/* border: 1px solid rgb(0, 255, 255); */
+	
+		width: 80vw;
+
+		margin-top: 6vh;
+	  }
+	
+	
+
+	  .HomePageMissionspan {
+		/* border: 1px solid rgb(47, 0, 255); */
+	
+		width: 75vw;
+
+	  }
+	
+	
+	
+	
+	  .System1Contentrow{
+		/* border: 1px solid rgb(143, 14, 255); */
+	
+		width: 75vw;
+	  }
+	
+	
+	.System1Contentrow span {
+		/* border: 1px solid rgb(255, 130, 14); */
+	
+		width: 70vw;
+	}
+	
+	
+	
+	
+	
+	
+
+.System2Contentrow{
+	/* border: 1px solid rgb(143, 14, 255); */
+
+	width: 75vw;
+
+}
+
+
+
+/* .System2Contentrow span {
+	border: 1px solid rgb(255, 130, 14);
+
+	width: 26vw;
+
+	color: rgba(var(--fg));
+	
+	font-weight: 250;
+	font-size: 1rem;
+
+} */
+
+
+
+
+
+.System2Contentspan1  {
+	/* border: 0.5px solid rgb(204, 196, 196); */
+
+	width: 70vw;
+
+}
+
+
+
+
+.System2Contentspan2  {
+	/* border: 1px solid rgb(255, 130, 14); */
+
+	width: 70vw;
+
+}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
+	  .SignInMiddleLogincolumn{
+		/* border: 1px solid rgb(255, 102, 102); */
+	
+		width: 80vw;
+		height: 60vh;
+
+
+		border-radius: 2%;
+		
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: center;
+	}
+
+
+
+
+	.HomePageMiddleLogincolumn{
+		/* border: 1px solid rgb(102, 237, 255); */
+	
+		width: 80vw;
+		height: 10vh;
+
+		margin-top: 4vh;
+
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+	
+	
+	.HomePageCredentialsrow  {
+		/* border: 1px solid rgb(204, 196, 196); */
+	
+		width: 75vw;
+		height: 5vh;
+
+		margin-top: 0vh;
+	}
+	
+
+	
+	  .SignInErrorrow{
+		/* border: 1px solid rgb(69, 165, 255); */
+	
+		width: 75vw;
+	  }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	  .SignInEmailTitlerow{
+		/* border: 1px solid rgb(69, 255, 178); */
+	
+		width: 75vw;
+	  }
+	 
+	
+	  .SignInEmailInputrow {
+		/* border: 1px solid rgb(69, 255, 100); */
+	
+		width: 75vw;
+	  }
+	
+	
+	  .SignInPasswordTitlerow{
+		/* border: 1px solid rgb(69, 255, 246); */
+	
+		width: 75vw;
+	  }
+	
+
+	
+	
+	
+	  .SignInPasswordInput {
+		/* border: 1px solid rgb(69, 255, 100); */
+	
+		width: 75vw;
+	  }
+	
+	
+	  .SignInButton{
+		/* border: 1px solid rgb(165, 69, 255); */
+	
+		width: 75vw;
+	  }
+	
+
+	
+	
+	
+	
+	
+	  .SignInSignUp{
+		/* border: 1px solid rgb(255, 69, 178); */
+	
+		width: 75vw;
+	  }
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	.SignUpTitlerow{
+		/* border: 1px solid rgb(69, 165, 255); */
+	
+		width: 75vw;
+	  }
+	
+
+	
+	  .SignUpEmailTitlerow {
+		/* border: 1px solid rgb(255, 243, 69); */
+	
+		width: 75vw;
+	  }
+	 
+	
+	  .SignUpEmailInputrow{
+		/* border: 1px solid rgb(69, 255, 100); */
+	
+		width: 75vw;
+	  }
+	
+	
+	  .SignUpPasswordTitlerow {
+			/* border: 1px solid rgb(69, 255, 246); */
+	
+			width: 75vw;
+	  }
+	
+	
+	
+	  .SignUpPasswordInput {
+		/* border: 1px solid rgb(69, 255, 100); */
+	
+		width: 75vw;
+	  }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	.ForgotFeedbackrow{
+		/* border: 1px solid rgb(69, 165, 255); */
+	
+		width: 75vw;
+
+		margin-bottom: 13vh;
+
+	  }
+	
+
+	  .ForgotEmailTitlerow {
+		/* border: 1px solid rgb(255, 243, 69); */
+	
+		width: 75vw;
+	  }
+	
+	  .ForgotEmailInputrow {
+		/* border: 1px solid rgb(69, 255, 100); */
+	
+		width: 75vw;
+	  }
+
+
+
+
+  .HomePageFooterProductcolumn{
+	/* border: 1px solid rgb(81, 255, 0); */
+
+	width: 24vw;
+  }
+
+
+
+
+  	.HomepageMultiModuleContainer {
+		/* border: 1px solid rgb(35, 255, 244); */
+	
+		position: relative;
+		top: -280.8vh;
+		right: -9.9vw;
+
+		width: 79vw;
+		height: 84vh;
+	}
+
+	
+
+
+
+
+}

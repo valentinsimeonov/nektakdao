@@ -1,0 +1,474 @@
+
+  .LongProposalsMain {
+	/* border: 1px solid rgb(250, 0, 0); */
+
+		
+	height: 74.5vh;
+	width: 30vw;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+  }
+
+
+
+
+  .LongProposalsPostsscroll {
+	/* border: 1px solid rgb(150, 190, 90); */
+		
+	height: 74.3vh;
+	width: 30vw;
+
+  }
+/* 
+	overflow-y: auto;
+	overflow-x: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: #88888852 transparent;
+
+  }
+
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+
+  height: 10px;
+  width: 2px;
+}
+  
+ */
+
+
+
+.LongProposalsChatChannels {
+	/* border: 1px solid rgb(29, 70, 218); */
+
+	height: 74vh;
+	width: 30vw;	
+
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: flex-start;
+  }
+
+
+  .LongProposalsChatChannels2Long  {
+	/* border: 1px solid rgb(60, 62, 65); */
+
+	/* background: white; */
+
+	
+		/* background: rgb(49, 57, 63); */
+		background: rgb(40, 48, 53);
+	/* background: rgb(38, 44, 49);
+	background: rgb(33, 38, 43); */
+	
+	
+	width: 30vw;
+	height: 74vh;
+
+	border-radius: 5px;
+
+	/* margin-top: 0.5vh; */
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+
+	box-shadow: 0px 0px 3px 1px rgba(161, 157, 157, 0.4);
+
+  }
+
+
+
+
+  .LongProposalsChannelCardrow{
+	/* border: 1px solid rgb(108, 230, 28); */
+
+	width: 25vw;
+	height: 7vh;
+
+	padding: 1%;
+
+	border-radius: 5px;
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+  }
+
+
+  .LongProposalsChannelCardrow:hover {
+	/* border: 1px solid greenyellow; */
+
+	border-top: transparent;
+	border-left: transparent;
+	border-right: transparent;
+
+	border-bottom-right-radius: 1px solid green;
+	border-bottom-left-radius: 1px solid green;
+
+  }
+
+
+
+
+  .LongProposalsChannelCardLogoColumn{
+	/* border: 1px solid rgb(230, 28, 180); */
+   
+	width: 3vw;
+	height: 6.3vh;
+	margin-left: 0.3vw;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+  }
+
+  .LongProposalsChannelCardLogoColumn img{
+	/* border: 1px solid rgb(230, 183, 28); */
+
+	width: 2.5vw;
+	height: 4.6vh; 
+
+	border-radius: 100%;
+
+	object-fit: fill;
+  }
+
+
+
+  .LongProposalsChannelCardNameandDescriptionColumn{
+	/* border: 1px solid rgb(43, 7, 7); */
+
+	--width: 21.1vw;
+	width: var(--width);
+	height: calc(var(--width) / 1.618 / 1.618 / 1.618 / 1.618);
+  
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
+
+
+	overflow-y: auto;
+	overflow-x: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: #030303 #f1f1f1;
+  }
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+
+  height: 10px;
+  width: 2px;
+}
+
+
+
+
+.LongProposalsChatChannelsTitle{
+	/* border: 1px solid rgb(2, 61, 255); */
+
+	--width: 20.8vw;
+	width: var(--width);
+	height: calc(var(--width) / 1.618 / 1.618 / 1.618 / 1.618 / 1.618);
+  
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+
+	margin-top: 1%;
+
+	font-family: 'Roboto', sans-serif;
+	font-size: 1rem;
+	font-weight: 700;
+	color: #6e6b6b;
+
+	overflow: hidden; 
+  }
+
+
+
+
+
+
+  .LongProposalsChatChannelsShortBody{
+	/* border: 1px solid rgb(211, 11, 134); */
+
+	--width: 13.3vw;
+	width: var(--width);
+	height: calc(var(--width) / 1.618 / 1.618 / 1.618 / 1.618 / 1.618 / 1.618);
+
+	color: #ada6a6;
+	font-size: 0.8rem;
+	line-height: 1.0;
+	font-weight: 400;
+	text-align: left;
+
+	overflow: hidden; 
+	text-overflow: ellipsis; 
+  }
+
+
+  .LongProposalsChannelCard2rowLong{
+	/* border: 1px solid rgb(108, 230, 28); */
+
+	height: 62.6vh;
+	width: 27.9vw;
+
+	border-radius: 5px;
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+  }
+
+
+
+
+
+
+
+  .LongProposalsChannelCard2NameandDescriptionColumnLong{
+	/* border: 1px solid rgb(241, 29, 213); */
+	
+	height: 62.4vh;
+	width: 27.9vw;
+
+	padding: 1%;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
+
+	overflow: hidden; 
+	text-overflow: ellipsis; 
+
+	overflow-y: auto;
+	overflow-x: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: #fffde5 transparent;
+	}
+	
+	
+	::-webkit-scrollbar {
+	width: 5px;
+	}
+	
+	::-webkit-scrollbar-track {
+	background: transparent;
+	}
+	
+	::-webkit-scrollbar-thumb {
+	/* background: #888; */
+	/* background: #1b1b1b; */
+	
+	height: 10px;
+	width: 2px;
+	}
+
+
+
+
+.LongProposalsChannelCard2NameandDescriptionColumnLong span {
+	/* border: 1px solid rgb(134, 27, 93); */
+
+	height: auto;
+	width: 27.2vw;
+
+	color:rgb(105, 103, 103);
+	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+	font-weight: 600;
+	font-size: 0.9rem;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  .LongProposalsCategoryButtonsrow{
+	  /* border: 1px solid rgb(47, 241, 29); */
+  
+	  height: 3vh;
+	  width: 29vw;
+	  padding: 1%;
+  
+	  display: flex;
+	  flex-direction: row;
+	  justify-content: flex-start;
+	  align-items: center;
+  
+	}
+  
+  
+  
+  
+	.LongProposalsCategorybuttons {
+	  /* border: 1px solid rgb(0, 255, 242); */
+  
+	  height: 3vh;
+	  width: 8vw;
+  
+	  display: flex;
+	  flex-direction: row;
+	  justify-content: center;
+	  align-items: center;
+  
+	  border-radius: 4px;
+	  box-shadow: 0 0 2px rgba(52, 152, 219, 0.7);
+
+  
+  }
+
+
+  
+  .LongProposalsCategorybuttons span {
+	  /* color:rgb(105, 103, 103); */
+  		color: rgb(65, 76, 87);
+
+	  font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+	  font-weight: 400;
+	  font-size: 0.9rem;
+
+	  display: flex;
+	  flex-direction: row;
+	  justify-content: center;
+	  align-items: center;
+
+  }
+
+
+
+
+
+
+
+
+
+.LongProposalsChannelCard2VotingButtonsrow {
+	/* border: 1px solid rgb(28, 122, 230); */
+
+	--width: 27.9vw;
+	width: var(--width);
+	height: calc(var(--width)  / 1.618 / 1.618 / 1.618 / 1.618 /1.618 );
+  
+	border-radius: 5px;
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-evenly;
+}
+
+
+
+
+
+.LongProposalsChannelCard2VotingButtonsbutton{
+	/* border: 1px solid rgb(75, 230, 28); */
+
+   min-width: 3vw;
+   max-width: 8vw;
+
+   height: 4vh;
+
+   border-radius: 4px;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+   cursor: default;
+}
+
+
+  .LongProposalsChannelCard2VotingButtonsbutton:hover{
+	/* background: #faeded; */
+	box-shadow: 0 0 2px rgba(52, 152, 219, 0.7);
+
+
+  }
+
+
+
+  .LongProposalsChannelCard2VotingButtonsbutton img {
+	/* border: 1px solid rgb(190, 28, 230); */
+
+	width: 2vw;
+	height: 3.4vh;
+
+	border-top-left-radius: 4px;
+	border-bottom-left-radius: 4px;
+
+	object-fit:contain;
+  }
+
+  .LongProposalsChannelCard2VotingButtonsbutton span {
+	/* border: 1px solid rgb(190, 28, 230); */
+
+	min-width: 2vw;
+	max-width: 5.8vw;
+	height: 3.8vh;
+
+	border-top-right-radius: 4px;
+	border-bottom-right-radius: 4px;
+
+	color:rgb(204, 196, 196);
+	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+	font-weight: 600;
+	font-size: 1.2rem;
+	text-align: center;
+  }	  
+
+
+
+
+
+
+
+/*
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+/////////////////  The Great Clean /////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+*/

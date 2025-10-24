@@ -1,0 +1,605 @@
+
+
+
+  .CreateProposalsChatMain {
+	/* border: 1px solid rgb(250, 0, 0); */
+	
+	
+	height: 70vh;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+  }
+
+
+
+  .CreateProposalsPosts {
+	/* border: 1px solid rgb(150, 190, 90); */
+		
+	height: 90vh;
+
+	overflow-y: auto;
+	overflow-x: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: #030303 #f1f1f1;
+  }
+
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+
+  height: 10px;
+  width: 2px;
+}
+  
+
+
+
+.CreateProposalsChatChannels {
+	/* border: 1px solid rgb(29, 70, 218); */
+
+	width: 30vw;
+	height: 87.4vh;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+  }
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .CreateProposalsChatChannels2Longcolumn  {
+	/* border: 1px solid rgb(60, 62, 65); */
+
+	/* background: rgb(255, 255, 255); */
+	
+
+
+
+		/* background: rgb(49, 57, 63); */
+		background: rgb(40, 48, 53);
+	/* background: rgb(38, 44, 49);
+	background: rgb(33, 38, 43); */
+	
+
+	width: 30vw;
+	height: 74.6vh;
+
+	border-radius: 5px;
+
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+
+	box-shadow: 0px 0px 3px 1px rgba(161, 157, 157, 0.4);
+
+  }
+
+
+
+  .CreateProposalsChannelCardrow{
+	/* border: 1px solid rgb(108, 230, 28); */
+
+
+   width: 25vw;
+   height: 7vh;
+	
+	padding: 1%;
+
+	border-radius: 5px;
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+  }
+
+/* 
+  .CreateProposalsChannelCardrow:hover {
+	border: 1px solid greenyellow;
+
+	border-top: transparent;
+	border-left: transparent;
+	border-right: transparent;
+
+	border-bottom-right-radius: 1px solid green;
+	border-bottom-left-radius: 1px solid green;
+
+  } */
+
+
+
+
+
+  .CreateProposalsChannelCardLogoColumn{
+	/* border: 1px solid rgb(230, 28, 180); */
+  
+	width: 3vw;
+	height: 6.3vh;
+	/* margin-left: 0.3vw; */
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+  }
+
+  .CreateProposalsChannelCardLogoColumn img{
+	/* border: 1px solid rgb(230, 183, 28); */
+
+	width: 2.5vw;
+	height: 4.6vh; 
+
+	border-radius: 100%;
+
+	object-fit: fill;
+
+
+
+  }
+
+
+
+
+
+  .CreateProposalsChannelCardrow input[type="file"]::-webkit-file-upload-button {
+	visibility: hidden;
+  }
+
+/* Style the file input container */
+.CreateProposalsChannelCardrow input[type="file"] {
+	width: 0.4vw;
+	height: 1vh;
+	/* margin-top: 4.8vh; */
+	/* margin-left: 2vw; */
+
+	position: relative;
+	top: 2vh;
+	left: 0.7vw;
+
+	overflow: hidden; 
+  }
+  
+  /* Style the pseudo-element to show the plus sign */
+  .CreateProposalsChannelCardrow input[type="file"]::before {
+	content: '+';
+	color: whitesmoke;
+
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+
+	/* background-color: #fc9090;  */
+	
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	
+	font-size: 0.7rem; 
+	font-weight: 300;
+	cursor: pointer; 
+  }
+
+
+  
+  .CreateProposalsChannelCardrow input[type="file"] + span {
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .CreateProposalsChannelCardNameandDescriptionColumn{
+	/* border: 1px solid rgb(43, 7, 7); */
+
+	--width: 21.1vw;
+	width: var(--width);
+	height: calc(var(--width) / 1.618 / 1.618 / 1.618 / 1.618);
+  
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
+
+	overflow-y: auto;
+	overflow-x: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: #030303 #f1f1f1;
+  }
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+
+  height: 10px;
+  width: 2px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.MakeProposalTitleField{
+	/* border: 1px solid rgb(21, 255, 0); */
+
+	background: transparent;
+
+	height: 3.5vh;
+	width: 20.9vw;
+
+	border-radius: 4px;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+	outline: none;
+
+	overflow: none;
+	
+  }
+
+
+
+  .CreateProposalsChatChannelsShortBody{
+	/* border: 1px solid rgb(211, 11, 134); */
+
+	--width: 13.3vw;
+	width: var(--width);
+	height: calc(var(--width) / 1.618 / 1.618 / 1.618 / 1.618 / 1.618 / 1.618);
+
+	color: #ada6a6;
+	font-size: 0.8rem;
+	line-height: 1.0;
+	font-weight: 400;
+	text-align: left;
+
+	overflow: hidden; 
+	text-overflow: ellipsis; 
+  }
+
+
+  .CreateProposalsChannelCard2rowLong{
+	/* border: 1px solid rgb(28, 58, 230); */
+
+	height: 62vh;
+	width: 27.9vw;
+
+
+	border-radius: 5px;
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+  }
+
+
+
+
+
+
+  .CreateProposalsChannelCard2NameandDescriptionColumnLong{
+	/* border: 1px solid rgb(241, 29, 213); */
+
+	height: 61.8vh;
+	width: 29.2vw;
+	padding: 1%;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
+
+	overflow-y: auto;
+	overflow-x: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: #fffdf5fd transparent;
+	}
+	
+	
+	::-webkit-scrollbar {
+	width: 5px;
+	}
+	
+	::-webkit-scrollbar-track {
+	background: transparent;
+	}
+	
+	::-webkit-scrollbar-thumb {
+	background: #888;	
+	height: 10px;
+	width: 2px;
+	}
+
+
+
+
+.CreateProposalsChannelCard2NameandDescriptionColumnLong div span {
+	/* border: 1px solid rgb(134, 27, 93); */
+	
+	color:rgb(105, 103, 103);
+
+	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+	font-weight: 600;
+	font-size: 1rem;
+
+}
+
+
+
+
+.CreateProposalsCategoryButtonsrow{
+	/* border: 1px solid rgb(47, 241, 29); */
+
+	height: 3vh;
+	width: 29vw;
+	padding: 1%;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+
+  }
+
+
+
+
+  .CreateProposalsCategorybuttons {
+	/* border: 1px solid rgb(0, 255, 242); */
+
+	height: 3vh;
+	width: 8vw;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-right: 1vw;
+
+	border-radius: 4px;
+
+
+}
+
+.CreateProposalsCategorybuttons:hover{
+	/* background: rgb(239, 240, 241); */
+	box-shadow: 0 0 2px rgba(52, 152, 219, 0.7);
+
+}
+
+
+.CreateProposalsCategorybuttons span {
+	color:rgb(105, 103, 103);
+
+	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+	font-weight: 400;
+	font-size: 0.9rem;
+}
+
+.CreateProposalsCategorybuttons:hover span {
+	/* color: rgb(96, 112, 128); */
+	color: rgb(139, 157, 175);
+
+}
+
+.CreateProposalsCategorybuttonsSelected{
+	/* background: rgb(230, 232, 235); */
+	box-shadow: 0 0 2px rgba(52, 152, 219, 0.7);
+
+}
+
+
+.CreateProposalsCategorybuttonsSelected span {
+	color: rgb(65, 76, 87);
+
+	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+	font-weight: 600;
+	font-size: 0.9rem;
+}
+
+
+
+
+.MakeProposalBodyField{
+	/* border: 1px solid rgb(21, 255, 0); */
+	
+	background: transparent;
+	
+	width: 26.8vw;
+	min-height: 50px;
+
+	border-radius: 4px;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+	outline: none;
+	resize: none;	
+
+
+	color:rgb(105, 103, 103);
+	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+	font-weight: 600;
+	font-size: 1rem;
+  }
+
+
+
+
+  .CreateProposalsChannelCard2VotingButtonsrow {
+	/* border: 1px solid rgb(28, 122, 230); */
+
+	--width: 27.9vw;
+	width: var(--width);
+	height: calc(var(--width)  / 1.618 / 1.618 / 1.618 / 1.618 /1.618 );
+  
+	border-radius: 5px;
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: right;
+}
+
+
+
+
+
+
+
+
+
+.MakeProposalButtonbutton{
+	/* border: 1px solid rgb(105, 103, 103); */
+
+   width: 5.5vw;
+   height: 4vh;
+
+   border-radius: 4px;
+	
+   margin-right: 2vw;
+
+   display: flex;
+   justify-content: center;
+   align-items: center;
+
+   cursor: default;
+
+/* background: #ffffff; */
+	
+}
+
+
+  .MakeProposalButtonbutton:hover{
+	/* background: #2b2a2a; */
+	box-shadow: 0 0 2px rgba(52, 152, 219, 0.7);
+
+
+  }
+
+  .MakeProposalButtonbutton span {
+	/* border: 1px solid rgb(190, 28, 230); */
+
+	width: 5vw;
+	height: 3vh;
+
+	border-radius: 4px;
+
+	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+	font-weight: 600;
+	font-size: 1.2rem;
+
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center; 
+
+	color:rgb(105, 103, 103);
+
+  }	  
+
+  .MakeProposalButtonbutton:hover span {
+	/* color:rgb(238, 231, 231); */
+	/* color: rgb(49, 58, 66); */
+	color: rgb(139, 157, 175);
+
+
+}
+
+
+
+
+
+/*
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+/////////////////  The Great Clean /////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+*/

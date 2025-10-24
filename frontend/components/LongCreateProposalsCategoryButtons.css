@@ -1,0 +1,86 @@
+  .LongCreateProposalsCategoryButtonMain{
+	/* border: 1px solid rgb(0, 247, 255); */
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	width: 29.6vw;
+	height: 5vh;
+  }
+
+
+
+
+  .LongCreateProposalsCategoryButton {
+	/* border: 1px solid rgb(0, 255, 242); */
+
+	width: 28vw;
+	height: 3.4vh;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	border-radius: 2px;
+
+}
+
+
+.LongCreateProposalsCategoryButton:hover{
+	/* background: rgb(239, 240, 241); */
+			/* background: rgb(49, 57, 63); */
+			background: rgba(77, 73, 73, 0.932);
+
+}
+
+
+.LongCreateProposalsCategoryButton span {
+	color:rgb(105, 103, 103);
+
+	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+	font-weight: 750;
+	font-size: 1.4rem;
+}
+
+.LongCreateProposalsCategoryButton:hover span {
+	/* color: rgb(65, 76, 87); */
+	color: rgb(164, 195, 221);
+
+
+}
+
+.LongCreateProposalsCategoryButtonSelected{
+	/* background: rgb(230, 232, 235); */
+			/* background: rgb(49, 57, 63); */
+			background: rgba(77, 73, 73, 0.932);
+
+}
+
+
+.LongCreateProposalsCategoryButtonSelected span {
+	/* color: rgb(65, 76, 87); */
+	color: rgb(164, 195, 221);
+
+	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+	font-weight: 7500;
+	font-size: 1.4rem;
+}
+
+
+
+
+
+
+
+
+/*
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+/////////////////  The Great Clean /////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+*/

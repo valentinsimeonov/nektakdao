@@ -1,0 +1,465 @@
+
+
+  .UserBarMainrow{
+		/* border: 1px solid rgb(252, 58, 58); */
+
+		width: 49.6vw;
+		height: 10vh;
+
+		padding: 1%;
+
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+
+
+  }
+
+
+
+
+
+  .UserBarButtonrow{
+	/* border: 1px solid rgb(0, 58, 250); */
+	
+	width: 29.8vw;
+	height: 5.5vh;
+
+	display:flex;
+	flex-direction: row;
+	justify-content: space-evenly;
+	align-items: center;
+
+  }
+
+
+
+  .UserBarbutton {
+	/* border: 1px solid rgb(0, 255, 242); */
+
+	width: 8vw;
+	height: 3.4vh;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	border-radius: 2px;
+
+}
+
+
+.UserBarbutton:hover{
+	/* background: rgb(239, 240, 241); */
+	background: rgba(77, 73, 73, 0.932);
+
+}
+
+
+.UserBarbutton span {
+	color:rgb(105, 103, 103);
+
+	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+	font-weight: 600;
+	font-size: 0.9rem;
+}
+
+.UserBarbutton:hover span {
+	/* color:rgb(238, 231, 231); */
+	/* color: rgb(65, 76, 87); */
+	color: rgb(164, 195, 221);
+
+
+}
+
+
+.UserBarbuttonSelected{
+	/* background: rgb(230, 232, 235); */
+	background: rgba(77, 73, 73, 0.932);
+
+}
+
+
+.UserBarbuttonSelected span {
+	/* color: rgb(65, 76, 87); */
+	color: rgb(164, 195, 221);
+
+	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+	font-weight: 600;
+	font-size: 0.9rem;
+}
+
+
+
+
+
+
+
+
+  .UserBarUserCard{
+	/* border: 1px solid silver; */
+	border: 1px solid rgb(60, 62, 65);
+
+	height: 5.5vh;
+	width: 18.8vw;
+  }
+
+
+  .UserBarUserCard button {
+	/* border: 1px solid rgb(250, 234, 6); */
+
+	/* border: 1px solid rgb(60, 62, 65); */
+
+	width: 18.6vw;
+	height: 5.5vh;
+	border-radius: 5px;
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+  }
+
+
+
+  .UserBarUserCard button:hover {
+	/* border: 1px solid rgb(255, 255, 255); */
+	/* background: rgb(33, 38, 44); */
+	background: rgb(41, 47, 54);
+
+  }
+
+
+
+
+
+
+
+  .UserBarCardrow{
+	/* border: 1px solid rgb(108, 230, 28); */
+
+
+	width: 18vw;
+	height: 5.5vh;
+	border-radius: 5px;
+
+	padding: 1%;
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+
+
+  }
+
+
+  .UserBarCardLogoColumn{
+	/* border: 1px solid rgb(230, 28, 180); */
+
+
+	width: 3vw;
+	height: 5.5vh;
+	margin-left: 0.3vw;
+	/* border-radius: 10px; */
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+  }
+
+  .UserBarCardLogoColumn img{
+	/* border: 1px solid rgb(230, 183, 28); */
+
+
+	width: 2.5vw;
+	height: 4.6vh;
+
+	border-radius: 100%;
+
+	object-fit: fill;
+
+	/* border-radius: 10px; */
+
+	/* display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center; */
+  }
+
+
+
+
+.UserBarCardNameandDescriptionColumn{
+	/* border: 1px solid rgb(255, 255, 255); */
+
+	width: 14.5vw;
+	height: 5.5vh;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+
+
+  .ChatUserBarsTitle{
+	/* border: 1px solid white; */
+
+	width: 14.5vw;
+
+	height: 3vh;
+	margin-top: 1%;
+
+	font-family: 'Roboto', sans-serif;
+	font-size: 1rem;
+	font-weight: bold;
+	color: #6e6b6b;
+	/* background: rgb(41, 47, 54); */
+
+	overflow: hidden; 
+	/* text-overflow: ellipsis; */
+  }
+
+
+  .ChatUserBarsShortBody{
+	/* border: 1px solid rgb(211, 11, 134); */
+
+	width: 15vw;
+	height: 2vh;
+
+	font-size: 0.8rem;
+	color: #ada6a6;
+	line-height: 1.0;
+
+	overflow: hidden; 
+	text-overflow: ellipsis; 
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    .UserBarLogoButtonrow{
+		border: 1px solid rgb(58, 213, 252);
+
+		width: 5vw;
+		height: 9.8vh;
+
+		/* padding: 1%; */
+
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+	}
+
+
+
+.UserBarComunitiesbutton{
+	/* border: 1px solid rgba(255, 255, 255, 0.774); */
+
+	/* border: 1px solid rgba(77, 127, 201, 0.774); */
+	border-radius: 7px;
+	
+	/* background: rgb(49, 57, 63); */
+		background: rgb(40, 48, 53);
+	/* background: rgb(38, 44, 49);
+	background: rgb(33, 38, 43); */
+	
+	
+	/* margin-top: 1%; */
+	margin-left: 0.5%;
+	/* margin-left: 0.5%; */
+	/* padding: 1%; */
+
+	
+	width: 4vw; 
+	height: 7.5vh;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+  }
+
+  .UserBarComunitiesbutton img {
+	/* border: 1px solid rgba(202, 33, 33, 0.774); */
+
+	border-top-left-radius: 7px;
+	border-top-right-radius: 7px;
+
+	/* width: 70%;
+	height: 70%; */
+
+	width: 3.8vw; 
+	height: 5vh;
+	padding: 2%;
+	object-fit: contain;
+	
+  }
+
+  .UserBarComunitiesbutton span {
+	/* border: 1px solid white; */
+
+	border-bottom-left-radius: 7px;
+	border-bottom-right-radius: 7px;
+
+
+	color: rgb(77, 126, 201);
+
+	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+	font-weight: 600;
+	/* font-size: 0.6rem; */
+	text-align: center;
+	font-size: 0.7rem;
+
+	width: 3.8vw; 
+	height: 2vh;
+
+	padding: 1%;
+
+	overflow: hidden;
+
+  }
+
+  .UserBarComunitiesbutton:hover {
+	/* border: 1px solid rgb(56, 93, 148); */
+	/* border: 1px solid rgb(14, 128, 124); */
+	background: rgb(49, 57, 63);
+	transform: scale(1.1);
+  }
+
+
+  .UserBarComunitiesbuttonSelected{
+	border: 1px solid rgb(200, 224, 224);
+  }
+
+
+
+
+
+
+
+
+
+.UserBarCreateCommsbutton{
+	/* border: 1px solid rgba(255, 255, 255, 0.774); */
+
+	/* border: 1px solid rgba(77, 127, 201, 0.774); */
+	border-radius: 7px;
+	
+	/* background: rgb(49, 57, 63); */
+		background: rgb(40, 48, 53);
+	/* background: rgb(38, 44, 49);
+	background: rgb(33, 38, 43); */
+	
+	
+	/* margin-top: 1%; */
+	margin-left: 0.5%;
+	/* margin-left: 0.5%; */
+	/* padding: 1%; */
+
+	
+	width: 2vw; 
+	height: 7.5vh;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+  }
+
+
+
+  .UserBarCreateCommsbutton span {
+	/* border: 1px solid white; */
+
+	border-bottom-left-radius: 7px;
+	border-bottom-right-radius: 7px;
+
+
+	color: rgb(77, 126, 201);
+
+	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+	font-weight: 600;
+	/* font-size: 0.6rem; */
+	text-align: center;
+	font-size: 0.7rem;
+
+	width: 3.8vw; 
+	height: 2vh;
+
+	padding: 1%;
+
+	overflow: hidden;
+
+  }
+
+  .UserBarCreateCommsbutton:hover {
+	/* border: 1px solid rgb(56, 93, 148); */
+	/* border: 1px solid rgb(14, 128, 124); */
+	background: rgb(49, 57, 63);
+	transform: scale(1.1);
+  }
+
+
+  .UserBarCreateCommsbuttonSelected{
+	border: 1px solid rgb(200, 224, 224);
+  }
+
+
+
+
+
+
+
+
+  .UserBarCommsButtonrow{
+	border: 1px solid rgb(58, 213, 252);
+
+	width: 40.8vw;
+	height: 9.8vh;
+
+	margin-left: 0.5vw;
+
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+
+}

@@ -38,6 +38,3 @@ contract NektakToken is ERC20, ERC20Permit, ERC20Votes, Ownable {
         super._burn(account, amount);
     }
 }
-
-
-

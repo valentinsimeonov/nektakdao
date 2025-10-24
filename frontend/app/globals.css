@@ -1,0 +1,508 @@
+/*globals.css*/
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* 1) Base (light) theme vars */
+:root {
+
+  --font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+  --font-size: 16px;
+  --font-weight: 400;
+
+  --border-radius-card: 8px;
+  --border-radius-button: 4px;
+
+  --price-up: #10B981;   /* tailwind-green-500 */
+  --price-down: #EF4444; /* tailwind-red-500 */
+
+    /* text colors */
+    --fg-lowest:            77,  85,  96, 1;   /* very subtle text */
+    --fg-low:              102, 102, 102, 1;   /* secondary text */
+    --fg:                   34,  34,  34, 1;   /* body copy */
+    --fg-high:             51,  51,  51, 1;   /* highlighted text */
+    --fg-title:            20,  48, 100, 1;   /* headings */
+    --fg-title-high:       30,  78, 155, 1;   /* heading hover/active */
+    --fg-search:           143, 142, 142, 1;   /* placeholder/search text */
+    --fg-error:            255, 0, 0, 0.726;
+  
+    /* backgrounds & surfaces */
+    --bg:                 251, 251, 251, 1;   /* page background */
+    --primary-low:        255, 255, 255, 1;   /* panels, sidebars */
+    --primary:            255, 255, 255, 1;    /* cards, modals */
+    --objects:            207, 228, 255, 0.3;    /* inputs, dropdowns */
+    --accent:             207, 228, 255, 0.5;   /* borders, dividers */
+    --accent-high:        160, 180, 205, 1;   /* hovered borders */
+  
+    /* special icons */
+    --special-char-circle: 90, 160, 210, 1;   /* info badges */
+  
+  
+    --border-low: 0, 0, 0, 0.096;
+    --border-high: 0, 0, 0, 0.4;
+
+}
+
+
+
+
+
+/* 2) Dark theme override */
+html.dark {
+
+  --fg-lowest: 110, 107, 107, 0.999;
+  --fg-low: 173, 166, 166, 0.999;
+  --fg: 204, 196, 196, 0.999;
+  --fg-high: 238, 231, 231, 0.999;
+
+  --fg-title: 77, 126, 201, 0.999;
+  --fg-title-high: 92, 153, 245, 0.999;
+  --fg-search: 143, 142, 142, 0.999;
+  --fg-error: 255, 0, 0, 0.726;
+
+
+  --bg:   22, 26, 29, 0.999;
+  --primary-low: 29, 35, 39, 0.999;
+  --primary: 33, 38, 43, 0.999;
+  --objects: 40, 48, 53, 0.999;
+  --accent: 49, 57, 63, 0.999;
+  --accent-high: 77, 89, 100, 0.999;
+
+
+  --border-low: 255, 255, 255, 0.1;
+  --border-high: 255, 255, 255, 0.4;
+
+}
+
+
+
+
+/* Web3 Theme Overrides */
+html.theme-web3 {
+  /* Text */
+  --fg-lowest:           100, 100, 110, 1;   /* tiny captions */
+  --fg-low:              140, 140, 160, 1;   /* secondary text */
+  --fg:                  180, 180, 200, 1;   /* body copy */
+  --fg-high:             230, 230, 250, 1;   /* highlights */
+  --fg-title:            160, 130, 255, 1;   /* headings */
+  --fg-title-high:       200, 170, 255, 1;   /* heading hover/active */
+  --fg-search:           160, 160, 160, 1;   /* placeholder/search */
+
+  /* Backgrounds & Surfaces */
+  --bg:                    8,  10,  25, 1;   /* page background */
+  --primary-low:          15,  18,  45, 1;   /* panels, sidebars */
+  --primary:              20,  22,  55, 1;   /* cards, modals */
+  --objects:              26,  30,  66, 1;   /* inputs, dropdowns */
+  --accent:                0, 255, 212, 0.300;   /* neon cyan borders/dividers */
+  --accent-high:           0, 200, 167, 0.800;    /* hovered borders */
+
+  --border-low: 255, 255, 255, 0.1;
+  --border-high: 255, 255, 255, 0.4;
+
+
+}
+
+
+
+html.theme-mono {
+
+  --fg-lowest:           120, 120, 120, 1;   /* tiny captions */
+  --fg-low:              140, 140, 140, 1;   /* secondary text */
+  --fg:                  160, 160, 160, 1;   /* body copy */
+  --fg-high:             200, 200, 200, 1;   /* highlights */
+  --fg-title:             74, 144, 226, 1;   /* headings */
+  --fg-title-high:       104, 174, 236, 1;   /* heading hover/active */
+  --fg-search:           130, 130, 130, 1;   /* placeholder/search */
+
+  /* Backgrounds & Surfaces */
+  --bg:                    202, 227, 255, 1; /* page background */
+  --primary-low:          235, 243, 253, 0.700; /* panels, sidebars */
+  --primary:              225, 238, 252, 0.800; /* cards, modals */
+  --objects:              215, 233, 250, 0.800; /* inputs, dropdowns */
+
+  /* Accent */
+  --accent:                74, 144, 226, 0.150; /* primary blue */
+  --accent-high:          104, 174, 236, 0.200; /* hovered blue */
+
+  --border-low: 255, 255, 255, 0.1;
+  --border-high: 255, 255, 255, 0.4;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+html.theme-pastel {
+
+
+--fg-lowest:          90,  90,  90, 1;    /* tiny captions */
+--fg-low:            120, 120, 120, 1;    /* secondary text */
+--fg:                150, 150, 150, 1;    /* body copy */
+--fg-high:           200, 200, 200, 1;    /* highlights */
+--fg-title:          188, 138, 228, 1;    /* headings (lavender) */
+--fg-title-high:     215, 165, 245, 1;    /* heading hover/active */
+--fg-search:         160, 160, 160, 1;    /* placeholder/search */
+
+/* Backgrounds & Surfaces */
+--bg:                230, 225, 200, 1;    /* page background (soft ivory) */
+--primary-low:       240, 235, 230, 0.500;    /* panels, sidebars */
+--primary:           230, 225, 220, 0.800;    /* cards, modals */
+--objects:           220, 215, 210, 0.800;    /* inputs, dropdowns */
+
+/* Accents (pastel mint & blush) */
+--accent:            168, 230, 207, 0.400;    /* mint borders/dividers */
+--accent-high:       204, 246, 229, 0.400;    /* mint hover */
+
+--border-low: 255, 255, 255, 0.1;
+--border-high: 255, 255, 255, 0.4;
+}
+
+
+
+
+
+html.theme-analogous {
+
+  --fg-lowest:           110, 110, 110, 1;
+  --fg-low:              130, 130, 130, 1;
+  --fg:                  150, 150, 150, 1;
+  --fg-high:             190, 190, 190, 1;
+  --fg-title:             24, 188, 156, 1; /* turquoise */
+  --fg-title-high:        22, 160, 133, 1; /* hover */
+  --fg-search:           140, 140, 140, 1;
+
+  /* Backgrounds & Surfaces */
+  --bg:                    250, 255, 254, 1;
+  --primary-low:          235, 247, 245, 0.800;
+  --primary:              225, 243, 241, 0.800;
+  --objects:              215, 239, 238, 0.800;
+
+  /* Accent */
+  --accent:               72, 201, 176, 0.400; /* teal */
+  --accent-high:          26, 188, 156, 0.500; /* turquoise */
+
+  --border-low: 255, 255, 255, 0.1;
+  --border-high: 255, 255, 255, 0.4;
+
+}
+
+
+
+
+html.theme-complementary {
+
+
+  --fg-lowest:           100, 100, 100, 1;
+  --fg-low:              120, 120, 120, 1;
+  --fg:                  140, 140, 140, 1;
+  --fg-high:             180, 180, 180, 1;
+  --fg-title:            155,  89, 182, 1; /* purple */
+  --fg-title-high:       198,  82, 158, 1; /* hover */
+  --fg-search:           130, 130, 130, 1;
+
+  /* Backgrounds & Surfaces */
+  --bg:                    254, 252, 245, 1;
+  --primary-low:          250, 245, 225, 0.800;
+  --primary:              245, 240, 205, 0.800;
+  --objects:              240, 235, 185, 0.800;
+
+  /* Accent */
+  --accent:              241, 196,  15, 0.200; /* yellow */
+  --accent-high:         243, 156,  18, 0.200; /* hover */
+
+  --border-low: 255, 255, 255, 0.1;
+  --border-high: 255, 255, 255, 0.4;
+}
+
+
+
+html.theme-triadic {
+
+  /* Text */
+  --fg-lowest:           100, 100, 100, 1;
+  --fg-low:              120, 120, 120, 1;
+  --fg:                  140, 140, 140, 1;
+  --fg-high:             180, 180, 180, 1;
+  --fg-title:            231,  76,  60, 1; /* red */
+  --fg-title-high:       192,  57,  43, 1; /* hover */
+  --fg-search:           130, 130, 130, 1;
+
+  /* Backgrounds & Surfaces */
+  --bg:                    255, 255, 255, 1;
+  --primary-low:          250, 250, 250, 1;
+  --primary:              245, 245, 245, 1;
+  --objects:              240, 240, 240, 1;
+
+  /* Accent */
+  --accent:               52, 152, 219, 0.200; /* blue */
+  --accent-high:          41, 128, 185, 0.200; /* hover */
+
+  --border-low: 255, 255, 255, 0.1;
+  --border-high: 255, 255, 255, 0.4;
+
+}
+
+
+
+
+html.theme-tetradic {
+
+
+ /* Text */
+ --fg-lowest:           100, 100, 100, 1;
+ --fg-low:              120, 120, 120, 1;
+ --fg:                  140, 140, 140, 1;
+ --fg-high:             180, 180, 180, 1;
+ --fg-title:            231,  76,  60, 1; /* red */
+ --fg-title-high:       192,  57,  43, 1; /* hover */
+ --fg-search:           130, 130, 130, 1;
+
+ /* Backgrounds & Surfaces */
+ --bg:                    255, 255, 255, 1;
+ --primary-low:          250, 250, 250, 1;
+ --primary:              245, 245, 245, 1;
+ --objects:              240, 240, 240, 1;
+
+ /* Accent */
+ --accent:               46, 204, 113, 0.200; /* green */
+ --accent-high:          243, 156, 18, 0.200; /* orange */
+
+ --border-low: 255, 255, 255, 0.1;
+ --border-high: 255, 255, 255, 0.4;
+}
+
+
+
+
+
+html.theme-duotone {
+
+ /* Text */
+ --fg-lowest:           110, 110, 110, 1;
+ --fg-low:              130, 130, 130, 1;
+ --fg:                  150, 150, 150, 1;
+ --fg-high:             190, 190, 190, 1;
+ --fg-title:            172, 126, 210, 1; /* mix of both */
+ --fg-title-high:       142,  92, 182, 1; /* hover */
+ --fg-search:           140, 140, 140, 1;
+
+ /* Backgrounds & Surfaces */
+ --bg:                    246, 248, 250, 1;
+ --primary-low:          235, 240, 245, 1;
+ --primary:              225, 233, 240, 1;
+ --objects:              215, 226, 235, 1;
+
+ /* Accent */
+ --accent:               44,  62,  80, 0.200; /* deep blue */
+ --accent-high:         142,  68, 173, 0.200; /* vibrant purple */
+
+ --border-low: 255, 255, 255, 0.1;
+ --border-high: 255, 255, 255, 0.4;
+
+}
+
+
+
+
+
+html.theme-earthy {
+
+ /* Text */
+ --fg-lowest:          100, 100,  90, 1;
+ --fg-low:             120, 120, 110, 1;
+ --fg:                 140, 140, 130, 1;
+ --fg-high:            180, 180, 170, 1;
+ --fg-title:          211,  84,   0, 1; /* terracotta */
+ --fg-title-high:     192,  60,   0, 1;
+ --fg-search:         130, 130, 120, 1;
+
+ /* Backgrounds & Surfaces */
+ --bg:                245, 240, 230, 1; /* sand */
+ --primary-low:       235, 225, 210, 1;
+ --primary:           225, 215, 190, 1;
+ --objects:           215, 205, 170, 1;
+
+ /* Accent */
+ --accent:            127, 140,   0, 0.200; /* olive */
+ --accent-high:       151, 177,  54, 0.200;
+
+ --border-low: 255, 255, 255, 0.1;
+ --border-high: 255, 255, 255, 0.4;
+
+}
+
+
+
+
+
+html.theme-neon {
+ /* Text */
+ --fg-lowest:           200, 200, 200, 1;
+ --fg-low:              220, 220, 220, 1;
+ --fg:                  240, 240, 240, 1;
+ --fg-high:             255, 255, 255, 1;
+ --fg-title:           255,   0, 127, 1; /* hot pink */
+ --fg-title-high:      255,  50, 150, 1;
+ --fg-search:          200, 200, 200, 1;
+
+ /* Backgrounds & Surfaces */
+ --bg:                  15,  15,  15, 1;
+ --primary-low:         30,  30,  30, 1;
+ --primary:             45,  45,  45, 1;
+ --objects:             60,  60,  60, 1;
+
+ /* Accent */
+ --accent:             255,   0, 255, 0.200; /* electric lime/pink blend */
+ --accent-high:         0, 255, 255, 0.200; /* cyan */
+
+ --border-low: 255, 255, 255, 0.1;
+ --border-high: 255, 255, 255, 0.4;
+
+
+}
+
+
+
+
+
+html.theme-semantic {
+
+ /* Text */
+ --fg-lowest:           100, 100, 100, 1;
+ --fg-low:              140, 140, 140, 1;
+ --fg:                  180, 180, 180, 1;
+ --fg-high:             230, 230, 230, 1;
+ --fg-title:             0, 255, 255, 0.600;
+ --fg-title-high:       255, 255, 255, 1;
+ --fg-search:           140, 140, 140, 1;
+
+ /* Backgrounds & Surfaces */
+ --bg:                    12,  12,  12, 1;
+ --primary-low:          25,  25,  25, 1;
+ --primary:              35,  35,  35, 1;
+ --objects:              50,  50,  50, 1;
+
+ /* Accent (Success) */
+ --accent:               46, 204, 113, 0.200; /* green */
+ --accent:               0, 255, 255, 0.200;
+
+
+ --accent-high:          39, 174,  96, 0.200; /* success-hover */
+
+ --border-low: 255, 255, 255, 0.1;
+ --border-high: 255, 255, 255, 0.4;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* Global resets & typography */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: var(--font-size);
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: rgba(var(--bg));
+  color:            rgb(var(--fg));
+  line-height: 1.5;
+}
+
+
+
+
+/*     DARK DEV      */
+	/* background: rgb(49, 57, 63); */
+	/* background: rgb(40, 48, 53); */
+	/* background: rgb(38, 44, 49); */
+	/* background: rgb(33, 38, 43); */
+	/* background: rgb(29, 35, 39); */
+	/* background: rgb(22, 26, 29); */
+
+
+
+
+
+
+/* Extra Small (XS) Screens: (max-width: 576px)*/
+@media screen and (max-width: 576px) {
+	html {
+	  font-size: 12px;
+	}
+  }
+
+/* Small (SM) Screens: (min-width: 577px) */
+  @media screen and (min-width: 577px) and (max-width: 768px) {
+	html {
+	  font-size: 12px;
+	}
+  }
+
+/*Medium (MD) Screens: (min-width: 769px) */
+  @media screen and (min-width: 769px) and (max-width: 992px) {
+	html {
+	  font-size: 14px;
+	}
+  }
+  
+/*Large (LG) Screens: (min-width: 993px) */
+  @media screen and (min-width: 993px) and (max-width: 1200px) {
+	html {
+	  font-size: 16px;
+	}
+  }
+ 
+/*Extra Large (XL) Screens: (min-width: 1201px) */
+  @media screen and (min-width: 1201px) {
+	html {
+	  font-size: 16px;
+	}
+  }
+
+/* Super Extra Large (XXL) Screens: (min-width: 1601px and larger) */
+  @media screen and (min-width: 1601px) {
+	html {
+	  font-size: 18px;
+	}
+  }

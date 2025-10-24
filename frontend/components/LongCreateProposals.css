@@ -1,0 +1,756 @@
+.LongCreateProposalsMaincolumn {
+	/* border: 1px solid rgb(255, 0, 0); */
+
+	width: 48vw;
+	height: 80vh;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+
+	background: transparent;
+  }
+
+
+  .LongCreateProposalsTypes{
+	/* border: 2px solid blue; */
+	
+	--width: 47.8vw;
+	width: var(--width);
+	height: calc(var(--width)  / 1.618 / 1.618 / 1.618 / 1.618 / 1.618 / 1.618);
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	border-top-left-radius: 7px;
+	border-bottom-left-radius: 7px;
+  }
+
+
+
+.LongCreateProposalsMainrow {
+	/* border: 2px solid purple; */
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center; 
+	align-items: flex-start;
+
+	width: 48vw;
+	height: 75vh;
+  }
+
+
+  
+
+
+  .L2SidePanelandExtendButton{
+	/* border: 1px solid rgb(17, 207, 90); */
+
+	height: 74.8vh;
+	width: 9vw;
+
+	display: flex;
+	align-items: flex-start;
+
+	border-top-left-radius: 7px;
+	border-bottom-left-radius: 7px;
+  }
+
+
+
+  .L2SidePanelSubFuncButtons{
+	/* border: 1px solid rgb(255, 208, 0); */
+	
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+
+	height: 34.3vh;
+	width: 8.8vw;
+
+	margin-top: 9vh;
+  }
+
+
+
+
+  .L2SubCategoryRightColumn{
+	/* border: 1px solid rgb(247, 0, 255); */
+
+	width: 8.6vw;
+	height: 34.2vh;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+  }
+
+
+
+
+
+
+
+
+  .L2FuncButtonSubCategory {
+	/* border: 1px solid rgb(0, 255, 242); */
+	
+	height: 3.4vh;
+	width: 8vw;
+
+	display: flex;
+	justify-content: left;
+	align-items: center;
+
+	border-radius: 2px;
+
+}
+
+.L2FuncButtonSubCategory::before {
+	/* border: 1px solid white; */
+	
+	content: '\2022';
+	color: rgb(65, 76, 87);
+
+	font-size: 1.5rem;
+	
+	width: 1vw;
+	height: 2.9vh;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	/* align-self: center; */
+	margin-top: -0.5vh;
+}
+
+.L2FuncButtonSubCategory:hover{
+	/* background: rgb(239, 240, 241); */
+			/* background: rgb(49, 57, 63); */
+			background: rgba(77, 73, 73, 0.932);
+
+}
+
+.L2FuncButtonSubCategory:hover::before {
+	color: rgb(164, 195, 221);
+}
+
+.L2FuncButtonSubCategory span {
+	color:rgb(105, 103, 103);
+
+	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+	font-weight: 400;
+	font-size: 0.9rem;
+}
+
+.L2FuncButtonSubCategory:hover span {
+	/* color:rgb(238, 231, 231); */
+	/* color: rgb(65, 76, 87); */
+	color: rgb(139, 157, 175);
+
+
+}
+
+.L2FuncButtonSubCategorySelected{
+	/* background: rgb(230, 232, 235); */
+			/* background: rgb(49, 57, 63); */
+			background: rgba(77, 73, 73, 0.932);
+
+}
+
+.L2FuncButtonSubCategorySelected:before{
+	content: '\2022';
+	color: rgb(164, 195, 221);
+}
+
+.L2FuncButtonSubCategorySelected span {
+	/* color: rgb(65, 76, 87); */
+	color: rgb(139, 157, 175);
+
+	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+	font-weight: 600;
+	font-size: 0.9rem;
+}
+
+
+
+
+
+
+
+.L2MiddleContainer{
+	/* border: 1px solid rgb(77, 126, 201); */
+
+	display: flex;
+	flex-direction: column;
+
+	width: 30vw;
+ 	height: 74.8vh;
+  }
+
+
+
+  /* .L2MiddleComponents{
+	border: 1px solid rgb(201, 102, 77);
+
+	border-radius: 10px;
+
+	display: flex;
+	flex-direction: column;
+
+	width: 29.8vw;
+	height: 74.8vh;
+  } */
+
+
+
+  .LongCreateProposalsVideoSidePanelMain{
+	/* border: 1px solid rgb(228, 253, 6); */
+
+	display: flex;
+	flex-direction: row;
+
+	width: 9vw;
+	height: 51.6vh;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+/////////////////  The Great Clean /////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+*/
+
+
+
+
+
+
+  .LongCreateProposalsSideButton{
+	/* border: 1px solid rgb(77, 126, 201); */
+	
+	/* background: rgb(33, 38, 44); */ /* It was here*/
+
+	border-right: none; 
+
+	border-top-left-radius: 7px; 
+	border-bottom-left-radius: 7px; 
+	
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	
+	width: 1vw;
+	/* height: 36vh; */
+
+	height: 51.6vh;
+
+	}
+
+	  
+
+  .LongCreateProposalsSideButton:hover {
+		/* border: 1px solid rgb(164, 195, 221); */
+		border-right: none; 
+		/* background: rgb(77, 89, 100); */
+
+		background: rgb(49, 57, 63);
+		/* background: rgb(38, 44, 49);
+		background: rgb(33, 38, 43);
+		background: rgb(22, 26, 29); */
+  }
+
+
+  .LongCreateProposalsSideButton img {
+		/* border: 2px solid rgb(255, 0, 242); */
+
+		width: 75%;
+		object-fit: cover;
+		/* margin-left: 18%; */
+	}
+
+
+
+
+
+
+	.L2SubCategoryLeftColumn{
+	/* border: 1px solid rgb(60, 255, 0); */
+
+	width: 0.7vw;
+	height: 34.2vh;
+
+	margin-top: 0.2vh;
+
+	display: flex;
+	flex-direction: column;
+
+	}
+
+
+
+
+
+	
+/* ////////////////////////////////////////////////////////////// */
+	
+
+  .L2SubCategoryLeftColumnPlaceholder{
+	/* background: rgb(33, 38, 43); */
+
+	width: 0.7vw;
+	height: 2.9vh;
+  }
+
+
+
+	.L2SubCategoryExcStatsMarket{
+
+
+		/* border: 1px solid rgb(204, 196, 196); */
+		/* border-right: transparent; */
+		/* border-left: transparent; */
+		/* border-bottom: transparent; */
+
+		/* background: rgb(33, 38, 43); */
+
+		width: 0.7vw;
+		height: 9vh;
+		/* margin-top: 2vh; */
+
+
+
+	}
+	/* .L2SubCategoryExcStatsMarket::before{
+		content: "\2022";
+		color: rgb(65, 76, 87);
+	} */
+
+
+	.L2SubCategoryExcStatsMarket:hover{
+		/* background: rgb(77, 89, 100); */
+		background: rgb(239, 240, 241);
+
+
+	}
+
+	/* .L2SubCategoryExcStatsMarket:hover::before{
+		color: rgb(187, 222, 250);
+
+	} */
+
+	.L2SubCategoryExcStatsMarketSelected{
+		/* background: rgb(77, 89, 100); */
+		background: rgb(230, 232, 235);
+
+	}
+
+
+
+
+
+	.L2SubCategoryTrustSocials{
+		/* border: 1px solid rgb(0, 255, 0); */
+
+		/* border: 1px solid rgb(204, 196, 196);;
+		border-right: transparent;
+		border-left: transparent; */
+		/* border-bottom: transparent; */
+
+		/* background: rgb(33, 38, 43); */
+
+		width: 0.7vw;
+		height: 6vh;
+	}
+
+	.L2SubCategoryTrustSocials:hover{
+		/* background: rgb(77, 89, 100); */
+		background: rgb(239, 240, 241);
+
+	}
+
+	.L2SubCategoryTrustSocialsSelected{
+		/* background: rgb(77, 89, 100); */
+		/* background: rgb(230, 232, 235); */
+
+	}
+
+
+
+	.L2SubCategoryTechDeveloper{
+		/* border: 1px solid rgb(0, 255, 242); */
+/* 
+		border: 1px solid rgb(204, 196, 196);
+		border-right: transparent;
+		border-left: transparent;
+		border-top: transparent; */
+
+		/* background: rgb(33, 38, 43); */
+
+		width: 0.7vw;
+		height: 6vh;
+	}
+
+	.L2SubCategoryTechDeveloper:hover{
+		/* background: rgb(77, 89, 100); */
+		background: rgb(239, 240, 241);
+
+	}
+
+	.L2SubCategoryTechDeveloperSelected{
+		/* background: rgb(77, 89, 100); */
+		background: rgb(230, 232, 235);
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .LongCreateProposalsAll{
+	/* border: 1px solid rgb(255, 255, 255); */
+
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+
+	width: 23vw;
+	max-height: 71vh;
+
+	padding: 1%;
+
+	/* background: rgb(38, 44, 49); */
+	/* background: rgb(33, 38, 43); */
+	/* background: rgb(22, 26, 29); */
+	
+	overflow-y: auto;
+	overflow-x: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: #888 #f1f1f1;
+  }
+
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  height: 10px;
+  width: 2px;
+}
+  
+
+
+
+  .L2Optimistic{
+	/* border: 1px solid rgb(255, 255, 255); */
+
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	/* align-items: center; */
+
+	width: 23vw;
+	/* width: 21.7vw; */
+
+	max-height: 71vh;
+
+	padding: 1%;
+	
+	overflow-y: auto;
+	overflow-x: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: #888 #f1f1f1;
+  }
+
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  height: 10px;
+  width: 2px;
+}
+
+
+
+
+  .L2Zpk{
+	/* border: 1px solid rgb(255, 255, 255); */
+
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	/* align-items: center; */
+
+	width: 23vw;
+	/* width: 21.7vw; */
+
+	max-height: 71vh;
+
+	padding: 1%;
+	
+	overflow-y: auto;
+	overflow-x: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: #888 #f1f1f1;
+  }
+
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  height: 10px;
+  width: 2px;
+}
+
+
+
+
+
+  .LongCreateProposalsVideoSidePanel{
+	/* border: 1px solid green; */
+
+	/* border: 1px solid rgb(50, 83, 133); */
+	border-right: transparent;
+	border-left: transparent;
+
+	/* background: rgb(33, 38, 43); */
+
+	width: 8.8vw;
+	/* min-height:22vh;
+	max-height: 22vh; */
+	/* height: 36.8vh; */
+	height: 51.6vh;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	overflow: hidden;
+}
+
+  .LongCreateProposalsSideVideoButton{
+	/* border: 1px solid red; */
+
+	/* border: 1px solid rgb(77, 126, 201); */
+	
+	/* background: rgb(33, 38, 44); */
+	/* background: rgb(239, 240, 241); */
+
+	border-left: none; 
+	border-top-right-radius: 7px; 
+	border-bottom-right-radius: 7px; 
+	
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	width: 1vw;
+	/* height: 36.8vh; */
+	height: 51.6vh;
+
+  }
+
+
+  .LongCreateProposalsSideVideoButton:hover {
+	/* border: 1px solid rgb(164, 195, 221); */
+	
+	/* border: 1px solid rgb(77, 126, 201); */
+	border-left: none; 
+	/* background: rgb(77, 89, 100); */
+	background: rgb(239, 240, 241);
+
+	background: rgb(49, 57, 63);
+/* background: rgb(38, 44, 49);
+background: rgb(33, 38, 43);
+background: rgb(22, 26, 29); */
+
+}
+
+.LongCreateProposalsSideVideoButton img {
+	/* border: 2px solid rgb(255, 0, 242); */
+	width: 75%;
+	object-fit: cover;
+}
+
+
+
+  .LongCreateProposalsVideoButton{
+	/* border: 1px solid rgb(138, 221, 99); */
+	width: 7vw;
+	height: 4.8vh;
+	margin-top: 4%;
+
+	border-radius: 2%;
+
+	/* background: rgb(49, 57, 63); */
+	/* background: rgb(40, 48, 53); */
+	/* background: rgb(38, 44, 49); */
+	/* background: rgb(33, 38, 43); */
+	/* background: rgb(29, 35, 39); */
+	/* background: rgb(22, 26, 29);  */
+  }
+
+  .LongCreateProposalsVideoButton:hover{
+
+	background: rgb(239, 240, 241);
+
+	/* background: rgb(49, 57, 63); */
+/* background: rgb(40, 48, 53); */
+/* background: rgb(38, 44, 49); */
+/* background: rgb(33, 38, 43); */
+/* background: rgb(29, 35, 39); */
+/* background: rgb(22, 26, 29);  */
+
+  }
+
+  .LongCreateProposalsVideoButton span {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	color:rgb(105, 103, 103);
+
+	/* color:rgb(204, 196, 196); */
+	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
+	font-weight: 600;
+	font-size: 0.7rem;
+  }
+
+
+
+
+
+
+
+
+
+  .LongCreateProposalsVideoSidePanelMainClosed{
+	/* border: 1px solid rgb(255, 255, 255); */
+
+	display: flex;
+	flex-direction: row;
+
+	width: 1vw;
+	height: 34.5vh;
+}

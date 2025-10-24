@@ -46,30 +46,30 @@ services:
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-      target: development
-    depends_on: ['database', 'redis']
-    environment:
-      - NODE_ENV=development
-    volumes:
-      - ${PWD}/backend:/app
-    ports:
-      - "${SERVER_PORT}:${SERVER_PORT}"
-    container_name: ${SERVER_HOST}
-    env_file:
-      - .env
-    healthcheck:
-      test: ["CMD-SHELL", "curl --fail http://localhost:8080/"]
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #     target: development
+  #   depends_on: ['database', 'redis']
+  #   environment:
+  #     - NODE_ENV=development
+  #   volumes:
+  #     - ${PWD}/backend:/app
+  #   ports:
+  #     - "${SERVER_PORT}:${SERVER_PORT}"
+  #   container_name: ${SERVER_HOST}
+  #   env_file:
+  #     - .env
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl --fail http://localhost:8080/"]
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       target: development
-    depends_on: ['backend']
+    # depends_on: ['backend']
     volumes:
       - ./frontend/node_modules:/app/node_modules
       - ./frontend/.next:/app/.next
@@ -81,17 +81,17 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "curl --fail http://localhost/"]
 
-  nginx2:
-    image: nginx:1.19.8-alpine
-    restart: always
-    build:
-      context: ./nginx2
-      dockerfile: Dockerfile
-    container_name: ${NGINX_HOST}
-    env_file:
-      - .env
-    ports:
-      - "${NGINX_PORT}:${NGINX_PORT}"
+  # nginx2:
+  #   image: nginx:1.19.8-alpine
+  #   restart: always
+  #   build:
+  #     context: ./nginx2
+  #     dockerfile: Dockerfile
+  #   container_name: ${NGINX_HOST}
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "${NGINX_PORT}:${NGINX_PORT}"
 
 volumes:
   db_data:

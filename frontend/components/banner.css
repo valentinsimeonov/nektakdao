@@ -1,0 +1,114 @@
+ .BannerMain{
+	/* border: 1px solid rgb(245, 29, 29); */
+
+	width: 100vw;
+	/* height: 10vh; */
+
+	display:flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+	background-color: rgba(var(--bg));
+
+ }
+
+ .BannerLeft{
+	/* border: 1px solid rgb(29, 61, 245); */
+
+	width: 50vw;
+	/* height: 10vh; */
+ }
+
+
+  /* Ad container below */
+.BannerAd {
+	/* border: 1px solid rgb(29, 61, 245); */
+
+	width: 50vw;
+	height: 10vh;
+
+	/* background-color: aquamarine; */
+  }
+
+
+
+
+
+  /* This style targets the ad unit itself and is important */
+.BannerAd .adsbygoogle {
+
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+
+
+
+
+
+
+
+
+
+
+ .BannerRight{
+	/* border: 1px solid rgb(29, 61, 245); */
+
+	width: 50vw;
+	height: 10vh;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+ }
+
+
+
+ .BannerButton  img {
+	/* border: 1px solid rgb(205, 245, 29); */
+	
+	width: 40vw;
+	height: 9vh;
+
+    object-fit: contain;
+
+	cursor: auto; 
+
+ }
+
+
+
+
+
+
+ @media (max-width: 768px) {
+
+  
+	.BannerLeft {
+	/* border: 1px solid rgb(29, 61, 245); */
+
+	  /* width: 100vw; */
+	  display: none;
+
+	}
+
+	    /* .BannerAd, .BannerAd .adsbygoogle {
+      height: 60px; 
+      min-height: 60px;
+    }
+
+	 */
+  
+	.BannerButton img {
+	/* border: 1px solid rgb(29, 61, 245); */
+
+	  width: 100vw;
+	}
+  }
+
+
+

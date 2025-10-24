@@ -1,0 +1,49 @@
+# Dependency directories
+node_modules/
+.npm
+.npmrc
+
+# Next.js build output
+.next/
+out/
+
+# Local development
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Operating system files
+Thumbs.db
+ehthumbs.db
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional gitlint cache
+.gitlint
+
+# Miscellaneous
+README.md
+.git
+.gitignore
+.dockerignore
+*.md

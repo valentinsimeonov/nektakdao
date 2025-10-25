@@ -225,9 +225,9 @@ nartex@compvos:~/vscode/nektakdao$
 
 
 
+### Test RPCs
 
-
-
+https://chainlist.org/chain/84532
 
 
 

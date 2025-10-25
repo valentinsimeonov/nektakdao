@@ -98,6 +98,11 @@ Github Khan Ban  --- Move to Sprint 2
 
 
 
+
+
+
+
+
 ### Artistic Approach :)
 
 We got the Building(Local Environment) and the Path(Deployment) towards the City(Blokchain).
@@ -111,12 +116,25 @@ Now we need to work on how the Building Interacts(Contracts) with the City and h
     Github Khan Ban
 
 
-#### ADDED. Gnosis Safe
+#### 1. Gnosis Safe
 
     Safe Wallet (Gnosis Safe) MultiSig Wallet
 
 
-#### 1. Contracts - Implement more of governance model
+#### 2. Frontend (in parallel with Contracts)
+
+    Proposals Dashboard UI
+
+    Connect wallet, delegate, propose, view proposals, vote, queue/execute.
+    
+    Connect to testnet contracts.
+
+    Wire subgraph later to provide historical queries.
+
+
+
+
+#### 3. Contracts - Implement more of governance model
     
     Governor, Timelock, Token, Vesting.
  
@@ -131,22 +149,6 @@ Now we need to work on how the Building Interacts(Contracts) with the City and h
     Upgradeability strategy: self-upgradeable G2overnor? or immutable + new Governor to migrate?
 
 
-#### 2. Security & testing - Minimal for Sprint 2(maybe leave as backend if Contracts take too long), more on later Sprints
-
-    Unit tests (Hardhat + Waffle/Chai).
-
-    Integration tests Propose, Vote, Queue, Execute
-
-
-#### 3. Frontend (in parallel with Contracts)
-
-    Proposals Dashboard
-
-    Connect to testnet contracts first.
-    
-    Connect wallet, delegate, propose, view proposals, vote, queue/execute.
-
-    Wire subgraph later to provide historical queries.
 
 #### 4. Infra & deployment
 
@@ -158,8 +160,11 @@ Now we need to work on how the Building Interacts(Contracts) with the City and h
 
 
 
+#### 5. Security & testing - Minimal for Sprint 2(maybe leave as backend if Contracts take too long), more on later Sprints
 
+    Unit tests (Hardhat + Waffle/Chai).
 
+    Integration tests Propose, Vote, Queue, Execute
 
 
 

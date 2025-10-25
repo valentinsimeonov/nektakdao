@@ -172,3 +172,6 @@ export default function LongCreateProposals(): JSX.Element {
     </div>
   );
 }
+
+
+

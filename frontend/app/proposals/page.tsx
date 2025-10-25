@@ -1,3 +1,5 @@
+//app/proposals/page.ts
+
 "use client";
 
 import './proposals.css';
@@ -37,14 +39,3 @@ export default function HomePage() {
 
 
 
-
-
-
-				
-				{/* <button className="HomePageLeftModuleButton"
-						//  onClick={this.fetchData} disabled={loading}
-				>
-					<span>
-						 
-					</span>
-				</button> */}

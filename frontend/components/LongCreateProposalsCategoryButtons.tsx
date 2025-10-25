@@ -7,8 +7,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { RootState } from '../store/types';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { l2extendleftpanel, l2selectedsubfunc, l2extendrightpanel, l2videoon,
+import { 
+	
+	l2extendleftpanel, l2selectedsubfunc, l2extendrightpanel, l2videoon,
 	l2resetfunc, l2resetcategorybuttons, l2cat, l2selectedcategory, l2selectl1,
+
+	
 	createnewproposal
 } 	from '../store/ProposalsSlice';
 

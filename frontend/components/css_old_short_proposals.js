@@ -119,7 +119,7 @@
 
 
 
-	.EthereumL2CategoryButtonSelected{
+	.EthereumproposalsallcategoryButtonSelected{
 		/* color:rgb(238, 231, 231); */
 		/* background: transparent; */
 		background: rgb(230, 232, 235);
@@ -140,7 +140,7 @@
 
 	} */
 	
-	.EthereumL2CategoryButtonSelected span {
+	.EthereumproposalsallcategoryButtonSelected span {
 		/* color:rgb(238, 231, 231); */
 		color: rgb(65, 76, 87);
 

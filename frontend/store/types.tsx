@@ -3,15 +3,7 @@
 import { ThemeName } from './ThemeSlice';
 
 
-
-
-
-
 export type RootState = {
-
-
-
-
 
 
 	proposals: {

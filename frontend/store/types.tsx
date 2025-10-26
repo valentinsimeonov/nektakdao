@@ -1,6 +1,5 @@
 // types.tsx
 
-import { ThemeName } from './ThemeSlice';
 
 
 export type RootState = {

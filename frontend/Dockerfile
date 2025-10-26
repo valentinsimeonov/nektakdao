@@ -7,6 +7,22 @@ RUN apk add --no-cache curl
 # Create app directory
 WORKDIR /app
 
+
+
+# make these build args visible at build-time and into the image
+ARG NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
+ARG NEXT_PUBLIC_BASE_SEPOLIA_RPC
+
+ENV NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=$NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
+ENV NEXT_PUBLIC_BASE_SEPOLIA_RPC=$NEXT_PUBLIC_BASE_SEPOLIA_RPC
+
+# optional debug - prints the project id during build (remove or comment after verifying)
+RUN echo "BUILD: NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=${NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID}" || true
+RUN echo "BUILD: NEXT_PUBLIC_BASE_SEPOLIA_RPC=${NEXT_PUBLIC_BASE_SEPOLIA_RPC}" || true
+
+
+
+
 # # Optionally, if you need to change the UID and GID of the 'node' user to match your host
 # ARG USER_UID=1000
 # ARG USER_GID=1000

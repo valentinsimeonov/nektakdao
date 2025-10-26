@@ -3,41 +3,6 @@
 
 
 
-/* SubFunc Buttons */
-	l2ExtendLeftPanel: false,
-	l2SimpleView: false,
-
-	l2ExtendRightPanel: false,
-	l2VideoOn: false,
-	l2WhichVideo: null,
-
-/* Other */	
-	l2Layer2: false,
-
-
-	proposalsselectedsubfunc: "l2simpleview",
-
-	l2IsSelected: false,
-	l1Selected: null,
-
-
-	l2DopdownButton: false,
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

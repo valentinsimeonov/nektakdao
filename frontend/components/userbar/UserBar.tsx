@@ -5,6 +5,12 @@
 
 import './UserBar.css';
 
+
+import ConnectWallet from "../ConnectWallet";
+
+
+
+
 export default function UserBar() {
 
 
@@ -37,6 +43,13 @@ export default function UserBar() {
 						PlaceHolder
 					</span>
 				</button>
+
+				   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+					<ConnectWallet />
+
+					</div>
+
+
 			</div>
 
 			<div className="UserBarUserCard">

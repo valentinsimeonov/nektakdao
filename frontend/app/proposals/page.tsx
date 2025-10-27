@@ -5,7 +5,7 @@
 import './proposals.css';
 import RootLayout from '../layout';
 
-import LongCreateProposals from '../../components/LongCreateProposals';
+import LongCreateProposals from '../../components/proposals/LongCreateProposals';
 import ShortProposals from '../../components/ShortProposals';
 import CommsMain from '../../components/communities/CommsMain';
 import UserBar from '../../components/userbar/UserBar';

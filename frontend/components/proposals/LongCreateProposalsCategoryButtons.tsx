@@ -1,10 +1,12 @@
+// components/proposals/LongCreateProposalsCategory.tsx
+
 // "use client";
 import './LongCreateProposalsCategoryButtons.css';
 
 import React, { useState, useEffect, useRef } from "react";
 
 /* Redux */
-import { RootState } from '../store/types';
+import { RootState } from '../../store/types';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { 
@@ -14,7 +16,7 @@ import {
 
 	
 	createnewproposal
-} 	from '../store/ProposalsSlice';
+} 	from '../../store/ProposalsSlice';
 
 
 

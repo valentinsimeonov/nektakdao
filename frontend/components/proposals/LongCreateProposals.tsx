@@ -1,4 +1,4 @@
-// components/LongCreateProposals.tsx
+// components/proposals/LongCreateProposals.tsx
 "use client";
 
 import "./LongCreateProposals.css";
@@ -9,7 +9,7 @@ import CreateProposals from "./CreateProposals";
 import React, { useState, useEffect, useRef } from "react";
 
 /* Redux */
-import { RootState } from "../store/types";
+import { RootState } from "../../store/types";
 import { useSelector, useDispatch } from "react-redux";
 
 import {
@@ -23,7 +23,7 @@ import {
   l2selectedcategory,
   l2selectl1,
   dropdownbutton,
-} from "../store/ProposalsSlice";
+} from "../../store/ProposalsSlice";
 
 
 

@@ -1,4 +1,4 @@
-//shortProposals.tsx
+//components/proposals/shortProposals.tsx
 "use client";
 
 import './ShortProposals.css';
@@ -6,7 +6,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from 'axios';
 
 /* Redux */
-import { RootState } from '../store/types';
+import { RootState } from '../../store/types';
 import { useSelector, useDispatch } from 'react-redux';
 import { 
 	
@@ -15,7 +15,7 @@ import {
 	dropdownbutton, 
 	
 	shortproposalselected }
-	from '../store/ProposalsSlice';
+	from '../../store/ProposalsSlice';
 
 
 interface Post {

@@ -1,4 +1,4 @@
-// components/VotingModule.tsx
+// components/proposals/VotingModule.tsx
 "use client";
 
 import "./VotingModule.css";
@@ -6,7 +6,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 /* Redux */
-import { RootState } from "../store/types";
+import { RootState } from "../../store/types";
 import { useSelector, useDispatch } from "react-redux";
 import {
   l2extendleftpanel,
@@ -23,7 +23,7 @@ import {
   
   shortproposalselected,
   createnewproposal,
-} from "../store/ProposalsSlice";
+} from "../../store/ProposalsSlice";
 
 interface Post {
   id: number;

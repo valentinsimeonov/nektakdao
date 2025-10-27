@@ -1,4 +1,4 @@
-// components/CreateProposals.tsx
+// components/proposals/CreateProposals.tsx
 "use client";
 
 import "./CreateProposals.css";
@@ -6,7 +6,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 /* Redux */
-import { RootState } from "../store/types";
+import { RootState } from "../../store/types";
 import { useSelector, useDispatch } from "react-redux";
 import {
   l2extendleftpanel,
@@ -21,7 +21,7 @@ import {
   dropdownbutton,
   shortproposalselected,
   createnewproposal,
-} from "../store/ProposalsSlice";
+} from "../../store/ProposalsSlice";
 
 interface Post {
   id: number;

@@ -9,16 +9,29 @@ import LongCreateProposals from '../../components/LongCreateProposals';
 import ShortProposals from '../../components/ShortProposals';
 import CommsMain from '../../components/communities/CommsMain';
 import UserBar from '../../components/userbar/UserBar';
+import Banner from '../../components/banner';
 
 export default function HomePage() {
 
   return (
 	<RootLayout>
 		<div className="HomePageMaincolumn">
+							<Banner />
+
+
+
+			<div className='HomePageNavBarContainer'>
+					<UserBar />
+			</div>
+
+
+
 			<div className="HomePageMainrow">
+
+				
 				<div className="HomePageLeftModulecolumn">
 					
-					<CommsMain />
+					{/* <CommsMain /> */}
 					
 					<ShortProposals />
 				
@@ -26,7 +39,6 @@ export default function HomePage() {
 
 				<div className="HomePageRightModulecolumn">
 				
-					<UserBar />
 
 					<LongCreateProposals />
 			

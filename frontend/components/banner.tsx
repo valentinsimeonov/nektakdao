@@ -18,11 +18,11 @@ export default function Banner() {
 				window.open('https://www.savethechildren.org/', '_blank');
 				}}
 			>
-				<img src={`/Banners/SaveTheChildrenTransparent.png`} alt={`Baner`} onError={(e) => {
+				{/* <img src={`/Banners/SaveTheChildrenTransparent.png`} alt={`Baner`} onError={(e) => {
 					if (e.currentTarget.src !== "/logo/SpiralLogo.png") {
 						e.currentTarget.src = "/logo/SpiralLogo.png";
 					}
-				}} />
+				}} /> */}
 			</button>
 		</div>
 

@@ -6,11 +6,9 @@ import React, { useEffect } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useBalance } from "wagmi";
 
-/**
- * Minimal wallet UI:
- * - ConnectButton (RainbowKit)
- * - Shows address (shortened), balance and network (from connector chains if available)
- */
+
+
+
 export default function ConnectWallet(): JSX.Element {
   const { address, isConnected, connector } = useAccount();
   const { data: balance } = useBalance({
@@ -35,7 +33,7 @@ export default function ConnectWallet(): JSX.Element {
   return (
     <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
       <ConnectButton />
-      <div style={{ display: "flex", flexDirection: "column", fontSize: 12 }}>
+      <div style={{ display: "flex", flexDirection: "column", fontSize: 12 , color: "white"}}>
         {isConnected ? (
           <>
             <div>Addr: {shortAddress}</div>

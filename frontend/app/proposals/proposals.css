@@ -9,16 +9,49 @@
 
 	background: rgb(65, 62, 62);
 
+
+	overflow-y: hidden;
+	overflow-x: hidden;
+
   }
+
+
+
+    .HomePageNavBarContainer{
+	border: 1px solid rgb(223, 223, 223);
+	
+	height: 6vh;
+	width: 100vw;
+
+	border-right: transparent;
+	border-left: transparent;
+	border-top: transparent;
+
+
+
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-end;
+
+
+	
+}
+
 
 
   .HomePageMainrow{
 	/* border: 1px solid rgb(0, 47, 255); */
 	
-	height: 99.8vh;
+	height: 83.8vh;
 	width: 99.8vw;
 
 	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
 
 	background: rgb(65, 62, 62);
 
@@ -34,7 +67,7 @@
   .HomePageLeftModulecolumn{
 	/* border: 1px solid rgb(229, 255, 0); */
 
-	height: 99.6vh;
+	height: 83.6vh;
 	width: 49.8vw;
 
 	display: flex;
@@ -73,7 +106,7 @@
   .HomePageRightModulecolumn{
 	/* border: 1px solid rgb(0, 255, 255); */
 
-	height: 99.6vh;
+	height: 83.6vh;
 	width: 49.8vw;
 
 	display: flex;

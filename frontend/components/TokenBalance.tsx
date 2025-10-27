@@ -29,3 +29,7 @@ export function TokenBalance({ tokenAddress }: TokenBalanceProps) {
 
   return <div>Token balance: {data ? String(data) : "—"}</div>;
 }
+
+
+
+

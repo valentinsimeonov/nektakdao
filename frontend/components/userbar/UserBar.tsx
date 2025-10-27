@@ -21,37 +21,37 @@ export default function UserBar() {
 		<div className='UserBarMainrow'>
 
 			<div className='UserBarButtonrow'>
-				<button className="UserBarbutton">
+				{/* <button className="UserBarbutton"> */}
 						{/* <button className={`UserBarbutton ${(categoryType === "all") ? 'UserBarbuttonSelected' : ''}`}
 						onClick={() => handleCategoryButton('all')}> */}
-					<span>
+					{/* <span>
 						My Proposals
 					</span>
-				</button>
+				</button> */}
 						{/* <button className={`UserBarbutton ${(categoryType === "governance") ? 'UserBarbuttonSelected' : ''}`}
 						onClick={() => handleCategoryButton('governance')}> */}
-				<button className="UserBarbutton">
+				{/* <button className="UserBarbutton">
 					<span>
 						Saved Proposals
 					</span>
-				</button>
+				</button> */}
 						{/* <button className={`UserBarbutton ${(categoryType === "projects") ? 'UserBarbuttonSelected' : ''}`}
 						onClick={() => handleCategoryButton('projects')}> */}
 						
-				<button className="UserBarbutton">
+				{/* <button className="UserBarbutton">
 					<span>
 						PlaceHolder
 					</span>
-				</button>
+				</button> */}
 
 				   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-					<ConnectWallet />
+						<ConnectWallet />
 
 					</div>
 
 
 			</div>
-
+{/* 
 			<div className="UserBarUserCard">
 				<button>
 					<div className='UserBarCardrow'>
@@ -70,7 +70,7 @@ export default function UserBar() {
 						</div>
 					</div>
 				</button>
-			</div>
+			</div> */}
 
 
 

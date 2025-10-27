@@ -54,7 +54,7 @@ Once we got the narrow path we will make it bigger into a road and then a Highwa
 
 
 
-### Sprint 1
+### Sprint 1 - DEV Version
 
 #### 1. Project Structure
    
@@ -109,7 +109,7 @@ We got the Building(Local Environment) and the Path(Deployment) towards the City
 Now we need to work on how the Building Interacts(Contracts) with the City and how the Building Interacts(Frontend) with the People who are using it.
 
 
-### Sprint 2
+### Sprint 2 - DEV Version
 
 #### 0. Backlog
 
@@ -121,15 +121,23 @@ Now we need to work on how the Building Interacts(Contracts) with the City and h
     Safe Wallet (Gnosis Safe) MultiSig Wallet
 
 
-#### 2. Frontend (in parallel with Contracts)
+#### 2. Frontend
 
-    Proposals Dashboard UI
+    Proposals Dashboard UI - Draft
 
     Connect wallet, delegate, propose, view proposals, vote, queue/execute.
     
     Connect to testnet contracts.
 
     Wire subgraph later to provide historical queries.
+
+
+
+Wallet connected to Frontend, Frontend connectd to Contracts, Contracts deployed on Chain
+
+
+
+
 
 
 
@@ -170,3 +178,58 @@ Now we need to work on how the Building Interacts(Contracts) with the City and h
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## For Production Version
+
+### Contracts Upgrades
+
+Production deployment workflow & safety checklist
+
+Use this checklist for mainnet-grade deployments:
+
+Key management
+
+Use multisig (Gnosis Safe) or a hardware key for deployer/admin operations.
+
+
+Contracts & upgrades
+
+Governor & Token definitely upgradeable.
+
+Timelock probably immutable.
+
+OpenZeppelin Upgrades plugin (UUPS) for upgradeability. Test storage layout carefully.
+
+Roles & ownership
+
+
+Timelock controlled by a secure multisig or governance.
+
+
+Deployment scripting
+
+Deeterministic script that writes addresses & ABI to a known location.
+
+Nonce getTransactionCount("pending") once and increment in-script for multiple txs.
+
+
+On-chain upgrade via governance
+
+Deploy new implementation.
+
+Governance proposal calls timelock to execute proxy upgrade (or direct upgrade if governance has authority).
+
+Timelock enforces delay for review.

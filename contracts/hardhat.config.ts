@@ -1,3 +1,5 @@
+//contracts/hardhat.config.ts
+
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomiclabs/hardhat-ethers";
 // import "@nomiclabs/hardhat-etherscan";

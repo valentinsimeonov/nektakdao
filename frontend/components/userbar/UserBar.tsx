@@ -1,12 +1,10 @@
-
-
+//components/userbar/UserBar.ts
 
 
 
 import './UserBar.css';
-
-
 import ConnectWallet from "../ConnectWallet";
+// import BoxInteraction from "../BoxInteraction";
 
 
 
@@ -15,12 +13,30 @@ export default function UserBar() {
 
 
 
-
 	return(
 
 		<div className='UserBarMainrow'>
 
 			<div className='UserBarButtonrow'>
+
+				{/* <BoxInteraction /> */}
+
+				<div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+					<ConnectWallet />
+				</div>
+
+			</div>
+
+		</div>
+
+
+	);
+};
+
+
+
+
+
 				{/* <button className="UserBarbutton"> */}
 						{/* <button className={`UserBarbutton ${(categoryType === "all") ? 'UserBarbuttonSelected' : ''}`}
 						onClick={() => handleCategoryButton('all')}> */}
@@ -44,14 +60,17 @@ export default function UserBar() {
 					</span>
 				</button> */}
 
-				   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-						<ConnectWallet />
-
-					</div>
 
 
-			</div>
-{/* 
+
+
+
+
+
+
+
+
+				{/* 
 			<div className="UserBarUserCard">
 				<button>
 					<div className='UserBarCardrow'>
@@ -71,50 +90,3 @@ export default function UserBar() {
 					</div>
 				</button>
 			</div> */}
-
-
-
-{/* 
-			<div className='UserBarLogoButtonrow'>
-				<button	className='UserBarComunitiesbutton'
-					>
-					<img src={'/ShareMoreBlack.png'} />
-					<span>Channel</span>
-				</button>
-			</div>
-
-
-			<button className='UserBarCreateCommsbutton'>
-				<span>
-					+
-				</span>
-			</button>
-
-
-			<div className='UserBarCommsButtonrow'>
-				<button	className='UserBarComunitiesbutton'
-					>
-					<img src={'/ShareMoreBlack.png'} />
-					<span>Channel</span>
-				</button>
-
-				<button	className='UserBarComunitiesbutton'
-					>
-					<img src={'/ShareMoreBlack.png'} />
-					<span>Channel</span>
-				</button>
-			</div> */}
-
-			
-
-
-		</div>
-
-
-	);
-};
-
-
-
-
-

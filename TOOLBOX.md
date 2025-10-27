@@ -50,7 +50,7 @@ Timelock: 0xe75AFbd91b46b1Fe4D368d7b810c4B41D453eAf2
 
 Governor: 0x3803cEc7f7c4B6acE16fFaDe010F4C63e9B21540
 
-
+Box: 0xEF535c19ED4831caAE5E074A1f2ddE23C9298C62
 
 
 
@@ -211,7 +211,29 @@ nartex@compvos:~/vscode/nektakdao$
 
 
 
-
+dev@f326314a1e48:/project/contracts$ 
+dev@f326314a1e48:/project/contracts$ npx hardhat run scripts/deployBox.ts --network base_sepolia
+Downloading compiler 0.8.20
+Compiled 2 Solidity files successfully
+[deployBox] deploying with 0x9623B00BdBC5dA9C8d9Fa2a352E96B3EEd569eC0
+[deployBox] deployer ETH balance: 0.818226726745229436
+Nothing to compile
+No need to generate any newer typings.
+[deployBox] using nonce: 13
+[deployBox] tx: 0x7b5e8accd7f03dee87e1117b646cbbf1160d8b17df4e41be199b40a4fda714ce
+[deployBox] Box deployed at: 0xEF535c19ED4831caAE5E074A1f2ddE23C9298C62
+[deployBox] Could not write deployments file (permission?), printing to stdout instead
+{
+  "network": "base_sepolia",
+  "timestamp": "2025-10-27T14:06:22.735Z",
+  "deployer": "0x9623B00BdBC5dA9C8d9Fa2a352E96B3EEd569eC0",
+  "contracts": {
+    "Box": {
+      "address": "0xEF535c19ED4831caAE5E074A1f2ddE23C9298C62"
+    }
+  }
+}
+[deployBox] done.
 
 
 

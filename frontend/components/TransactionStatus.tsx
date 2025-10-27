@@ -35,7 +35,7 @@ export default function TransactionStatus({
       {/* Pending State */}
       {isPending && (
         <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#ffa500" }}>
-          <span className="spinner">⏳</span>
+          <span className="spinner"> Loading</span>
           <span>Waiting for wallet confirmation...</span>
         </div>
       )}
@@ -65,7 +65,7 @@ export default function TransactionStatus({
       {/* Confirming State */}
       {isConfirming && (
         <div style={{ marginTop: "8px", color: "#ffa500" }}>
-          <span className="spinner">⏳</span> Waiting for blockchain confirmation...
+          <span className="spinner"> Loading</span> Waiting for blockchain confirmation...
         </div>
       )}
 
@@ -85,7 +85,7 @@ export default function TransactionStatus({
                   fontSize: "0.9em",
                 }}
               >
-                View on Explorer 🔗
+                View on Explorer 
               </a>
             </div>
           )}
@@ -95,7 +95,7 @@ export default function TransactionStatus({
       {/* Error State */}
       {error && (
         <div style={{ color: "#ff6b6b" }}>
-          ❌ Error: {error.message || "Transaction failed"}
+           Error: {error.message || "Transaction failed"}
         </div>
       )}
 

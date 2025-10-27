@@ -115,31 +115,41 @@ Now we need to work on how the Building Interacts(Contracts) with the City and h
 
     Github Khan Ban
 
-
 #### 1. Gnosis Safe
 
     Safe Wallet (Gnosis Safe) MultiSig Wallet
-
 
 #### 2. Frontend
 
     Proposals Dashboard UI - Draft
 
-    Connect wallet, delegate, propose, view proposals, vote, queue/execute.
+    Connect wallet
     
     Connect to testnet contracts.
 
-    Wire subgraph later to provide historical queries.
+    Stored Value Testing End to End Connectivity.
+    
+    Wallet connected to Frontend, Frontend connectd to Contracts, Contracts deployed on Chain
+
+    Verified and Returned Transaction Hash
 
 
 
-Wallet connected to Frontend, Frontend connectd to Contracts, Contracts deployed on Chain
 
 
 
 
 
 
+### Sprint 3 - DEV Version
+
+
+#### 1. Frontend
+
+    Make proposal
+    View proposals
+    Vote
+    Queue/execute.
 
 
 #### 3. Contracts - Implement more of governance model
@@ -155,6 +165,14 @@ Wallet connected to Frontend, Frontend connectd to Contracts, Contracts deployed
     Timelock delay (seconds) and custom roles
         
     Upgradeability strategy: self-upgradeable G2overnor? or immutable + new Governor to migrate?
+
+
+
+
+
+
+
+
 
 
 

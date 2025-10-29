@@ -144,6 +144,11 @@ Now we need to work on how the Building Interacts(Contracts) with the City and h
 ### Sprint 3 - DEV Version
 
 
+#### 0. Contracts Security Course - Patrick Collins
+
+https://updraft.cyfrin.io/courses/security/puppy-raffle/reentrancy-recap
+
+
 #### 1. Frontend
 
     Make proposal

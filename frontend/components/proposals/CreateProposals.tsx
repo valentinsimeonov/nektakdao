@@ -322,3 +322,7 @@ export default function CreateProposals(): JSX.Element {
     </div>
   );
 }
+
+
+
+

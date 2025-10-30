@@ -159,6 +159,9 @@ https://updraft.cyfrin.io/courses/security/puppy-raffle/reentrancy-recap
 
 #### 3. Contracts - Implement more of governance model
     
+    OpenZeppelin upgradeable contracts.
+
+
     Governor, Timelock, Token, Vesting.
  
     Add events, admin controls, tests (unit & property), and gas profiling.

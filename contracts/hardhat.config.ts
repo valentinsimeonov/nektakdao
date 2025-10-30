@@ -1,23 +1,18 @@
 //contracts/hardhat.config.ts
 
 import { HardhatUserConfig } from "hardhat/config";
-import "@nomiclabs/hardhat-ethers";
-// import "@nomiclabs/hardhat-etherscan";
-import "@typechain/hardhat";
+import "@nomicfoundation/hardhat-toolbox"; // This imports ethers, verify, etc.
+import "@openzeppelin/hardhat-upgrades";
 import * as dotenv from "dotenv";
-import "@nomicfoundation/hardhat-verify";
 
 dotenv.config();
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.20",
+    version: "0.8.24",
     settings: {
-      optimizer: {
-        enabled: true,
-        runs: 200,
-      },
-      evmVersion: "paris",
+      optimizer: { enabled: true, runs: 200 },
+      evmVersion: "cancun", // <-- CRITICAL: This fixes the "mcopy" error
     },
   },
   networks: {
@@ -40,17 +35,19 @@ const config: HardhatUserConfig = {
       chainId: 8453,
     },
   },
-  // Using Etherscan V2 API - single API key for all chains
   etherscan: {
-    // Use your Etherscan API key for all chains (V2 unified API)
-    apiKey: process.env.ETHERSCAN_API_KEY || "",
+    apiKey: {
+      mainnet: process.env.ETHERSCAN_API_KEY || "",
+      sepolia: process.env.ETHERSCAN_API_KEY || "",
+      base: process.env.BASESCAN_API_KEY || "",
+      baseSepolia: process.env.BASESCAN_API_KEY || "",
+    },
     customChains: [
       {
         network: "base_sepolia",
         chainId: 84532,
         urls: {
-          // Etherscan V2 API endpoint for Base Sepolia
-          apiURL: "https://api.etherscan.io/v2/api?chainid=84532",
+          apiURL: "https://api-sepolia.basescan.org/api",
           browserURL: "https://sepolia.basescan.org",
         },
       },
@@ -58,8 +55,7 @@ const config: HardhatUserConfig = {
         network: "base_mainnet",
         chainId: 8453,
         urls: {
-          // Etherscan V2 API endpoint for Base Mainnet
-          apiURL: "https://api.etherscan.io/v2/api?chainid=8453",
+          apiURL: "https://api.basescan.org/api",
           browserURL: "https://basescan.org",
         },
       },
@@ -73,7 +69,7 @@ const config: HardhatUserConfig = {
   },
   typechain: {
     outDir: "typechain",
-    target: "ethers-v5",
+    target: "ethers-v6", // Use ethers-v6
   },
   mocha: {
     timeout: 40000,

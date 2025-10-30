@@ -1,5 +1,27 @@
 
 
+
+
+npx hardhat clean && npx hardhat compile --show-stack-traces
+
+
+
+
+npx hardhat run contracts/scripts/deployTimelockUpgradeable.ts --network base_sepolia
+
+
+
+npx hardhat run scripts/deployTimelockUpgradeable.ts --network base_sepolia
+
+
+npx hardhat run scripts/deployTokenUpgradeable.ts --network base_sepolia
+
+
+npx hardhat run scripts/deployGovernorUpgradeable.ts --network base_sepolia
+
+
+
+
 # start services (it won't run any command by default)
 docker compose -f docker-compose.dev.yml up -d hardhat-cli
  docker compose -f docker-compose.dev.yml build hardhat-cli --no-cache

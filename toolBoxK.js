@@ -35,7 +35,7 @@
     // Grant PROPOSER role to governor
     const grantProposerTx = await timelock.grantRole(PROPOSER_ROLE, governor.address);
     await grantProposerTx.wait();
-    console.log("✓ Granted PROPOSER role to Governor");
+    console.log(" Granted PROPOSER role to Governor");
 
     // Optional: Revoke admin role from deployer (for production)
     // const revokeAdminTx = await timelock.revokeRole(TIMELOCK_ADMIN_ROLE, deployer.address);

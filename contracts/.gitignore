@@ -1,12 +1,69 @@
+# === Environment & Secrets ===
 .env
-*.swp
-.DS_Store
-.idea
+.env.*
+# !.env.example
+*.key
+*.pem
+*.cert
+*.secrets.json
 
-
-
-
-# dependencies
-/node_modules
-/.pnp
+# === Node.js Dependencies ===
+node_modules/
+.pnp/
 .pnp.js
+
+# === Build Artifacts ===
+artifacts/
+cache/
+coverage/
+typechain/
+dist/
+build/
+
+# === Hardhat & Ethers ===
+.deployments/
+.deploy/
+deployments-local/
+deployments/test-*
+hardhat.cache
+hardhat.log
+hardhat-network-*
+
+# === Logs & Temp Files ===
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.pid
+*.pid.lock
+*.seed
+*.bak
+*.tmp
+*.swp
+
+# === OS & Editor ===
+.DS_Store
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# === Docker ===
+/docker-compose.override.yml
+*.pid
+*.sock
+
+# === Miscellaneous ===
+*.tgz
+*.zip
+*.tar
+*.tar.gz
+
+# === Local Database / Chain Data  ===
+/chain-data/
+/ganache-data/
+/base-local-data/
+
+# === TypeScript ===
+*.tsbuildinfo

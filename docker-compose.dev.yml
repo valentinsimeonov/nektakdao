@@ -13,14 +13,16 @@ services:
       - ./contracts:/project/contracts:cached
       - node_modules_contracts:/project/contracts/node_modules
       - hardhat_cache:/project/contracts/cache
-      - hardhat_artifacts:/project/contracts/artifacts
-      - hardhat_typechain:/project/contracts/typechain
+      # - hardhat_artifacts:/project/contracts/artifacts
+      # - hardhat_typechain:/project/contracts/typechain
       - ./contracts/deployments:/project/contracts/deployments:rw
+      - ./contracts/.openzeppelin:/project/contracts/.openzeppelin:rw
     tty: true
     stdin_open: true
     environment:
       - NODE_ENV=development
     command: tail -f /dev/null
+
 
   hardhat-node:
     image: ghcr.io/foundry-rs/foundry:latest

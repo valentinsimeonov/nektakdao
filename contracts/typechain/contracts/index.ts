@@ -3,5 +3,6 @@
 /* eslint-disable */
 import type * as timelockControllerUpgradeableSol from "./TimelockControllerUpgradeable.sol";
 export type { timelockControllerUpgradeableSol };
+export type { ERC1967ProxyWrapper } from "./ERC1967ProxyWrapper";
 export type { NektakGovernorUpgradeable } from "./NektakGovernorUpgradeable";
 export type { NektakTokenUpgradeable } from "./NektakTokenUpgradeable";

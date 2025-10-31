@@ -8,37 +8,50 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git build-essential python3 curl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Create non-root dev user
-RUN useradd -m dev && mkdir -p /home/dev/.npm-global && chown -R dev:dev /home/dev
+# Create npm global directory for node user
+RUN mkdir -p /home/node/.npm-global && \
+    chown -R node:node /home/node
+
+# Create working directory and set ownership BEFORE switching user
+RUN mkdir -p /project/contracts && \
+    chown -R node:node /project/contracts
 
 # Set working directory
 WORKDIR /project/contracts
 
 # Copy package files first for caching
-COPY package.json package-lock.json ./
+COPY --chown=node:node package.json package-lock.json ./
 
-# CRITICAL: Install exact versions without modifications
-# Clean install with exact versions from package-lock.json
+# Switch to node user for npm install
+USER node
+
+# Install dependencies
 RUN npm ci --legacy-peer-deps
 
 # Verify hardhat version
 RUN npx hardhat --version
 
-# Create cache/artifacts directories 
-RUN mkdir -p cache artifacts typechain
+# Switch back to root to copy remaining files
+USER root
 
-# Copy the rest of the project (excluding node_modules via .dockerignore)
-COPY . .
+# Copy the rest of the project
+COPY --chown=node:node . .
 
-# Ensure all directories are writable by dev user
-RUN chown -R dev:dev /project/contracts
+# Create necessary directories with proper permissions
+RUN mkdir -p \
+    cache \
+    artifacts \
+    typechain \
+    deployments \
+    .openzeppelin \
+    && chown -R node:node /project/contracts
 
-# Switch to non-root user
-USER dev
+# Switch back to node user for runtime
+USER node
 
 # Set npm global path
-ENV NPM_CONFIG_PREFIX=/home/dev/.npm-global
-ENV PATH=/home/dev/.npm-global/bin:$PATH
+ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
+ENV PATH=/home/node/.npm-global/bin:$PATH
 
 # Default entrypoint
 ENTRYPOINT ["bash", "-lc"]

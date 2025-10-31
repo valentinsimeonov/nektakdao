@@ -7,7 +7,6 @@ npx hardhat clean && npx hardhat compile --show-stack-traces
 
 
 
-npx hardhat run contracts/scripts/deployTimelockUpgradeable.ts --network base_sepolia
 
 
 
@@ -113,6 +112,111 @@ npx hardhat verify --network base_sepolia --contract contracts/NektakGovernor.so
 
 
 
+## Deploy Details - UPGRADEABLE CONTRACTS
+
+
+
+
+nartex@compvos:~/vscode/nektakdao$ ./hardhat.sh shell
+[INFO] Starting interactive shell in hardhat-cli container...
+node@c53d9982fbe1:/project/contracts$ 
+node@c53d9982fbe1:/project/contracts$ 
+node@c53d9982fbe1:/project/contracts$ 
+node@c53d9982fbe1:/project/contracts$ 
+node@c53d9982fbe1:/project/contracts$ 
+node@c53d9982fbe1:/project/contracts$ 
+node@c53d9982fbe1:/project/contracts$ npx hardhat clean && npx hardhat compile --show-stack-traces
+WARNING: You are currently using Node.js v18.20.4, which is not supported by Hardhat. This can lead to unexpected behavior. See https://v2.hardhat.org/nodejs-versions
+
+
+WARNING: You are currently using Node.js v18.20.4, which is not supported by Hardhat. This can lead to unexpected behavior. See https://v2.hardhat.org/nodejs-versions
+
+
+Downloading compiler 0.8.24
+Generating typings for: 63 artifacts in dir: typechain for target: ethers-v6
+Successfully generated 194 typings!
+Compiled 62 Solidity files successfully (evm target: cancun).
+node@c53d9982fbe1:/project/contracts$ 
+node@c53d9982fbe1:/project/contracts$ 
+node@c53d9982fbe1:/project/contracts$ 
+node@c53d9982fbe1:/project/contracts$ 
+node@c53d9982fbe1:/project/contracts$ 
+node@c53d9982fbe1:/project/contracts$ 
+node@c53d9982fbe1:/project/contracts$ npx hardhat run scripts/deployTimelockUpgradeable.ts --network base_sepolia
+WARNING: You are currently using Node.js v18.20.4, which is not supported by Hardhat. This can lead to unexpected behavior. See https://v2.hardhat.org/nodejs-versions
+
+
+============================================================
+STEP 1: Deploy TimelockController (Manual UUPS)
+============================================================
+Network: base_sepolia
+Deployer: 0x9623B00BdBC5dA9C8d9Fa2a352E96B3EEd569eC0
+Balance: 0.818205013234514179 ETH
+
+Timelock Config:
+  Min Delay: 1 seconds
+  Initial Proposer: 0x9623B00BdBC5dA9C8d9Fa2a352E96B3EEd569eC0
+  Executors: [anyone]
+
+⏳ Deploying Timelock Implementation...
+ Implementation deployed at: 0x9645e485b04246163684Bff3dcfBF8295917712B
+ Deploying ERC1967Proxy...
+ Proxy deployed at: 0x6EEE9840017D4fc58C8c9D657E65fe010D815484
+
+DEBUG: proxy: 0x6EEE9840017D4fc58C8c9D657E65fe010D815484
+DEBUG: impl : 0x9645e485b04246163684Bff3dcfBF8295917712B
+DEBUG: code at proxy length: 328 
+DEBUG: code at impl  length: 18018 
+DEBUG: impl slot raw: 0x0000000000000000000000009645e485b04246163684bff3dcfbf8295917712b
+DEBUG: expected impl slot: 0x0000000000000000000000009645e485b04246163684bff3dcfbf8295917712b
+DEBUG: impl slot matches impl address: true
+DEBUG: raw call result for getMinDelay: 0x0000000000000000000000000000000000000000000000000000000000000001
+DEBUG: decoded getMinDelay: 1
+DEBUG: no deploy tx hash available on contract instance
+ Verifying deployment...
+   Min Delay: 1 seconds
+   Deployer has PROPOSER_ROLE: true
+   Anyone can execute: true
+
+Saved to: /project/contracts/deployments/base_sepolia.json
+============================================================
+STEP 1 COMPLETE
+============================================================
+ Summary:
+   Timelock Proxy: 0x6EEE9840017D4fc58C8c9D657E65fe010D815484
+   Implementation: 0x9645e485b04246163684Bff3dcfBF8295917712B
+   Min Delay: 1 seconds
+
+  Next: Run deploy-2-token.ts
+
+node@c53d9982fbe1:/project/contracts$ 
+
+
+
+
+
+
+
+### TOKEN
+
+
+
+
+node@c53d9982fbe1:/project/contracts$ 
+node@c53d9982fbe1:/project/contracts$ npx hardhat run scripts/deployTokenUpgradeable.ts --network base_sepolia
+WARNING: You are currently using Node.js v18.20.4, which is not supported by Hardhat. This can lead to unexpected behavior. See https://v2.hardhat.org/nodejs-versions
+
+
+Deploying token on base_sepolia from 0x9623B00BdBC5dA9C8d9Fa2a352E96B3EEd569eC0
+Balance: 0.818202678757386355 ETH
+Deploying token implementation...
+ Token implementation: 0x02a2A3680171de8deA9e6CdfA39715B3004eaE05
+Deploying ERC1967ProxyWrapper with initializer...
+ Token proxy: 0xea5810e02ED8e6dd6835d076408a6FFB772d9F57
+ Verified name/symbol: Nektak Token / NKT
+ Implementation (used): 0x02a2A3680171de8deA9e6CdfA39715B3004eaE05
+Saved /project/contracts/deployments/base_sepolia.json
+Done.
 
 
 
@@ -122,7 +226,104 @@ npx hardhat verify --network base_sepolia --contract contracts/NektakGovernor.so
 
 
 
-# Deployment Details
+
+### Governor
+
+
+
+
+
+
+
+
+node@b03b7d03c612:/project/contracts$ 
+node@b03b7d03c612:/project/contracts$ npx hardhat run scripts/deployGovernorUpgradeable.ts --network base_sepolia
+WARNING: You are currently using Node.js v18.20.4, which is not supported by Hardhat. This can lead to unexpected behavior. See https://v2.hardhat.org/nodejs-versions
+
+
+Network: base_sepolia chainId: 84532
+Deploying governor from: 0x9623B00BdBC5dA9C8d9Fa2a352E96B3EEd569eC0
+Using TIMELOCK_PROXY_ADDRESS from .env
+Using token: 0xea5810e02ED8e6dd6835d076408a6FFB772d9F57
+Using timelock: 0x6EEE9840017D4fc58C8c9D657E65fe010D815484
+Deploying Governor implementation...
+Governor implementation: 0x312d61b01d9526f2ae928991fD1c5F5016d8914a
+Deploying proxy (with initializer)...
+Governor proxy deployed at: 0x90382F047bbc21d95736b96e803b53843087AB8a
+Saved governor to: /project/contracts/deployments/base_sepolia.json
+Granting PROPOSER_ROLE to governor on timelock...
+Granted PROPOSER_ROLE to governor: 0x90382F047bbc21d95736b96e803b53843087AB8a
+Governor deploy + configuration complete.
+node@b03b7d03c612:/project/contracts$ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Deployment Details --- NON UPGRADEABLE CONTRACTS
 
 
 nartex@compvos:~/vscode/nektakdao$ ./hardhat.sh shell

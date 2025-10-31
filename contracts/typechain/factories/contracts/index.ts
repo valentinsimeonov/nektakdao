@@ -2,5 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as timelockControllerUpgradeableSol from "./TimelockControllerUpgradeable.sol";
+export { ERC1967ProxyWrapper__factory } from "./ERC1967ProxyWrapper__factory";
 export { NektakGovernorUpgradeable__factory } from "./NektakGovernorUpgradeable__factory";
 export { NektakTokenUpgradeable__factory } from "./NektakTokenUpgradeable__factory";

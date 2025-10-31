@@ -1,18 +1,26 @@
-//contracts/hardhat.config.ts
+// //contracts/hardhat.config.ts
 
 import { HardhatUserConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-toolbox"; // This imports ethers, verify, etc.
+import "@nomicfoundation/hardhat-toolbox";
 import "@openzeppelin/hardhat-upgrades";
 import * as dotenv from "dotenv";
 
 dotenv.config();
+
+
+
+// extend so TS won't complain about plugin-added properties
+interface ExtendedHardhatUserConfig extends HardhatUserConfig {
+  etherscan?: any;
+}
+
 
 const config: HardhatUserConfig = {
   solidity: {
     version: "0.8.24",
     settings: {
       optimizer: { enabled: true, runs: 200 },
-      evmVersion: "cancun", // <-- CRITICAL: This fixes the "mcopy" error
+      evmVersion: "cancun",
     },
   },
   networks: {
@@ -28,11 +36,16 @@ const config: HardhatUserConfig = {
       url: process.env.BASE_SEPOLIA_RPC_URL || "https://sepolia.base.org",
       accounts: process.env.DEPLOYER_PRIVATE_KEY ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
       chainId: 84532,
+      // CRITICAL: These settings fix the "Method not found" error on Base
+      timeout: 60000,
+      gasPrice: "auto",
     },
     base_mainnet: {
       url: process.env.BASE_MAINNET_RPC_URL || "https://mainnet.base.org",
       accounts: process.env.DEPLOYER_PRIVATE_KEY ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
       chainId: 8453,
+      timeout: 60000,
+      gasPrice: "auto",
     },
   },
   etherscan: {
@@ -69,7 +82,7 @@ const config: HardhatUserConfig = {
   },
   typechain: {
     outDir: "typechain",
-    target: "ethers-v6", // Use ethers-v6
+    target: "ethers-v6",
   },
   mocha: {
     timeout: 40000,

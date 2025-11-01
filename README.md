@@ -159,7 +159,15 @@ https://updraft.cyfrin.io/courses/security/puppy-raffle/reentrancy-recap
 
 #### 3. Contracts - Implement more of governance model
     
-    OpenZeppelin upgradeable contracts.
+    Create and Deploy OpenZeppelin upgradeable contracts.
+
+    Timelock, Token, Governor
+    
+    Then we will Mint some NKTs
+    3. We will send the NKTs to a MEtamask Wallet Address 
+    4. We will Connect with the Wallet to the Frontend and make a Proposal
+
+
 
 
     Governor, Timelock, Token, Vesting.

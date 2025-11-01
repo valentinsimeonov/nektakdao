@@ -18,6 +18,33 @@ npx hardhat run scripts/deployTokenUpgradeable.ts --network base_sepolia
 
 npx hardhat run scripts/deployGovernorUpgradeable.ts --network base_sepolia
 
+npx hardhat run scripts/mintTokensToWallet.ts --network base_sepolia
+
+
+
+
+
+### Base Sepolia Explorer 
+
+https://sepolia.basescan.org/tx/0x6524fbf739070b7b4a07ccf345efe6d0e12e02830c1816d8b3484cdc55c33f9a
+
+
+
+
+### If the tx shows a Transfer to the recipient address with the expected amount but MetaMask still shows nothing
+
+    You likely need to add the token manually in MetaMask (MetaMask doesn’t always auto-detect testnet tokens). Steps:
+
+    Open MetaMask, switch to Base Sepolia network. (If Base Sepolia is not configured, add it using Base docs.) 
+    docs.base.org
+
+    Go to Assets → Import tokens → Custom token.
+
+    Paste the token contract address (the token proxy), and MetaMask should auto-fill Symbol (NKT) and Decimals (18). If it doesn’t, enter them manually (Symbol = NKT, Decimals = 18). Then Add. MetaMask will show the token balance. (See MetaMask docs on displaying/importing tokens.)
+
+
+
+
 
 
 

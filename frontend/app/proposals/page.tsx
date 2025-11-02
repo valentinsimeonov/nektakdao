@@ -32,7 +32,7 @@ export default function HomePage() {
 										
 					{/* <ShortProposals /> */}
 				
-				<BoxInteraction />
+					<BoxInteraction />
 				
 				</div>
 

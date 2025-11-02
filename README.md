@@ -151,26 +151,65 @@ https://updraft.cyfrin.io/courses/security/puppy-raffle/reentrancy-recap
 
 #### 1. Frontend
 
+    Make proposal on Chain.
+
+
+#### 2. Contracts - Implement more of governance model
+    
+    Create and Deploy OpenZeppelin upgradeable contracts.
+
+    Timelock, Token, Governor, Proxy.
+    
+
+#### 3. End to End functionality:
+
+
+    1. First we need to deploy the Upgradeable Contracts to Base Sepolia.
+    1.a Governor Contract
+    1.b Token Contract
+    1.c Timelock Contract
+    2. Then we will Mint some NKTs
+    3. We will send the NKTs to a Wallet Address 
+    4. We will Connect with the Wallet to the Frontend and make a Proposal On Chain
+
+
+Next up: Backend and Database, Frontend Finish Make Proposal(retrieve proposals)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## TODO
+
+
+
+### 1. Backend
+
+### 2. Database
+
+
+#### 1. Frontend
+
     Make proposal
     View proposals
     Vote
     Queue/execute.
 
 
-#### 3. Contracts - Implement more of governance model
-    
-    Create and Deploy OpenZeppelin upgradeable contracts.
 
-    Timelock, Token, Governor
-    
-    Then we will Mint some NKTs
-    3. We will send the NKTs to a MEtamask Wallet Address 
-    4. We will Connect with the Wallet to the Frontend and make a Proposal
+### 2. Contracts
 
-
-
-
-    Governor, Timelock, Token, Vesting.
  
     Add events, admin controls, tests (unit & property), and gas profiling.
 
@@ -179,14 +218,6 @@ https://updraft.cyfrin.io/courses/security/puppy-raffle/reentrancy-recap
     Voting parameters: voting delay, voting period (blocks/time), proposal threshold, quorum numerator.
 
     Timelock delay (seconds) and custom roles
-        
-    Upgradeability strategy: self-upgradeable G2overnor? or immutable + new Governor to migrate?
-
-
-
-
-
-
 
 
 

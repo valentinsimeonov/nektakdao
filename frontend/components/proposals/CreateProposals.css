@@ -449,7 +449,7 @@
 
 
 .CreateProposalsCategorybuttons span {
-	color:rgb(105, 103, 103);
+	color:rgba(105, 103, 103, 0.993);
 
 	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
 	font-weight: 400;
@@ -458,7 +458,7 @@
 
 .CreateProposalsCategorybuttons:hover span {
 	/* color: rgb(96, 112, 128); */
-	color: rgb(139, 157, 175);
+	color: rgba(139, 157, 175, 0.993);
 
 }
 

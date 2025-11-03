@@ -146,7 +146,7 @@ Now we need to work on how the Building Interacts(Contracts) with the City and h
 
 #### 0. Contracts Security Course - Patrick Collins
 
-https://updraft.cyfrin.io/courses/security/puppy-raffle/reentrancy-recap
+    https://updraft.cyfrin.io/courses/security/puppy-raffle/reentrancy-recap
 
 
 #### 1. Frontend
@@ -162,7 +162,6 @@ https://updraft.cyfrin.io/courses/security/puppy-raffle/reentrancy-recap
     
 
 #### 3. End to End functionality:
-
 
     1. First we need to deploy the Upgradeable Contracts to Base Sepolia.
     1.a Governor Contract
@@ -190,11 +189,63 @@ Next up: Backend and Database, Frontend Finish Make Proposal(retrieve proposals)
 
 
 
-## TODO
 
 
+## Sprint 2 - DEV Version
 
 ### 1. Backend
+
+    Research adn Design On chain and Off Chain Data Flow between Frontend, Backend, Database and L2
+
+
+    Flow:
+
+    F
+    1. User connects with Wallet to Frontend
+    2. User builds proposal in UI and makes proposal using their wallet
+    3. Frontend sends the txHash, unique UUID of Proposal and Proposals fields to Backend. 
+
+    B
+    4. Backend accepts metadata (title, body) and stores it Backend also acepts the Transaction Hash and Unique UUID. Backend does not accept and save in the database the Proposer's Wallet or any wallet data
+    5. Backend then verifies that txHash indeed corresponds to a ProposalCreated for the governor contract and that the on-chain description matches the metadata (see verification steps below). If verified, backend persists the metadata + txHash
+    6. Backend also verifies in the Database that that txHash and uniqueUUID is not recorded already (we prevent clone attacks, Ta ta ta tan ta ta tan ta ta, ta ta ta ta tatan ta ta ta )
+
+
+#### We are tying to prevent a couple of issues, and also improve some, here are a couple:
+
+    1. Preventing Ethos voting rather than Logos Voting (people voting GO because of who made the proposal, rather than what does the Proposal propose)
+
+    3. We are not tying any Email Accounts to the Wallets, and we are not showing the Wallet Address for the Rpoposal in the UI, if anyone wants to know the Wallet Address they can use the Tx Hash on the Explorer
+
+    4. Creating DAO politicians. There are already enough Politicians in the world, we do not need more of them, and aespecially inventing a new class of politicians(DAO Politicians)
+
+    5. NO Delegate. You vote if you know about the Subject. If not, you educate yourself and then Vote, or you simply do not vote as you don;t know enough about the subject.
+
+    2. IF the Proposal is not in line with the Community Charter(Values, Morals) then we block the respective Wallet Addres(we can tell the Wallet Address becuase it is recorded on chain, by using the TRanscation Hash)
+
+
+We will tweak these issues some more depending on the Executors, either a double stage proposal or Triple Timelock(Proposal, Executor, Feedback).
+
+We will cross that bridge when we come to it.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## TODO
+
 
 ### 2. Database
 

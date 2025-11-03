@@ -513,30 +513,6 @@ export default function CreateProposals(): JSX.Element {
       </div>
 
 
-      {/* <div className="CreateProposalsChannelCard2VotingButtonsrow">
-        <button
-          className="MakeProposalButtonbutton"
-          onClick={() =>
-            PostData(
-              Titledata,
-              DescriptionBody,
-              MissionBody,
-              BudgetBody,
-              ImplementBody,
-              currentDate,
-              avatarFile,
-              categoryType
-            )
-          }
-        >
-          <span>Create</span>
-        </button>
-      </div> */}
-
-
-
-
-
     </div>
   );
 }

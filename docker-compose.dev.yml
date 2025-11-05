@@ -48,45 +48,23 @@ services:
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
 
-  # backend:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #     target: development
-  #   depends_on: ['database', 'redis']
-  #   environment:
-  #     - NODE_ENV=development
-  #   volumes:
-  #     - ${PWD}/backend:/app
-  #   ports:
-  #     - "${SERVER_PORT}:${SERVER_PORT}"
-  #   container_name: ${SERVER_HOST}
-  #   env_file:
-  #     - .env
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "curl --fail http://localhost:8080/"]
-
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #     target: development
-  #   # depends_on: ['backend']
-  #   volumes:
-  #     - ./frontend/node_modules:/app/node_modules
-  #     - ./frontend/.next:/app/.next
-  #     - ${PWD}/frontend:/app
-  #   ports:
-  #     - "${FRONTEND_PORT}:${FRONTEND_PORT}"
-  #   environment:
-  #     - NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID:${NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID}
-  #     - NEXT_PUBLIC_BASE_SEPOLIA_RPC:${NEXT_PUBLIC_BASE_SEPOLIA_RPC}
-  #   env_file:
-  #     - .env
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "curl --fail http://localhost/"]
-
-
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    depends_on: ['database', 'redis']
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ${PWD}/backend:/app
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    container_name: ${SERVER_HOST}
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8080/"]
 
 
   frontend:
@@ -97,7 +75,7 @@ services:
       args:
         NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID}
         NEXT_PUBLIC_BASE_SEPOLIA_RPC: ${NEXT_PUBLIC_BASE_SEPOLIA_RPC}
-      # depends_on: ['backend']
+    depends_on: ['backend']
     volumes:
       - ./frontend/node_modules:/app/node_modules
       - ./frontend/.next:/app/.next

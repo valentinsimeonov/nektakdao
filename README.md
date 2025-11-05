@@ -244,6 +244,7 @@ Next up: Backend and Database, Frontend Finish Make Proposal(retrieve proposals)
 
     6. We are avoiding adding more complexity by not bringing in SIWE. Old saying from 42: "Keep it simple, Stupid"
 
+
 We will tweak these issues some more depending on the Executors, either a double stage proposal or Triple Timelock(Proposal, Executor, Feedback).
 
 We will cross that bridge when we come to it.
@@ -327,7 +328,7 @@ We will cross that bridge when we come to it.
 
 
 
-## For Production Version
+## Phase 2 - Production Version
 
 ### Contracts Upgrades
 

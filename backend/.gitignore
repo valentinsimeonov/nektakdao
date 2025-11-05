@@ -1,69 +1,55 @@
-# === Environment & Secrets ===
-.env
-.env.*
-# !.env.example
-*.key
-*.pem
-*.cert
-*.secrets.json
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# === Node.js Dependencies ===
-node_modules/
-.pnp/
+# dependencies
+/.bin
+/node_modules
+/.pnp
 .pnp.js
 
-# === Build Artifacts ===
-artifacts/
-cache/
-coverage/
-typechain/
-dist/
-build/
+# testing
+/coverage
 
-# === Hardhat & Ethers ===
-.deployments/
-.deploy/
-deployments-local/
-deployments/test-*
-hardhat.cache
-hardhat.log
-hardhat-network-*
+# production
+/build
+/dist
 
-# === Logs & Temp Files ===
-*.log
+# misc
+.DS_Store
+*.pem
+
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-*.pid
-*.pid.lock
-*.seed
-*.bak
-*.tmp
-*.swp
 
-# === OS & Editor ===
-.DS_Store
-.idea/
-.vscode/
-*.sublime-project
+# local env files
+.env
+.env*.local
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
 *.sublime-workspace
 
-# === Docker ===
-/docker-compose.override.yml
-*.pid
-*.sock
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
-# === Miscellaneous ===
-*.tgz
-*.zip
-*.tar
-*.tar.gz
+# Portal
+**/**.tar
+# src/config/serviceAccountKey.json
 
-# === Local Database / Chain Data  ===
-/chain-data/
-/ganache-data/
-/base-local-data/
 
-# === TypeScript ===
-*.tsbuildinfo
+
+

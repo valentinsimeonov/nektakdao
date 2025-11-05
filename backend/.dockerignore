@@ -1,0 +1,32 @@
+# General
+.node_modules
+.git
+.gitignore
+.dockerignore
+README.md
+npm-debug.log
+npm-error.log
+
+# Specific to Node.js and TypeScript
+node_modules/
+dist/
+*.tsbuildinfo
+*.log
+
+# IDE-specific and other configuration files
+.vscode/
+*.swp
+*.swo
+*~
+
+# Test files and directories
+test/
+coverage/
+
+# Dependency directories
+browser_components/
+jspm_packages/
+
+# System Files
+.DS_Store
+Thumbs.db

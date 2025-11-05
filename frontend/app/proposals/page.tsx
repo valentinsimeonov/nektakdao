@@ -30,9 +30,9 @@ export default function HomePage() {
 
 				<div className="HomePageLeftModulecolumn">
 										
-					{/* <ShortProposals /> */}
+					<ShortProposals />
 				
-					<BoxInteraction />
+					{/* <BoxInteraction /> */}
 				
 				</div>
 

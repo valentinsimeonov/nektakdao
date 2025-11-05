@@ -191,24 +191,43 @@ Next up: Backend and Database, Frontend Finish Make Proposal(retrieve proposals)
 
 
 
-## Sprint 2 - DEV Version
+## Sprint 4 - DEV Version
 
 ### 1. Backend
 
-    Research adn Design On chain and Off Chain Data Flow between Frontend, Backend, Database and L2
+    Research and Design On Chain and Off Chain Data Flow between Frontend, Backend, Database and L2
 
 
-    Flow:
+    Implement Flow Stage 1:
 
-    F
-    1. User connects with Wallet to Frontend
-    2. User builds proposal in UI and makes proposal using their wallet
-    3. Frontend sends the txHash, unique UUID of Proposal and Proposals fields to Backend. 
+    Frontend: 
+    1. User connects with Wallet to Frontend 
+    2. User builds proposal in UI and makes proposal using their wallet 
+    3. Frontend sends the txHash, unique UUID and Wallet Address of Proposal and Proposals fields(metadata) to Backend. 
 
-    B
-    4. Backend accepts metadata (title, body) and stores it Backend also acepts the Transaction Hash and Unique UUID. Backend does not accept and save in the database the Proposer's Wallet or any wallet data
-    5. Backend then verifies that txHash indeed corresponds to a ProposalCreated for the governor contract and that the on-chain description matches the metadata (see verification steps below). If verified, backend persists the metadata + txHash
-    6. Backend also verifies in the Database that that txHash and uniqueUUID is not recorded already (we prevent clone attacks, Ta ta ta tan ta ta tan ta ta, ta ta ta ta tatan ta ta ta )
+    Backend: 
+    4. Backend accepts metadata (title, body) and stores it Backend also acepts the Transaction Hash and Unique UUID and Wallet Address.
+    5. Backend then verifies that txHash and wallet address indeed corresponds to a ProposalCreated for the governor contract and that the on-chain description matches the metadata. If verified, backend persists the metadata + txHash + wallet address 
+    6. Backend also verifies in the Database that that txHash and uniqueUUID and wallet address is not recorded already (we prevent clone attacks, Ta ta ta tan ta ta tan ta ta, ta ta ta ta tatan ta ta ta )
+
+    Frontend:
+    7. The Frontend does not show the Proposal Creator when the Frontend retrieves the Proposals in order to show users(All Proposals)
+
+
+    !important: 
+    - The Wallet Address will not be linked to any normal Email Account or any other Account. The Wallet Address is the Account.
+    - The Wallet Address will be used for the Chat part as well
+
+
+
+    Implement Flow Stage 2:
+
+
+    1. Work-for-DAO and Cycles systems to be on-chain as non-transferable reputation assets(we will use soulbound tokens, badges, on-chain points or on-chain work tokens, TBD)
+    
+    2. Work-for-DAO and Cycles systems will also be recorded in the Backend for easier access and retrieval, however the main truth source will be on Chain on the blockchain ledger.
+
+
 
 
 #### We are tying to prevent a couple of issues, and also improve some, here are a couple:
@@ -221,13 +240,13 @@ Next up: Backend and Database, Frontend Finish Make Proposal(retrieve proposals)
 
     5. NO Delegate. You vote if you know about the Subject. If not, you educate yourself and then Vote, or you simply do not vote as you don;t know enough about the subject.
 
-    2. IF the Proposal is not in line with the Community Charter(Values, Morals) then we block the respective Wallet Addres(we can tell the Wallet Address becuase it is recorded on chain, by using the TRanscation Hash)
+    2. IF the Proposal is not in line with the Community Charter(Values, Morals) then we block the respective Wallet Addres(we can tell the Wallet Address becuase it is recorded on chain, by using the Transcation Hash)
 
+    6. We are avoiding adding more complexity by not bringing in SIWE. Old saying from 42: "Keep it simple, Stupid"
 
 We will tweak these issues some more depending on the Executors, either a double stage proposal or Triple Timelock(Proposal, Executor, Feedback).
 
 We will cross that bridge when we come to it.
-
 
 
 

@@ -24,6 +24,8 @@ import {
 } from "../../store/ProposalsSlice";
 
 
+import{ MUTATION_CREATE_PROPOSAL } from '../../api/proposalsQuery';
+import { useMutation } from "@apollo/client";
 
 
 
@@ -64,7 +66,15 @@ interface Post {
   category: string[];
 }
 
+
+
+
+
+
 export default function CreateProposals(): JSX.Element {
+
+
+
   const dispatch = useDispatch();
 
   const l2DopdownButton = useSelector(
@@ -79,8 +89,7 @@ export default function CreateProposals(): JSX.Element {
 
   const [categoryType, setCategoryType] = useState("");
 
-  //////       Handlers
-  /////////////////////
+
   const [Titledata, setTitledata] = useState("");
   const [DescriptionBody, setDescriptionBody] = useState("");
   const [MissionBody, setMissionBody] = useState("");
@@ -90,6 +99,10 @@ export default function CreateProposals(): JSX.Element {
   const handleTitleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitledata(event.target.value);
   };
+
+
+
+
 
   // Typed textarea handlers
   const handleDescriptionBody = (
@@ -153,6 +166,36 @@ export default function CreateProposals(): JSX.Element {
 
 
 
+	  const [createProposal, { loading, error }] = useMutation(MUTATION_CREATE_PROPOSAL, {
+		onCompleted: (data) => {
+		  if (data.createProposal) {  // Check if the response is true
+
+      setTitledata("");
+      setDescriptionBody("");
+      setMissionBody("");
+      setBudgetBody("");
+      setImplementBody("");
+      setImageUrl(null);
+      setAvatarFile(null);
+
+			console.log('Proposal sent successfully.');
+      
+		  } else {
+			console.error('Failed to send proposal.');
+		  }
+		},
+		onError: (err) => {
+		  console.error("Error sending proposal:", err);
+		}
+	  });
+
+
+
+
+
+
+
+
 
   const PostData = async (
     Titledata: string,
@@ -204,6 +247,11 @@ export default function CreateProposals(): JSX.Element {
     console.log("F - CreateProposal -- useEffect -- posts: ", post);
   }, [post]);
 
+
+
+
+
+
   /*/// Scroll Into View //*/
   //////////////////////////
   const descriptionContainerRef = useRef<HTMLDivElement | null>(null);
@@ -223,6 +271,13 @@ export default function CreateProposals(): JSX.Element {
       implementContainerRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [l2SelectedSubFunc]);
+
+  //////////////////////////
+
+
+
+
+
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -356,19 +411,44 @@ export default function CreateProposals(): JSX.Element {
     }
   }
 
+
+
+
+
+
+
   /* Integrated create handler: submit to backend AND on-chain (if signer) */
   const handleCreateClick = async () => {
-    // run backend create (existing)
-    await PostData(
-      Titledata,
-      DescriptionBody,
-      MissionBody,
-      BudgetBody,
-      ImplementBody,
-      currentDate,
-      avatarFile,
-      categoryType
-    );
+
+    	
+		try {
+		  await createProposal({
+			variables: {
+
+        title: Titledata,
+        description: DescriptionBody,
+        mission: MissionBody,
+        budget: BudgetBody,
+        implement: ImplementBody,
+        created_at: currentDate,
+        // avatarFile,
+        category: categoryType
+			}
+		  });
+		} catch (err) {
+		  console.error("Error sending message:", err);
+		}
+
+    // await createProposal(
+    //   Titledata,
+    //   DescriptionBody,
+    //   MissionBody,
+    //   BudgetBody,
+    //   ImplementBody,
+    //   currentDate,
+    //   avatarFile,
+    //   categoryType
+    // );
 
     // create on-chain proposal if user connected (attempt via window signer)
     if (isConnected) {

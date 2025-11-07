@@ -1,10 +1,43 @@
-// ethereuml2slice.tsx
-import { isNonNullObject } from "@apollo/client/utilities";
-import { createSlice } from "@reduxjs/toolkit";
+//ProposalsSlice.tsx
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export const proposalsSlice = createSlice({
-  name: "proposals",
-  initialState: {
+
+interface ProposalsLeftModuleLayerPayload {
+	layer: string;
+	selectedButton?: string;
+  }
+
+
+export const proposalsSlice = createSlice ({
+	name: 'proposals',
+
+	initialState: {
+		proposalsLeftModuleLayer: "",
+		proposalsSelectedButton: "",
+
+
+
+
+		proposalsMiddleExplanationsExtendBottomPanel: false,
+		proposalsMiddleModuleButton: "details",
+		proposalsLeftExtendBottomPanel: false,
+		proposalsMiddleExtendButtonStats: false,
+		proposalsMiddleExtendButtonDescription: false,
+
+
+
+
+
+
+		proposalsShouldAutoScroll: true,
+
+		proposalsMiddleMobileVisible: false,
+
+
+
+
+
+
 
 /* Category Buttons */
 	l2AllCat: false,
@@ -36,8 +69,78 @@ export const proposalsSlice = createSlice({
 	
   },
 
+	reducers: {
 
-  reducers: {
+
+
+		proposalsleftmodulelayer: (state, action: PayloadAction<ProposalsLeftModuleLayerPayload>) => {
+			state.proposalsLeftModuleLayer = action.payload.layer;
+			// Always set the middle module button based on the layer
+			if (state.proposalsLeftModuleLayer === "all") {
+				state.proposalsSelectedButton = action.payload.selectedButton || "1";
+			} else if (state.proposalsLeftModuleLayer === "governance") {
+				state.proposalsSelectedButton = action.payload.selectedButton || "1";
+			} else if (state.proposalsLeftModuleLayer === "projects") {
+				state.proposalsSelectedButton = action.payload.selectedButton || "1";
+			}
+		},
+
+
+
+
+
+		proposalsmiddlemobilevisible(state, action: PayloadAction<boolean>) {
+			state.proposalsMiddleMobileVisible = action.payload;
+		},
+
+		setShouldAutoScroll(state, action: PayloadAction<boolean>) {
+			state.proposalsShouldAutoScroll = action.payload;
+		},
+
+		proposalsmiddleexplanationsextendbottompanel: (state) => {
+			state.proposalsMiddleExplanationsExtendBottomPanel = !state.proposalsMiddleExplanationsExtendBottomPanel;
+		},
+
+		proposalsselectedbutton: (state, action) => {
+			state.proposalsSelectedButton = action.payload;
+		},
+
+		proposalsextendbottompanel: (state) => {
+			state.proposalsLeftExtendBottomPanel = !state.proposalsLeftExtendBottomPanel;
+		},
+
+		proposalsextendbuttonstats: (state) => {
+			state.proposalsMiddleExtendButtonStats = !state.proposalsMiddleExtendButtonStats;
+		},
+
+		proposalsextendbuttondescription: (state) => {
+			state.proposalsMiddleExtendButtonDescription = !state.proposalsMiddleExtendButtonDescription;
+		},
+
+		proposalsmiddlemodulebutton: (state, action) => {
+			state.proposalsMiddleModuleButton = action.payload;
+		},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	shortproposalselected: (state, action) => {
 		state.shortProposalSelected = action.payload;
@@ -118,10 +221,30 @@ export const proposalsSlice = createSlice({
   },
 });
 
-export const { l2extendleftpanel, l2selectedsubfunc, l2extendrightpanel, l2videoon,
+
+export const { proposalsleftmodulelayer, proposalsselectedbutton, proposalsextendbottompanel,
+	proposalsextendbuttonstats, proposalsextendbuttondescription, proposalsmiddlemodulebutton,
+	proposalsmiddleexplanationsextendbottompanel, 
+	setShouldAutoScroll, proposalsmiddlemobilevisible,
+
+
+
+	l2extendleftpanel, l2selectedsubfunc, l2extendrightpanel, l2videoon,
 	l2resetfunc, l2resetcategorybuttons, l2cat, l2selectedcategory, l2selectl1,
 	dropdownbutton, shortproposalselected, createnewproposal
+	
+
 } = proposalsSlice.actions;
 
-
 export default proposalsSlice.reducer;
+
+
+
+
+
+
+
+
+
+
+

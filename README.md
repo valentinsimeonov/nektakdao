@@ -27,13 +27,13 @@ Governance: Snapshot
 
 Treasury: Gnosis Safe
 
-Infra: Docker, Hardhat(or Foundry), Alchemy or Quick Node
+Infra: Docker, Hardhat
 
 
 
 
 
-## Phase 1
+## Phase 1 - DEV Version
 First Iteration without: Work Score + Cycles/Time Multiplier + Token 
 
 Instead: Token + Snapshot + Safe + basic on-chain Governor
@@ -45,10 +45,10 @@ Basically we are simplyging the app in the beginning, then add everything we nee
 
 ### Artistic Approach :)
 
-Let's compare the DAO with a Building.
-The Local environment is the Building, the Blockchain is the City and the road to the City is the Deployment.
-Then we need to make the Building(Local Environment) and a small path(Deployment) towards the City(Blockchain).
-Once we got the narrow path we will make it bigger into a road and then a Highway.
+    Let's compare the DAO with a Building.
+    The Local environment is the Building, the Blockchain is the City and the road to the City is the Deployment.
+    Then we need to make the Building(Local Environment) and a small path(Deployment) towards the City(Blockchain).
+    Once we got the narrow path we will make it bigger into a road and then a Highway.
 
 
 
@@ -105,8 +105,8 @@ Github Khan Ban  --- Move to Sprint 2
 
 ### Artistic Approach :)
 
-We got the Building(Local Environment) and the Path(Deployment) towards the City(Blokchain).
-Now we need to work on how the Building Interacts(Contracts) with the City and how the Building Interacts(Frontend) with the People who are using it.
+    We got the Building(Local Environment) and the Path(Deployment) towards the City(Blokchain).
+    Now we need to work on how the Building Interacts(Contracts) with the City and how the Building Interacts(Frontend) with the People who are using it.
 
 
 ### Sprint 2 - DEV Version
@@ -139,6 +139,10 @@ Now we need to work on how the Building Interacts(Contracts) with the City and h
 
 
 
+
+### Artistic Approach :)
+
+    The Utilities Contracts that we have with the City can now be renegociated depending on the Building People's will.
 
 
 ### Sprint 3 - DEV Version
@@ -188,6 +192,9 @@ Next up: Backend and Database, Frontend Finish Make Proposal(retrieve proposals)
 
 
 
+### Artistic Approach :)
+
+Now we are building the Technical Floor of the Building.
 
 
 

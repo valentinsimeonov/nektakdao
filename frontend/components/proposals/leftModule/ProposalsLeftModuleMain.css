@@ -1,0 +1,411 @@
+  .ProposalsLeftModuleMainMaincolumn{
+	/* border: 1px solid red; */
+	
+	/* border: 1px solid rgb(60, 62, 65); */
+	/* border-top: transparent; */
+	/* border-bottom: transparent; */
+	/* border-left: transparent; */
+
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+
+	/* width: 20vw; */
+	width: 38vw;
+
+	height: 85vh;
+
+	/* margin-top: 1vh; */
+
+	/* background: rgb(255, 255, 255); */
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .IndivLeftLayerButtonsContainerrow{
+	/* border: 1px solid rgb(255, 123, 0); */
+  
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+  
+	width: 35.8vw;
+	height: 8vh;
+
+	padding-top: 1vh;
+
+	box-shadow: 0 2px 2px -2px rgba(var(--border-low));
+	}
+  
+  .IndivLeftLayerButton{
+	/* border: 1px solid rgb(0, 255, 21); */
+  
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+  
+  
+	width: 5vw;
+	height: 4vh;
+  
+	padding: 1.8%;
+  
+	box-shadow: 0 2px 2px -2px rgba(var(--border-low));
+
+  
+  }
+	.IndivLeftLayerButton:hover {
+		box-shadow: 0 2px 2px -2px rgba(var(--fg-title));
+	}
+  
+	.IndivLeftLayerButton span{  
+	
+		color: rgba(var(--fg-low));
+		font-weight: 600;
+		font-size: 0.8rem;
+	
+		margin-left: 0.5%;
+	}	  
+	
+	.IndivLeftLayerButton:hover span{  
+		color: rgba(var(--fg));
+	}
+  
+	.IndivLeftLayerButtonSelected{
+		box-shadow: 0 3px 2px -2px rgba(var(--fg-title-high));
+	}
+	
+	.IndivLeftLayerButtonSelected span{
+		color: rgba(var(--fg-high));
+	}
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .ProposalsLeftModuleMainMiddlecolumn{
+	/* border:1px solid rgb(30, 120, 255); */
+
+	width: 38vw;
+	/* height: 75.9vh; */
+
+
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+
+	/* background: rgb(49, 57, 63); */
+	/* background: rgb(40, 48, 53); */
+	/* background: rgb(38, 44, 49); */
+	/* background: rgb(33, 38, 43); */
+	/* background: rgb(29, 35, 39); */
+	background-color: rgba(var(--bg));
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+  .IndivLeftSearchrow {
+    /* border: 1px solid rgb(30, 255, 0); */
+  
+	position: relative;
+	
+    height: 5.5vh;
+	width: 38vw;
+  
+    display: flex;
+	flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+
+	/* box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); */
+	box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.3);
+
+    }
+  
+    .IndivLeftSearchrow input[type="text"] {
+    /* border: 1px solid blue; */
+  
+	width: 18.8vw;
+    height: 4vh;
+    padding: 3%;
+  	/* margin-left: 0.7vw; */
+    /* color: rgb(30, 30, 30); */
+    color: rgba(var(--fg-search));
+  
+    border-radius: 4px;
+    
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    /* background-color: rgb(50, 80, 104); */
+    /* background-color: rgb(27, 43, 56); */
+  
+  
+    /* background: rgb(49, 57, 63); */
+    /* background: rgb(40, 48, 53); */
+    /* background: rgb(38, 44, 49); */
+    /* background: rgb(33, 38, 43); */
+    /* background: rgb(29, 35, 39); */
+    background-color: rgba(var(--bg));
+  
+    
+    font-weight: 700;
+    font-size: 0.8rem;
+  
+    }
+    
+
+
+
+
+	.IndivLeftSearchDropdown {
+		/* border: 1px solid blue; */
+
+		/* border: 1px solid #ccc; */
+		position: absolute;
+		top: 27vh;      /* positions below the search input */
+		left: 4.5vw;
+		/* background: #fff; */
+		width: 18.8vw;
+		max-height: 36vh;
+		overflow-y: auto;
+		z-index: 1000;
+
+		/* background: rgb(49, 57, 63); */
+		/* background: rgb(40, 48, 53); */
+		/* background: rgb(38, 44, 49); */
+		/* background: rgb(33, 38, 43); */
+		background: rgb(29, 35, 39);
+		/* background-color: rgba(var(--bg)); */
+
+		background: rgba(207, 207, 207, 0.979); 
+
+		
+	  }
+
+	  /* .IndivLeftDropdownGroup{
+		border: 1px solid blue;
+
+	  } */
+
+
+  .IndivLeftDropdownGroupHeader span{
+	color: rgba(var(--fg));
+
+	
+	font-weight: 600;
+	font-size: 0.9rem;
+	}
+	
+
+
+
+
+
+	  .IndivLeftSearchDropdownItem {
+		/* border: 1px solid rgb(0, 255, 13); */
+
+		display: flex;
+		align-items: center;
+		padding: 8px;
+		cursor: pointer;
+	  }
+	  
+
+	  .IndivLeftSearchDropdownItem span{
+		/* border: 1px solid rgb(0, 255, 13); */
+
+		color: rgba(var(--fg));
+
+		
+		font-weight: 400;
+		font-size: 0.9rem;
+		}
+		
+	 
+	  .IndivLeftSearchDropdownItem:hover {
+		/* border: 1px solid rgb(0, 255, 13); */
+
+
+		/* background: rgb(49, 57, 63); */
+		background: rgb(40, 48, 53);
+		/* background: rgb(38, 44, 49); */
+		/* background: rgb(33, 38, 43); */
+		/* background: rgb(29, 35, 39); */
+		/* background-color: rgba(var(--bg)); */
+	  }
+	  
+	  .IndivLeftSearchDropdownItem img {
+		/* border: 1px solid rgb(0, 255, 13); */
+
+		width: 24px;
+		height: 24px;
+		margin-right: 8px;
+	  }
+
+
+	.IndivLeftImageDropDownContainerPlaceholder {
+		/* border: 1px solid rgba(232, 220, 57, 0.774); */
+	
+		width: 24px;
+		height: 24px;
+
+		margin-right: 8px;
+
+		font-size: 3rem;
+		font-weight: 500;
+		text-align: center;
+		/* color: rgb(77, 126, 201);  */
+		/* color: rgb(86, 65, 59);  */
+		/* color: rgba(86, 65, 59, 0.503);  */
+		color: rgba(var(--fg-title));
+	
+		background-color: transparent;
+	
+		display: none; /* Initially hidden */
+		align-items: center;
+		justify-content: center;
+	}
+	
+
+  .IndivLeftImageDropDownContainerPlaceholder span {
+	
+	font-weight: 600;
+	font-size: 1.4rem;
+	/* color: rgba(var(--fg)); */
+	color: rgba(var(--fg-title));
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media(max-width: 768px) {
+
+
+	.ProposalsLeftModuleMainMaincolumn{
+		/* border: 1px solid red; */
+
+		width: 100vw;
+		height: 85vh;
+
+		overflow-y: none;
+		overflow-x: none;
+	}
+	
+	  .IndivLeftLayerButtonsContainerrow{
+		/* border: 1px solid rgb(17, 0, 255); */
+	
+		width: 100vw;
+	  }
+	
+	  .IndivLeftLayerButton{
+		/* border: 1px solid rgb(0, 255, 21); */
+
+		width: 15vw;
+	  }
+
+	  .ProposalsLeftModuleMainMiddlecolumn{
+		/* border:1px solid rgb(30, 120, 255); */
+	
+		width: 98vw;
+	  }
+
+
+	
+}

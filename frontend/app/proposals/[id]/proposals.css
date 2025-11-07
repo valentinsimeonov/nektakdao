@@ -1,0 +1,258 @@
+.ProposalsMain{
+	/* border: 1px solid rgba(230, 37, 12, 0.979); */
+
+	width: 100vw;
+	height: 100vh;
+	/* max-height: 800vh; */
+
+	/* margin-left: 4%; */
+
+	/* background: rgb(22, 26, 29); */
+	background-color: rgba(var(--bg));
+	
+	overflow-x: hidden;
+	overflow-y: hidden;
+
+  }
+
+
+
+
+
+  .SidebarProposalsPop{
+	/* border: 1px solid rgb(76, 0, 255); */
+	
+		position: fixed;
+		top: 0vh;
+		left: 0vw;
+	  
+		width: 100vw;
+		height: 100vh;
+	
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	
+		background: rgba(0, 0, 0, 0.774);
+		/* background: rgb(0, 0, 0); */
+	
+		z-index: 2000;
+	  }
+	
+	
+
+  .ProposalsNavBarContainer{
+	/* border: 2px solid rgb(255, 240, 35); */
+	
+	height: 6vh;
+	width: 100vw;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+
+
+
+
+  .ProposalsModules{
+	/* border: 1px solid rgb(46, 238, 12); */
+
+	width: 100vw;
+	height: 84vh;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+
+	/* background-image: url("/Background/Grid_small.png");
+	background-size: cover;
+	background-position: center; */
+
+	/* background: rgb(22, 26, 29); */
+
+  }
+
+
+
+
+
+  .ProposalsLeftModuleContainer{
+	/* border: 1px solid rgb(237, 241, 15); */
+
+	width: 38vw;
+
+	height: 76vh;
+
+	/* max-width: 90vw; */
+
+	display: flex;
+	flex-direction: column;
+  }
+  
+
+
+
+
+
+
+
+
+
+  .ProposalsMiddleModuleContainer{
+	/* border: 1px solid rgb(15, 241, 15); */
+
+	width: 58vw;
+	/* max-width: 90vw; */
+
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+  }
+
+
+
+  .ProposalsMultiModuleContainer {
+	/* border: 1px solid rgb(35, 255, 244); */
+
+    position: fixed;
+    top: 16vh;
+    right: 0;
+
+	width: 32vw;
+    height: 84vh;
+
+    z-index: 1000;
+    transform: translateX(100%);
+    animation: slideIn 0.5s forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+.ProposalsMobileMiddleContainer {
+  /* border: 1px solid rgb(132, 0, 255); */
+
+  position: fixed;
+  top: 16vh;
+  left: 0;
+
+  width: 100vw;
+  height: 84vh;
+
+  background: rgba(var(--bg));
+  z-index: 1001;
+  transform: translateX(-100%);
+  animation: slideInFromLeft 0.4s forwards;
+  overflow-y: auto;
+}
+
+@keyframes slideInFromLeft {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0);      }
+}
+
+
+
+
+
+.ProposalsCloseMiddleModuleBtn {
+  /* border: 1px solid rgb(132, 0, 255); */
+
+
+  position: fixed;
+  top: 18vh;
+  left: 83vw;
+
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+
+  color: rgba(var(--fg));
+
+  background-color: rgba(var(--objects));
+
+  box-shadow: 0 0 0 1px rgba(var(--border-low));
+
+  z-index: 1002;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media (max-width: 768px) {
+
+
+	.ProposalsModules {
+		/* border: 1px solid rgb(241, 151, 15); */
+	
+		height: 84vh;
+
+		/* position: relative; */
+
+		overflow-y: none;
+
+		}
+	
+	  .ProposalsLeftModuleContainer{
+		/* border: 1px solid rgb(237, 241, 15); */
+	
+		width: 100vw;
+		min-height: 20vh;
+	  }
+	  
+
+
+		.ProposalsMiddleModuleContainer{
+			/* border: 2px solid rgb(15, 132, 241); */
+
+			width: 100vw;
+		}
+
+
+		.ProposalsMultiModuleContainer {
+			/* border: 1px solid rgb(35, 255, 244); */
+		
+			position: absolute;
+			top: 16vh;
+			right: 0vw;
+
+
+			width: 79vw;
+			height: 84vh;
+		}
+	
+		
+
+  }
+
+  

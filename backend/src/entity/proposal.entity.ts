@@ -10,6 +10,10 @@ export class Proposal {
   @Field()
   id: string;
 
+  @Column({ type: 'text', nullable: true })
+  @Field(() => String, { nullable: true })
+  category: string | null;
+
   // @Column({ type: 'text', nullable: true, unique: true })
   @Column({ type: 'text', nullable: true})
   @Field(() => String, {nullable: true})
@@ -97,10 +101,19 @@ export class Proposal {
   // @Column('numeric', { nullable: true })
   // confirmations: number | null;
 
+  @Field(() => Float, {nullable: true})
+  @Column('numeric', { nullable: true })
+  votesUp: number | null;
 
 
+  @Field(() => Float, {nullable: true})
+  @Column('numeric', { nullable: true })
+  votesDown: number | null;
 
 
+  // @Field(() => Float, {nullable: true})
+  // @Column('numeric', { nullable: true })
+  // shareMore: number | null;
 
 
   // The new 'status' field — enum as text in DB

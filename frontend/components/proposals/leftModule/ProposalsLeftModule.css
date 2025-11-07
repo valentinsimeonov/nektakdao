@@ -1,0 +1,1751 @@
+
+  .ProposalsLeftModuleCoinMain{
+	/* border: 1px solid rgb(179, 255, 0); */
+
+	width: 36.8vw;
+	/* height: 80vh; */
+	height: 75.9vh;
+
+	margin-left: 0.8vh;
+  }
+
+
+
+
+ 
+
+  .ProposalsSortByrow{
+	/* border: 1px solid green; */
+
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	justify-content: flex-end;
+
+
+	width: 35.8vw;
+	height: 3vh; 
+
+	/* padding-right: 1vw; */
+
+  }
+
+
+
+
+
+/* default button look */
+.ProposalsSortByrow .sort-btn {
+	/* border: 1px solid rgb(49, 87, 255); */
+
+	width: 5vw; 
+	height: 3vh;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	/* color: rgba(var(--fg));
+	
+	font-weight: 600;
+	font-size: 0.6rem; */
+
+	color: rgba(var(--fg));
+	
+	font-weight: 600;
+	font-size: 0.7rem;
+
+
+	/* padding: 4px 8px; */
+
+	/* font-size: 0.8rem; */
+	/* font-weight: 600; */
+	/* color: rgba(var(--fg-muted)); */
+	cursor: pointer;
+	transition: background 0.2s;
+  }
+  
+  /* hover state */
+  .ProposalsSortByrow .sort-btn:hover {
+	background: rgba(var(--accent));
+  }
+  
+  /* “active” (sorted) state */
+  .ProposalsSortByrow .sort-btn.active {
+	color: rgba(var(--fg));
+	border-bottom: 2px solid rgba(var(--accent));
+  }
+
+
+
+
+
+
+
+
+
+
+
+	.ProposalsLeftModuleBigColumn{
+	/* border: 1px solid rgb(30, 255, 0); */
+
+
+	width: 36.8vw;
+	/* height: 80vh; */
+	height: 72.9vh;
+
+	padding-left: 0.2vw;
+
+	overflow-y: auto;
+	overflow-x: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: rgba(var(--accent)) transparent;
+}
+
+  	::-webkit-scrollbar {
+	width: 5px;
+	}
+
+	::-webkit-scrollbar-track {
+	background: transparent;
+	}
+
+	::-webkit-scrollbar-thumb {
+	background: rgb(49, 57, 63);
+	}
+
+
+
+
+
+
+
+	
+
+
+.ProposalsCardBigColumn{
+	/* border: 1px solid rgb(77, 126, 201); */
+	
+	width: 35.8vw;
+
+	margin-top: 0.5vh;
+	margin-bottom: 1vh;
+
+	border-radius: var(--border-radius-card);
+	background-color: rgba(var(--primary));
+	box-shadow: 0 0 0 1px rgba(var(--border-low));
+
+  }
+
+  .ProposalsCardContainerColumn{
+	/* border: 1px solid rgb(98, 201, 77); */
+
+	border-radius: var(--border-radius-card);
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+
+
+	width: 35.8vw;
+	height: 13.4vh;
+
+	/* margin-top: 2vh; */
+  }
+
+  .ProposalsCardContainerColumn:hover{
+	/* border: 1px solid rgb(199, 231, 230); */
+	/* transform: scale(1.01); */
+	background-color: rgba(var(--accent));
+  }
+
+  .ProposalsCardContainerrow{
+	/* border: 1px solid rgb(255, 187, 0); */
+	
+	border-radius: var(--border-radius-card);
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+
+	width: 35.8vw;
+	height: 10vh;
+	padding: 1%;
+
+	/* box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); */
+  }
+
+  .ProposalsCardLogocolumn{
+	/* border: 1px solid rgb(0, 17, 255); */
+	
+	width: 6vw;
+	height: 9.6vh;
+
+	margin-left: 0.6vw;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+  }
+
+  /* .ProposalsCardLogocolumnimg {
+
+	width: 5vw;
+	height: 9vh;
+
+	border-radius: 80px;
+
+	object-fit: cover;
+  } */
+
+
+
+
+  .ProposalsCardImageContainer {
+	/* border: 1px solid rgba(201, 77, 77, 0.774); */
+
+    position: relative;
+
+	width: 4.8vw; 
+	height: 8vh;
+}
+ .ProposalsCardImageContainer img{
+
+	width: 4.8vw; 
+	height: 8vh;
+
+	object-fit: contain;
+}
+
+
+.ProposalsCardImageContainerPlaceholder {
+	/* border: 1px solid rgba(232, 220, 57, 0.774); */
+
+	width: 4.8vw; 
+	height: 8vh;
+	
+    font-size: 3rem;
+    font-weight: 500;
+    text-align: center;
+    /* color: rgba(var(--fg-title));  */
+	/* color: rgb(86, 65, 59);  */
+	/* color: rgba(86, 65, 59, 0.503);  */
+	color: rgba(var(--fg-title));
+
+    background-color: transparent;
+
+	display: none; /* Initially hidden */
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+.ProposalsCardNamerow{
+	/* border: 1px solid rgb(98, 0, 255); */
+	
+	display: flex;
+	flex-direction: row;
+
+	width: 16vw;
+	height: 9.5vh;
+  }
+
+
+
+
+
+
+
+
+
+  
+  .ProposalsCardPlaceholder{
+	/* border: 1px solid rgb(255, 166, 0); */
+
+
+	width: 6vw;
+	height: 9.6vh;
+
+	margin-left: 1vw;
+
+  }
+
+  .ProposalsCardLeftcolumn{
+	/* border: 1px solid rgb(190, 180, 88); */
+	
+	width: 5.5vw;
+	height: 9.5vh;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+
+	margin-left: 2vh;
+
+	/* padding-top: 0.7vh; */
+  }
+
+
+  .ProposalsCardLeftcolumn span{
+	/* border: 2px solid rgb(255, 251, 0); */
+
+	
+	font-weight: 600;
+	font-size: 0.9rem;
+	/* color: rgb(219, 243, 219); */
+	/* color: rgba(var(--fg)); */
+
+	margin-left: 2%;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+  }
+
+
+
+
+
+
+
+
+  .ProposalsCardLeftLeftcolumn{
+	/* border: 1px solid rgb(190, 180, 88); */
+	
+	width: 5.5vw;
+	height: 9.5vh;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+
+	margin-left: 4vh;
+
+	/* padding-top: 0.7vh; */
+  }
+
+
+  .ProposalsCardLeftLeftcolumn span{
+	/* border: 2px solid rgb(255, 251, 0); */
+
+	
+	font-weight: 600;
+	font-size: 0.9rem;
+	/* color: rgb(219, 243, 219); */
+	color: rgba(var(--fg));
+
+	margin-left: 2%;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+  }
+
+
+
+
+
+  .ProposalsCardRightcolumn{
+	/* border: 1px solid rgb(190, 180, 88); */
+	
+	width: 7.7vw;
+	height: 9.5vh;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+
+	margin-left: 0.5vw;
+	/* padding-top: 0.5vh; */
+	/* padding-top: 0.7vh; */
+
+
+  }
+
+
+  .ProposalsCardRightcolumn span{
+	/* border: 1px solid rgb(255, 251, 0); */
+
+	color: rgba(var(--fg));
+	
+	font-weight: 600;
+	font-size: 0.9rem;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+  }
+
+
+
+
+
+  .ProposalsCardLeftRightcolumn{
+	/* border: 1px solid rgb(190, 180, 88); */
+	
+	width: 5vw;
+	height: 9.5vh;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+  }
+
+
+  .ProposalsCardLeftRightcolumn span{
+	/* border: 1px solid rgb(255, 251, 0); */
+
+	color: rgba(var(--fg));
+	
+	font-weight: 600;
+	font-size: 0.9rem;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+  }
+
+
+
+
+
+  .ProposalsTitlerow{
+	/* border: 1px solid rgb(255, 0, 0); */
+
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: flex-start;
+
+	width: 35.8vw;
+	height: 3.6vh;
+
+	border-bottom-right-radius: var(--border-radius-card);
+	border-bottom-left-radius: var(--border-radius-card);
+	
+	box-shadow: 0 0 0 1px rgba(var(--border-low));
+}
+
+
+
+
+.ProposalsTitleNamespan{
+	/* border: 1px solid rgb(47, 0, 255); */
+
+	width: auto;
+	height: 2.8vh;
+
+	color: rgba(var(--fg-title));
+	
+	font-weight: 600;
+	font-size: 1.1rem;
+
+	margin-left:  1.6vw;
+
+	overflow: hidden;
+}
+
+.ProposalsTitlePricespan{
+	/* border: 1px solid rgb(47, 0, 255); */
+
+	width: auto;
+	height: 2.8vh;
+
+	color: rgba(var(--fg));
+	
+	font-weight: 600;
+	font-size: 1.1rem;
+
+	margin-right:  0.7vw;
+
+	overflow: hidden;
+}
+
+
+
+  .ProposalsCardBottomSidePanelOpencolumn{
+	/* border: 1px solid rgb(12, 192, 36); */
+
+	width: 35.8vw;
+	height: 60.4vh;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+  }
+
+
+
+
+
+    .ProposalsCardExchangeBottomSidePanelOpencolumn{
+	/* border: 1px solid rgb(189, 192, 12); */
+
+	width: 35.8vw;
+	height: 21vh;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+  }
+
+
+    .ProposalsCardWalletBottomSidePanelOpencolumn{
+	/* border: 1px solid rgb(189, 192, 12); */
+
+	width: 35.8vw;
+	height: 35vh;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+  }
+
+
+
+
+
+.ProposalsTable1row{
+	/* border: 1px solid red; */
+
+	width: 35.3vw;
+	height: 10vh;
+
+	/* margin-left: -1vh; */
+
+	display: flex;
+	flex-direction: row;
+	/* padding: 1%; */
+
+}
+
+
+
+
+.ProposalsTable2row{
+	/* border: 1px solid red; */
+
+	width: 35.8vw;
+	height: 8vh;
+
+	padding-left: 2%;
+
+	display: flex;
+	flex-direction: row;
+
+	  box-shadow: 0 2px 2px -2px rgba(var(--border-low));
+
+
+}
+
+
+
+
+
+
+	.ProposalsTableLeftcolumn{
+	/* border: 1px solid rgb(0, 68, 255); */
+
+	width: 15.2vw;
+	height: 8vh;
+
+	/* margin-left: 0.2vw; */
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
+}
+
+
+	.ProposalsTableLeftcolumn span{
+	/* border: 1px solid rgb(255, 255, 255); */
+
+	
+	color: rgba(var(--fg));
+	font-weight: 600;
+	font-size: 0.9rem;
+
+	overflow: hidden;
+}
+
+
+	.ProposalsTableRightcolumn{
+	/* border: 1px solid rgb(255, 251, 0); */
+
+	width: 19vw;
+	height: 8vh;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-end;
+}
+
+
+	.ProposalsTableRightcolumn span{
+	/* border: 1px solid rgb(255, 255, 255); */
+	
+	color: rgba(var(--fg));
+	font-weight: 600;
+	font-size: 0.9rem;
+
+	overflow: hidden;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.Proposals2RowsDatarow1 {
+	/* border: 1px solid rgb(212, 255, 253); */
+
+	width: 35.8vw;
+	height: 4.5vh;
+
+	/* margin-bottom: 0.5vh;
+	margin-top: 0.5vh; */
+
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .Proposals2RowsDatarow1wrapper{
+	border: 1px solid rgb(0, 0, 0);
+
+	width: 11.4vw; 
+	height: 3.4vh;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+	gap: 0.3vw;
+
+
+  }
+
+
+
+  .Proposals2RowsDatarow1Wrapperspan {
+
+	/* width: 13vw;  */
+	height: 3.4vh;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+  	white-space: normal;
+	text-align: center;
+
+	color: rgba(var(--fg));
+	
+	font-weight: 600;
+	font-size: 0.8rem;
+  }
+
+
+
+
+
+
+    .Proposals2RowsDatarow1WrapperImgTooltiprow{
+		/* border: 1px solid rgb(187, 23, 23); */
+
+		width: 1vw;
+		height: 1.5vh;
+
+		margin-bottom: 0.2vh;
+
+		position: relative;
+
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+
+	}
+
+
+
+	.ProposalsStatsTooltipimg {
+
+	width: 1vw;
+	height: 1.5vh;
+	object-fit: cover;
+
+	cursor: default;
+    outline: none;
+
+
+	}
+
+
+  .Proposals2RowsDatarow1WrapperImgTooltiprow:hover  .ProposalsStatsTooltip{
+		visibility: visible;
+		opacity: 1;
+
+  }
+
+
+  .ProposalsStatsTooltip{
+  		position: absolute;
+
+		/* top: -1700%; 
+		left: -100%;
+
+		transform: translateX(-50%); */
+
+		/* width: 15vw;   */
+
+
+
+		bottom: calc(100% + 8px);
+		left: 50%;
+		transform: translateX(-50%) translateY(6px); /* start slightly below and animate up */
+		transform-origin: center bottom;
+
+
+		max-width: 28vw;
+  		min-width: 15vw;
+
+		color: rgba(var(--fg));
+		font-weight: 400;
+		font-size: 0.9rem;
+		white-space: normal;
+
+
+		
+		padding: 1vh 0.8vw;
+
+
+		border-radius: var(--border-radius-card);
+		background-color: rgba(0, 0, 0, 0.966);
+
+
+		visibility: hidden;
+		opacity: 1;
+		transition: visibility 0s, opacity 0.2s linear;
+		z-index: 2000;
+
+}
+
+
+
+
+
+
+
+/* little arrow pointing to the icon */
+.ProposalsStatsTooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.96) transparent transparent transparent;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+
+
+
+/* fallback: if tooltip would overflow on the left side, nudge it right (simple CSS fallback) */
+.Proposals2RowsDatarow1WrapperImgTooltiprow.left-edge .ProposalsStatsTooltip {
+  left: 8%;
+  transform: translateX(0) translateY(6px);
+}
+
+/* fallback: if tooltip would overflow on the right side, nudge it left */
+.Proposals2RowsDatarow1WrapperImgTooltiprow.right-edge .ProposalsStatsTooltip {
+  left: auto;
+  right: 8%;
+  transform: translateX(0) translateY(6px);
+}
+
+
+
+
+
+
+
+
+
+  .Proposals2RowsDatarow2 {
+	/* border: 1px solid rgb(212, 255, 253); */
+
+	width: 35.8vw;
+	height: 4.5vh;
+
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+
+
+	box-shadow: 0 2px 2px -2px rgba(var(--border-low));
+
+  }
+
+
+  .Proposals2RowsDatarow2span{
+
+	width: 11.4vw; 
+
+	height: 3.4vh;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	white-space: normal;
+	text-align: center;
+
+	color: rgba(var(--fg));
+	
+	font-weight: 600;
+	font-size: 0.8rem;
+
+  }
+
+  .Proposals2RowsDatarow2wrapper{
+		/* border: 1px solid rgb(212, 255, 253); */
+
+
+	width: 11.4vw; 
+	height: 3.4vh;
+
+	margin-top: 1vh;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	gap: 0.5vw;
+  }
+
+
+  .Proposals2RowsDatarow2wrapper span {
+	/* border: 2px solid rgb(243, 43, 43); */
+
+	/* width: 13vw;  */
+
+	width: fit-content;
+
+	height: 3.4vh;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	white-space: normal;
+	text-align: center;
+
+	color: rgba(var(--fg));
+	
+	font-weight: 600;
+	font-size: 0.8rem;
+  }
+
+
+
+  .Proposals2RowsDatarow2wrapper span.text-green-500 {
+		/* border: 2px solid rgb(43, 243, 76); */
+
+	color: var(--price-up);
+  }
+  .Proposals2RowsDatarow2wrapper span.text-red-500 {
+	color: var(--price-down);
+  }
+
+
+
+
+  .Proposals2RowsDatarow2ArrowImage  {
+	/* border: 2px solid rgb(43, 186, 243); */
+
+	width: 0.8vw;
+	height: 1.5vh;
+
+	display: inline-block;
+
+	vertical-align: middle;
+	margin-right: 0.1vw;
+	margin-left: 0.3vw;
+
+	margin-bottom: 1vh;
+	max-width: 34px;
+	max-height: 34px;
+
+	object-fit: contain;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.ProposalsTablecolumn{
+	/* border: 1px solid rgb(0, 255, 242); */
+
+	/* border: 1px solid rgb(60, 62, 65); */
+	/* border-left: transparent;
+	border-right: transparent; */
+
+	width: 35.8vw;
+	height: 9vh;
+
+	display: flex;
+	flex-direction: column;
+	/* padding: 1%; */
+
+}
+
+.ProposalsTableToprow{
+
+/* border: 1px solid rgb(0, 68, 255); */
+
+/* width: 18.7vw; */
+width: 35.8vw;
+
+height: 4.5vh;
+
+display: flex;
+flex-direction: row;
+justify-content: space-evenly;
+align-items: center;
+}
+
+
+.ProposalsTableToprow span{
+/* border: 1px solid rgb(255, 255, 255); */
+
+
+/* color: rgba(var(--fg-title)); */
+color: rgba(var(--fg));
+
+font-weight: 600;
+font-size: 0.9rem;
+text-align: center;
+
+/* min-width: 6vw; */
+/* max-width: 8vw; */
+width: 8vw;
+
+overflow: hidden;
+}
+
+
+.ProposalsTableToprow span.text-green-500 {
+	color: var(--price-up);  /* tailwind-green-500 */
+  }
+  .ProposalsTableToprow span.text-red-500 {
+	color: var(--price-down);  /* tailwind-red-500 */
+  }
+
+
+
+
+
+.ProposalsTableBottomrow{
+/* border: 1px solid rgb(255, 251, 0); */
+
+/* width: 18.7vw; */
+width: 35.8vw;
+
+height: 4.5vh;
+
+display: flex;
+flex-direction: row;
+justify-content: space-evenly;
+align-items: center;
+}
+
+
+.ProposalsTableBottomrow span{
+	/* border: 1px solid rgb(255, 255, 255); */
+
+	width: 8vw;
+
+	color: rgba(var(--fg));
+	
+	font-weight: 600;
+	font-size: 0.9rem;
+	text-align: center;
+
+
+	overflow: hidden;
+}
+
+
+.ProposalsTableBottomrow span.text-green-500 {
+	color: var(--price-up);  /* tailwind-green-500 */
+  }
+  .ProposalsTableBottomrow span.text-red-500 {
+	color: var(--price-down);  /* tailwind-red-500 */
+  }
+
+
+
+.ProposalsCardBottomSidePanelButton{
+	/* border: 1px solid rgb(162, 12, 192); */
+
+	/* border-right: none;  */
+
+	border-bottom-right-radius: 8px; 
+	border-bottom-left-radius: 8px; 
+	
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	
+	width: 35.8vw;
+	height: 2vh;
+
+	box-shadow: 0 0 0 1px rgba(var(--border-low));
+  }
+
+
+
+
+  .ProposalsCardBottomSidePanelButton:hover {
+	/* border: 1px solid rgb(164, 195, 221); */
+	background-color: rgba(var(--accent));
+}
+
+
+.ProposalsCardBottomSidePanelButtonimg  {
+	/* border: 2px solid rgb(255, 0, 242); */
+
+	/* width: 4%; */
+	width: 1vw;
+	height: 2vh;
+
+
+	object-fit: contain;
+	/* margin-left: 18%; */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media (max-width: 768px) {
+
+
+
+	.ProposalsLeftModuleCoinMain{
+		/* border: 1px solid rgb(0, 255, 21); */
+	
+		width: 98vw;
+	}
+
+
+
+
+  .ProposalsSortByrow{
+	/* border: 1px solid green; */
+
+	width: 95vw;
+
+  }
+
+
+
+
+
+/* default button look */
+.ProposalsSortByrow .sort-btn {
+	/* border: 1px solid rgb(49, 87, 255); */
+
+	width: 14vw; 
+}
+
+
+
+
+
+
+
+
+	.ProposalsLeftModuleBigColumn{
+	/* border: 1px solid rgb(30, 255, 0); */
+
+		width: 96.5vw;
+	}
+
+
+
+
+
+	.ProposalsCardBigColumn{
+		/* border: 1px solid rgb(77, 126, 201); */
+	
+		width: 95vw;
+	  }
+	
+	  .ProposalsCardContainerColumn{
+		/* border: 1px solid rgb(98, 201, 77); */
+
+		width: 95vw;
+	  }
+	
+	  .ProposalsCardContainerrow{
+		/* border: 1px solid rgb(255, 187, 0); */
+
+		width: 95vw;
+	  }
+	
+	  .ProposalsCardLogocolumn{
+		/* border: 1px solid rgb(0, 17, 255); */
+		
+		width: 12vw;
+	  }
+	
+
+
+	  .ProposalsCardImageContainer {
+		/* border: 1px solid rgba(201, 77, 77, 0.774); */
+
+		width: 12vw;
+	}
+
+
+	 .ProposalsCardImageContainer img{
+		/* border: 1px solid rgba(77, 201, 153, 0.774); */
+
+		width: 12vw;
+	}
+	
+	
+	.ProposalsCardImageContainerPlaceholder {
+		/* border: 1px solid rgba(232, 220, 57, 0.774); */
+	
+		width: 12vw;
+	}
+	
+	
+	
+	.ProposalsCardNamerow{
+		/* border: 1px solid rgb(98, 0, 255); */
+
+		width: 39.7vw;
+	  }
+	
+
+	  .ProposalsCardLeftcolumn{
+		/* border: 1px solid rgb(190, 180, 88); */
+		
+		width: 17vw;
+
+	  }
+	
+  .ProposalsCardLeftLeftcolumn{
+	/* border: 1px solid rgb(190, 180, 88); */
+	
+	width: 17vw;
+	margin-left: 4vh;
+
+  }
+
+	  .ProposalsCardLeftRightcolumn{
+	/* border: 1px solid rgb(190, 180, 88); */
+	
+	width: 14vw;
+
+  }
+
+	
+
+
+
+
+	  .ProposalsCardRightcolumn{
+		/* border: 1px solid rgb(190, 180, 88); */
+		
+		width: 18vw;
+	  }
+	
+
+	
+	
+	
+	
+	
+	  .ProposalsTitlerow{
+		/* border: 1px solid rgb(255, 0, 0); */
+
+		width: 95vw;
+	}
+	
+	
+	
+
+
+	
+	
+	  .ProposalsCardBottomSidePanelOpencolumn{
+		/* border: 1px solid rgb(12, 192, 36); */
+
+		width: 95vw;
+	  }
+	
+	
+	
+	
+	
+	
+	
+	
+	.ProposalsTable1row{
+		/* border: 1px solid rgb(17, 0, 255); */
+
+		width: 95vw;
+		padding-left: 6.8vw;
+	}
+	
+	
+	
+	
+	.ProposalsTable2row{
+		/* border: 1px solid red; */
+
+		width: 95vw;
+		height: 8vh;	
+	}
+	
+	
+	
+	
+	
+	
+		.ProposalsTableLeftcolumn{
+		/* border: 1px solid rgb(0, 68, 255); */
+	
+		width: 35vw;
+	}
+	
+	
+
+	
+		.ProposalsTableRightcolumn{
+		/* border: 1px solid rgb(255, 251, 0); */
+	
+		width: 55.5vw;
+	}
+	
+	
+	
+	.ProposalsTablecolumn{
+		/* border: 1px solid rgb(0, 255, 242); */
+	
+		width: 95vw;
+	}
+	
+	.ProposalsTableToprow{
+	/* border: 1px solid rgb(0, 68, 255); */
+	
+	width: 95vw;
+	}
+	
+	
+	.ProposalsTableToprow span{
+	/* border: 1px solid rgb(255, 255, 255); */
+
+	width: 26vw;
+	
+	}
+	
+	
+	.ProposalsTableBottomrow{
+	/* border: 1px solid rgb(255, 251, 0); */
+	
+	width: 95vw;
+	}
+	
+	
+	.ProposalsTableBottomrow span{
+		/* border: 1px solid rgb(255, 255, 255); */
+
+		width: 26vw;
+	}
+	
+	
+	.ProposalsCardBottomSidePanelButton{
+		/* border: 1px solid rgb(162, 12, 192); */
+
+		width: 95vw;
+	  }
+	
+	.ProposalsCardBottomSidePanelButtonimg  {
+		/* border: 2px solid rgb(255, 0, 242); */
+	
+		width: 4vw;
+	}
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .Proposals2RowsDatarow1wrapper{
+	/* border: 1px solid rgb(187, 23, 23); */
+
+	
+	border: 1px solid rgb(0, 0, 0);
+	width: 30vw; 
+  }
+
+
+  .Proposals2RowsDatarow1Wrapperspan {
+		/* border: 1px solid rgb(187, 23, 23); */
+
+
+		width: fit-content !important;
+
+  }
+
+
+
+
+    .Proposals2RowsDatarow1WrapperImgTooltiprow{
+		/* border: 1px solid rgb(187, 23, 23); */
+
+		width: 3vw;
+
+		margin-bottom: 0.4vh;
+	}
+
+
+	.ProposalsStatsTooltipimg {
+
+	width: 3vw;
+	}
+
+
+
+
+
+  .ProposalsStatsTooltip{
+  		position: absolute;
+
+		max-width: 58vw;
+  		min-width: 35vw;
+
+		bottom: calc(100% + 8px);
+		left: -140%;
+		transform: translateX(-50%) translateY(6px); /* start slightly below and animate up */
+		transform-origin: center bottom;
+
+		padding: 1vh 2vw;
+
+  }
+
+
+
+.Proposals2RowsDatarow1WrapperImgTooltiprow.left-edge .ProposalsStatsTooltip {
+  left: 8% ;
+  transform: translateX(0) translateY(6px);
+}
+
+.Proposals2RowsDatarow1WrapperImgTooltiprow.right-edge .ProposalsStatsTooltip {
+  left: auto !important;
+  right: 8% !important;
+  transform: translateX(0) translateY(6px);
+}
+
+
+
+
+
+
+
+
+
+
+
+	.Proposals2RowsDatarow1 {
+		/* border: 1px solid rgb(212, 255, 253); */
+	
+		width: 95vw;  
+		margin-top: 1.5vh;
+
+		justify-content: center;
+	  }
+	
+	  .Proposals2RowsDatarow1 span {
+		/* border: 1px solid rgb(0, 0, 0); */
+	
+		/* width: 15.7vw;  */
+
+		width: 30vw; 
+
+	  }
+	
+
+
+
+
+
+
+
+
+
+
+	  .Proposals2RowsDatarow2 {
+		/* border: 1px solid rgb(212, 255, 253); */
+	
+		width: 95vw; 
+
+		justify-content: center;
+
+		gap: 1vw;
+		
+	  }
+	
+
+	  .Proposals2RowsDatarow2span{
+		/* border: 1px solid rgb(32, 172, 165); */
+
+		width: 30vw; 
+
+	  }
+
+
+  .Proposals2RowsDatarow2wrapper{
+		/* border: 1px solid rgb(212, 255, 253); */
+
+
+		width: 30vw; 
+  }
+
+
+
+
+
+	  .Proposals2RowsDatarow2 span {
+		/* border: 2px solid rgb(243, 43, 43); */
+	
+		/* width: 15.7vw;  */
+
+		width: 30vw; 
+
+	  }
+		
+
+
+  .Proposals2RowsDatarow2ArrowImage  {
+	/* border: 2px solid rgb(43, 186, 243); */
+
+	width: 2vw;
+	margin-bottom: 1.5vh;
+	margin-left: 4vw;
+
+  }
+
+
+
+	  .Proposals2RowsDatarow2LAST {
+		/* border: 1px solid rgb(212, 255, 253); */
+	
+		width: 95vw; 
+	  }
+	
+	  .Proposals2RowsDatarow2LAST span {
+		/* border: 2px solid rgb(243, 43, 43); */
+	
+		width: 15.7vw; 
+	  }
+	
+	
+	
+	
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

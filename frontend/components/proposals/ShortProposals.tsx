@@ -25,8 +25,10 @@ interface Post {
 	mission: string;
 	budget: string;
 	implement: string;
+
 	votesUp: number;
 	votesDown: number;
+
 	shareMore: number;
 	dateCreated: Date;
 	avatar: string;
@@ -42,168 +44,168 @@ export default function ShortProposals() {
 	const dispatch = useDispatch();
 	const shortProposalSelected = useSelector((state: RootState) =>  state.proposals.shortProposalSelected);
 
-	const [posts, setPosts] = useState<Post[]>([]);
-/////////////////////////
-// const posts = [
-// 	{
-// 		"id": 1,
-// 		"title": "Ipsum Lorem 1",
-// 		"description": "Ipsum Lorem 1",
-// 		"mission": "Mision Ipsum Lorem",
-// 		"budget": "Budget Ipsum Lorem",
-// 		"social": "Social Ipsum Lorem",
-// 		"implement": "Implement Ipsum Lorem",
-// 		"votesUp": 0,
-// 		"votesDown": 0,
-// 		"ShareMore": 0,
-// 	},
-// 	{
-// 		"id": 3,
-// 		"title": "Ipsum Lorem 1",
-// 		"description": "Ipsum Lorem 1",
-// 		"mission": "Mision Ipsum Lorem",
-// 		"budget": "Budget Ipsum Lorem",
-// 		"social": "Social Ipsum Lorem",
-// 		"implement": "Implement Ipsum Lorem",
-// 		"votesUp": 0,
-// 		"votesDown": 0,
-// 		"ShareMore": 0,
-// 	},
-// 	{
-// 		"id": 3,
-// 		"title": "Ipsum Lorem 1",
-// 		"description": "Ipsum Lorem 1",
-// 		"mission": "Mision Ipsum Lorem",
-// 		"budget": "Budget Ipsum Lorem",
-// 		"social": "Social Ipsum Lorem",
-// 		"implement": "Implement Ipsum Lorem",
-// 		"votesUp": 0,
-// 		"votesDown": 0,
-// 		"ShareMore": 0,
-// 	},
-// 	{
-// 		"id": 4,
-// 		"title": "Ipsum Lorem 1",
-// 		"description": "Ipsum Lorem 1",
-// 		"mission": "Mision Ipsum Lorem",
-// 		"budget": "Budget Ipsum Lorem",
-// 		"social": "Social Ipsum Lorem",
-// 		"implement": "Implement Ipsum Lorem",
-// 		"votesUp": 0,
-// 		"votesDown": 0,
-// 		"ShareMore": 0,
-// 	},
-// 	{
-// 		"id": 5,
-// 		"title": "Ipsum Lorem 1",
-// 		"description": "Ipsum Lorem 1",
-// 		"mission": "Mision Ipsum Lorem",
-// 		"budget": "Budget Ipsum Lorem",
-// 		"social": "Social Ipsum Lorem",
-// 		"implement": "Implement Ipsum Lorem",
-// 		"votesUp": 0,
-// 		"votesDown": 0,
-// 		"ShareMore": 0,
-// 	},
-// ];
+	// const [posts, setPosts] = useState<Post[]>([]);
+///////////////////////
+const posts = [
+	{
+		"id": 1,
+		"title": "Ipsum Lorem 1",
+		"description": "Ipsum Lorem 1 is a dummy or placeholder text commonly used in graphic design, publishing, and web development. Its purpose is to permit a page layout to be designed, independently of the copy that will subsequently populate it, or to demonstrate various fonts of a typeface without meaningful text that could be distracting. is a dummy or placeholder text commonly used in graphic design, publishing, and web development. Its purpose is to permit a page layout to be designed, independently of the copy that will subsequently populate it, or to demonstrate various fonts of a typeface without meaningful text that could be distracting.  ",
+		"mission": "Mision Ipsum Lorem",
+		"budget": "Budget Ipsum Lorem",
+		"social": "Social Ipsum Lorem",
+		"implement": "Implement Ipsum Lorem",
+		"votesUp": 0,
+		"votesDown": 0,
+		"ShareMore": 0,
+	},
+	{
+		"id": 3,
+		"title": "Ipsum Lorem 1",
+		"description": "Ipsum Lorem 1",
+		"mission": "Mision Ipsum Lorem",
+		"budget": "Budget Ipsum Lorem",
+		"social": "Social Ipsum Lorem",
+		"implement": "Implement Ipsum Lorem",
+		"votesUp": 0,
+		"votesDown": 0,
+		"ShareMore": 0,
+	},
+	{
+		"id": 3,
+		"title": "Ipsum Lorem 1",
+		"description": "Ipsum Lorem 1",
+		"mission": "Mision Ipsum Lorem",
+		"budget": "Budget Ipsum Lorem",
+		"social": "Social Ipsum Lorem",
+		"implement": "Implement Ipsum Lorem",
+		"votesUp": 0,
+		"votesDown": 0,
+		"ShareMore": 0,
+	},
+	{
+		"id": 4,
+		"title": "Ipsum Lorem 1",
+		"description": "Ipsum Lorem 1",
+		"mission": "Mision Ipsum Lorem",
+		"budget": "Budget Ipsum Lorem",
+		"social": "Social Ipsum Lorem",
+		"implement": "Implement Ipsum Lorem",
+		"votesUp": 0,
+		"votesDown": 0,
+		"ShareMore": 0,
+	},
+	{
+		"id": 5,
+		"title": "Ipsum Lorem 1",
+		"description": "Ipsum Lorem 1",
+		"mission": "Mision Ipsum Lorem",
+		"budget": "Budget Ipsum Lorem",
+		"social": "Social Ipsum Lorem",
+		"implement": "Implement Ipsum Lorem",
+		"votesUp": 0,
+		"votesDown": 0,
+		"ShareMore": 0,
+	},
+];
 
 
-	useEffect(() => {
-		const fetchAllPosts = async () => {
-		  try {
-			const response = await axios.get<Post[]>('http://localhost:5000/proposals');
-			setPosts(response.data);
+	// useEffect(() => {
+	// 	const fetchAllPosts = async () => {
+	// 	  try {
+	// 		const response = await axios.get<Post[]>('http://localhost:5000/proposals');
+	// 		setPosts(response.data);
 	
-			// Dispatch the first post ID if posts exist
-			if (response.data.length > 0) {
-			  dispatch(shortproposalselected(response.data[0].id));
-			}
-		   } catch (err: unknown) {
-        if (err instanceof Error) {
-          console.error("Error fetching posts:", err.message);
-        } else {
-          console.error("Error fetching posts:", String(err));
-        }
-      }
-		};
+	// 		// Dispatch the first post ID if posts exist
+	// 		if (response.data.length > 0) {
+	// 		  dispatch(shortproposalselected(response.data[0].id));
+	// 		}
+	// 	   } catch (err: unknown) {
+    //     if (err instanceof Error) {
+    //       console.error("Error fetching posts:", err.message);
+    //     } else {
+    //       console.error("Error fetching posts:", String(err));
+    //     }
+    //   }
+	// 	};
 	
-		fetchAllPosts();
-	  }, [dispatch]);
+	// 	fetchAllPosts();
+	//   }, [dispatch]);
 
 
-	const fetchAllPosts2 = async () => {
-	try {
-		const response = await axios.get('http://localhost:5000/proposals');
-		setPosts(response.data);
-	} catch (err: unknown) {
-		if (axios.isAxiosError(err)) {
-		// err is AxiosError now
-		if (err.response) {
-			// Not in the 2xx range
-			console.log(err.response.data);
-			console.log(err.response.status);
-			console.log(err.response.headers);
-		} else {
-			// No response (e.g., network error)
-			console.log("Axios error (no response):", err.message);
-		}
-		} else if (err instanceof Error) {
-		// Non-Axios generic Error
-		console.log("Non-Axios error:", err.message);
-		} else {
-		// Unknown throwable (string, number, etc.)
-		console.log("Unexpected error:", String(err));
-		}
-	}
-	};
+	// const fetchAllPosts2 = async () => {
+	// try {
+	// 	const response = await axios.get('http://localhost:5000/proposals');
+	// 	setPosts(response.data);
+	// } catch (err: unknown) {
+	// 	if (axios.isAxiosError(err)) {
+	// 	// err is AxiosError now
+	// 	if (err.response) {
+	// 		// Not in the 2xx range
+	// 		console.log(err.response.data);
+	// 		console.log(err.response.status);
+	// 		console.log(err.response.headers);
+	// 	} else {
+	// 		// No response (e.g., network error)
+	// 		console.log("Axios error (no response):", err.message);
+	// 	}
+	// 	} else if (err instanceof Error) {
+	// 	// Non-Axios generic Error
+	// 	console.log("Non-Axios error:", err.message);
+	// 	} else {
+	// 	// Unknown throwable (string, number, etc.)
+	// 	console.log("Unexpected error:", String(err));
+	// 	}
+	// }
+	// };
 
-	const [categoryType, setCategoryType] = useState('');
+	// const [categoryType, setCategoryType] = useState('');
 
 
-	const fetchbyCategory = async (category: string) => {
+	// const fetchbyCategory = async (category: string) => {
 
-		console.log("F - ShortProposals -- fetchByCategory -- categoryType: ", categoryType);
+	// 	console.log("F - ShortProposals -- fetchByCategory -- categoryType: ", categoryType);
 
-        try {
-            const response = await axios.get('http://localhost:5000/proposals/bycategory', {
-                params: {
-					category: String(category)
-                }
-            });
-            setPosts(response.data);
+    //     try {
+    //         const response = await axios.get('http://localhost:5000/proposals/bycategory', {
+    //             params: {
+	// 				category: String(category)
+    //             }
+    //         });
+    //         setPosts(response.data);
 			
-		} catch (err: unknown) {
-			if (err instanceof Error) {
-			console.error("Error fetching posts:", err.message);
-			} else {
-			console.error("Error fetching posts:", String(err));
-			}
-		}
-    };
+	// 	} catch (err: unknown) {
+	// 		if (err instanceof Error) {
+	// 		console.error("Error fetching posts:", err.message);
+	// 		} else {
+	// 		console.error("Error fetching posts:", String(err));
+	// 		}
+	// 	}
+    // };
 
-    const handleCategoryButton = (category: string) => {
-        setCategoryType(category);
+    // const handleCategoryButton = (category: string) => {
+    //     setCategoryType(category);
 		
-		if ((category === 'governance') || (category === 'projects')){
-			console.log("CATEGORY: ", category);
+	// 	if ((category === 'governance') || (category === 'projects')){
+	// 		console.log("CATEGORY: ", category);
 
-			fetchbyCategory(category);
-		}
-		if (category === 'all'){
-			console.log("CATEGORY All: ", category);
+	// 		fetchbyCategory(category);
+	// 	}
+	// 	if (category === 'all'){
+	// 		console.log("CATEGORY All: ", category);
 
-			fetchAllPosts2();
+	// 		fetchAllPosts2();
 
-		}
+	// 	}
 		
-    };
+    // };
 
 
 	return(
 		<div className='ShortProposalsMain'>
 			<div className='ShortProposalsButtonrow'>
 
-			<button className={`ShortProposalsbutton ${(categoryType === "all") ? 'ShortProposalsbuttonSelected' : ''}`}
+			{/* <button className={`ShortProposalsbutton ${(categoryType === "all") ? 'ShortProposalsbuttonSelected' : ''}`}
 						onClick={() => handleCategoryButton('all')}>
 					<span>
 						All
@@ -220,7 +222,7 @@ export default function ShortProposals() {
 					<span>
 						Projects
 					</span>
-				</button>
+				</button> */}
 			</div>
 		
 
@@ -236,9 +238,9 @@ export default function ShortProposals() {
 
 						<div className='ShortProposalsPostsCardrow'>
 							<div className='ShortProposalsPostsCardLogoColumn'>
-								{post &&
+								{/* {post &&
 								<img src={`http://localhost:5000/proposals/image/${post.avatar}`} alt="Avatar" />
-								}
+								} */}
 							</div>
 							
 							<div className='ShortProposalsPostsCardNameandDescriptionColumn'>
@@ -246,7 +248,7 @@ export default function ShortProposals() {
 									{post.title}
 								</span>
 								<span className='ShortProposalsPostsCardShortBody'>
-									{new Date(post.dateCreated).toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true })}
+									{/* {new Date(post.dateCreated).toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true })} */}
 
 								</span>
 							</div>

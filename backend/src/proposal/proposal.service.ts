@@ -31,6 +31,26 @@ public async findAllProposals(): Promise<Proposal[]> {
 
 
 
+public async findProposals(where: FindOptionsWhere<Proposal>) {
+  return await this.proposalRepo.findBy(where);
+}
+
+
+
+
+
+async createProposal(category: string, title: string, description: string, mission: string,  budget: string, implement: string, created_at: string): Promise<Proposal> {
+
+
+  const newProposal = this.proposalRepo.create({
+    category, title, description, mission,  budget, implement, created_at
+  });
+
+  await this.proposalRepo.save(newProposal);
+
+  return newProposal; // Only return the newly created proposal
+}
+
 
 
 

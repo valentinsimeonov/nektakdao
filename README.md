@@ -194,7 +194,7 @@ Next up: Backend and Database, Frontend Finish Make Proposal(retrieve proposals)
 
 ### Artistic Approach :)
 
-Now we are building the Technical Floor of the Building.
+Now we are building the Technical Floor(Backend) of the Building(App).
 
 
 
@@ -258,7 +258,15 @@ We will cross that bridge when we come to it.
 
 
 
+### 2. Database
+    Connect Database to Backend
+    Accomodate Proposal Entity
 
+#### 3. Frontend
+
+    GraphQL instead of Axios
+    Make proposal Module
+    View proposals Module
 
 
 
@@ -274,13 +282,8 @@ We will cross that bridge when we come to it.
 ## TODO
 
 
-### 2. Database
+#### 3. Frontend
 
-
-#### 1. Frontend
-
-    Make proposal
-    View proposals
     Vote
     Queue/execute.
 

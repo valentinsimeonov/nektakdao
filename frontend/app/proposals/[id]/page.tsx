@@ -6,7 +6,6 @@ import React from 'react';
 import './proposals.css';
 import RootLayout from '../../layout';
 import Banner from '../../../components/banner'
-import UserBar from '../../../components/userbar/UserBar';
 
 import { ApolloProvider } from '@apollo/client';
 import client from '../../../api/apolloclient';
@@ -21,6 +20,9 @@ import { useMediaQuery } from "../../../components/Utils";
 // import { indivmiddlemobilevisible } from "../../../store/IndivSlice";
 
 import  ProposalsLeftModuleMain  from "../../../components/proposals/leftModule/ProposalsLeftModuleMain";
+import Navbar from '../../../components/navbar/Navbar';
+import CreateProposals from '../../../components/proposals/CreateProposals';
+import LongCreateProposals from '../../../components/proposals/LongCreateProposals';
 
 
 
@@ -48,7 +50,7 @@ export default function ProposalsPage({
 					<Banner />
 					<div className='ProposalsNavBarContainer'>
 
-						<UserBar />
+						<Navbar />
 					</div>
 
 					<div className='ProposalsModules'>
@@ -57,29 +59,30 @@ export default function ProposalsPage({
 							<ProposalsLeftModuleMain id={id} />
 						</div>
 
-{/* 
+
 
 						{isMobile && mobileOpen && (
 						<div className="ProposalsMobileMiddleContainer">
-							<ProposalsMiddleModule />
+							{/* <ProposalsMiddleModule /> */}
 						</div>
 						)}
 
 
-						{isMobile && mobileOpen && (
+						{/* {isMobile && mobileOpen && (
 						<button className="ProposalsCloseMiddleModuleBtn"
 								onClick={() => dispatch(proposalsmiddlemobilevisible(false))}>
 							Close
 						</button>
-						)}
-
+						)} */}
 
 
 						{!isMobile && (
 						<div className='ProposalsMiddleModuleContainer'>
-							<ProposalsMiddleModule />
+							<LongCreateProposals />
+
+							{/* <ProposalsMiddleModule /> */}
 						</div>
-						)} */}
+						)}
 
 
 					</div>

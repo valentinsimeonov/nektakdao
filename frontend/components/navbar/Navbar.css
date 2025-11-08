@@ -1,6 +1,6 @@
 
 
-  .UserBarMainrow{
+  .NavbarMainrow{
 		/* border: 1px solid rgb(252, 58, 58); */
 
 		width: 49.6vw;
@@ -19,7 +19,7 @@
 
 
 
-  .UserBarButtonrow{
+  .NavbarButtonrow{
 	/* border: 1px solid rgb(0, 58, 250); */
 	
 	width: 49.8vw;
@@ -34,7 +34,123 @@
 
 
 
-  .UserBarbutton {
+
+
+
+
+
+
+  .NavBarDashboardMiniContainerrow{
+	/* border: 1px solid rgb(0, 0, 0); */
+
+
+	width: 3.8vw;
+	height: 6vh;
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+
+	position: relative;
+  }
+
+
+
+
+  .NavBarDashboardMiniContainerButtonrow{
+	/* border: 1px solid rgb(255, 242, 242); */
+
+
+	width: 3.8vw;
+	height: 6vh;
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+  }
+
+
+
+
+
+
+
+
+  .NavBarDashboardProposalsbutton {
+	/* border: 1px solid rgb(9, 255, 0); */
+
+	width: 2.5vw;
+	height: 5vh;
+	/* margin-top: 0.6vh; */
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+
+	/* border-radius: 50%; */
+
+	background-image: url('/logo/SpiralLogo120x120XeonDark.png'); 
+	background-size: contain;
+	background-repeat: no-repeat;
+
+	cursor: pointer;
+	transition: 0.3s ease-out;
+
+  }
+  
+  .NavBarDashboardProposalsbutton:hover {
+	background-image: url('/logo/SpiralLogo120x120XeonMedium.png'); 
+	background-size: contain;
+	background-repeat: no-repeat;
+
+	transform: scale(0.9);
+
+  }
+
+    .NavBarDashboardProposalsbuttonSelected{
+		background-image: url('/logo/SpiralLogo120x120XeonHigh.png'); 
+		background-size: contain;
+		background-repeat: no-repeat;
+	}
+
+
+	.NavBarDashboardMiniContainerButtonrow:hover .NavBarDashboardProposalsbuttonTooltip {
+		visibility: visible;
+		opacity: 1;
+	}
+	
+
+
+	.NavBarDashboardProposalsbuttonTooltip {
+		position: absolute;
+		/* top: 15%; 
+		left: 150%; */
+		top: -55%; 
+		left: 50%;
+		transform: translateX(-50%);
+		background-color: rgba(0, 0, 0, 0.75);
+		color: #fff;
+		padding: 0.5rem;
+		border-radius: 0.25rem;
+		font-size: 0.7rem;
+		white-space: nowrap;
+		visibility: hidden;
+		opacity: 0;
+		transition: visibility 0s, opacity 0.2s linear;
+		z-index: 1000;
+	}
+	
+
+
+
+
+
+
+
+  .Navbarbutton {
 	/* border: 1px solid rgb(0, 255, 242); */
 
 	width: 8vw;
@@ -49,14 +165,14 @@
 }
 
 
-.UserBarbutton:hover{
+.Navbarbutton:hover{
 	/* background: rgb(239, 240, 241); */
 	background: rgba(77, 73, 73, 0.932);
 
 }
 
 
-.UserBarbutton span {
+.Navbarbutton span {
 	color:rgb(105, 103, 103);
 
 	font-family: 'Lato', sans-serif, 'Montserrat Thin', sans-serif, Montserrat;
@@ -64,7 +180,7 @@
 	font-size: 0.9rem;
 }
 
-.UserBarbutton:hover span {
+.Navbarbutton:hover span {
 	/* color:rgb(238, 231, 231); */
 	/* color: rgb(65, 76, 87); */
 	color: rgb(164, 195, 221);
@@ -73,14 +189,14 @@
 }
 
 
-.UserBarbuttonSelected{
+.NavbarbuttonSelected{
 	/* background: rgb(230, 232, 235); */
 	background: rgba(77, 73, 73, 0.932);
 
 }
 
 
-.UserBarbuttonSelected span {
+.NavbarbuttonSelected span {
 	/* color: rgb(65, 76, 87); */
 	color: rgb(164, 195, 221);
 
@@ -96,7 +212,7 @@
 
 
 
-  .UserBarUserCard{
+  .NavbarUserCard{
 	/* border: 1px solid silver; */
 	border: 1px solid rgb(60, 62, 65);
 
@@ -105,7 +221,7 @@
   }
 
 
-  .UserBarUserCard button {
+  .NavbarUserCard button {
 	/* border: 1px solid rgb(250, 234, 6); */
 
 	/* border: 1px solid rgb(60, 62, 65); */
@@ -122,7 +238,7 @@
 
 
 
-  .UserBarUserCard button:hover {
+  .NavbarUserCard button:hover {
 	/* border: 1px solid rgb(255, 255, 255); */
 	/* background: rgb(33, 38, 44); */
 	background: rgb(41, 47, 54);
@@ -135,7 +251,7 @@
 
 
 
-  .UserBarCardrow{
+  .NavbarCardrow{
 	/* border: 1px solid rgb(108, 230, 28); */
 
 
@@ -154,7 +270,7 @@
   }
 
 
-  .UserBarCardLogoColumn{
+  .NavbarCardLogoColumn{
 	/* border: 1px solid rgb(230, 28, 180); */
 
 
@@ -169,7 +285,7 @@
 	justify-content: center;
   }
 
-  .UserBarCardLogoColumn img{
+  .NavbarCardLogoColumn img{
 	/* border: 1px solid rgb(230, 183, 28); */
 
 
@@ -191,7 +307,7 @@
 
 
 
-.UserBarCardNameandDescriptionColumn{
+.NavbarCardNameandDescriptionColumn{
 	/* border: 1px solid rgb(255, 255, 255); */
 
 	width: 14.5vw;
@@ -204,7 +320,7 @@
 
 
 
-  .ChatUserBarsTitle{
+  .ChatNavbarsTitle{
 	/* border: 1px solid white; */
 
 	width: 14.5vw;
@@ -223,7 +339,7 @@
   }
 
 
-  .ChatUserBarsShortBody{
+  .ChatNavbarsShortBody{
 	/* border: 1px solid rgb(211, 11, 134); */
 
 	width: 15vw;
@@ -275,7 +391,7 @@
 
 
 
-    .UserBarLogoButtonrow{
+    .NavbarLogoButtonrow{
 		border: 1px solid rgb(58, 213, 252);
 
 		width: 5vw;
@@ -291,7 +407,7 @@
 
 
 
-.UserBarComunitiesbutton{
+.NavbarComunitiesbutton{
 	/* border: 1px solid rgba(255, 255, 255, 0.774); */
 
 	/* border: 1px solid rgba(77, 127, 201, 0.774); */
@@ -318,7 +434,7 @@
 	align-items: center;
   }
 
-  .UserBarComunitiesbutton img {
+  .NavbarComunitiesbutton img {
 	/* border: 1px solid rgba(202, 33, 33, 0.774); */
 
 	border-top-left-radius: 7px;
@@ -334,7 +450,7 @@
 	
   }
 
-  .UserBarComunitiesbutton span {
+  .NavbarComunitiesbutton span {
 	/* border: 1px solid white; */
 
 	border-bottom-left-radius: 7px;
@@ -358,7 +474,7 @@
 
   }
 
-  .UserBarComunitiesbutton:hover {
+  .NavbarComunitiesbutton:hover {
 	/* border: 1px solid rgb(56, 93, 148); */
 	/* border: 1px solid rgb(14, 128, 124); */
 	background: rgb(49, 57, 63);
@@ -366,7 +482,7 @@
   }
 
 
-  .UserBarComunitiesbuttonSelected{
+  .NavbarComunitiesbuttonSelected{
 	border: 1px solid rgb(200, 224, 224);
   }
 
@@ -378,7 +494,7 @@
 
 
 
-.UserBarCreateCommsbutton{
+.NavbarCreateCommsbutton{
 	/* border: 1px solid rgba(255, 255, 255, 0.774); */
 
 	/* border: 1px solid rgba(77, 127, 201, 0.774); */
@@ -407,7 +523,7 @@
 
 
 
-  .UserBarCreateCommsbutton span {
+  .NavbarCreateCommsbutton span {
 	/* border: 1px solid white; */
 
 	border-bottom-left-radius: 7px;
@@ -431,7 +547,7 @@
 
   }
 
-  .UserBarCreateCommsbutton:hover {
+  .NavbarCreateCommsbutton:hover {
 	/* border: 1px solid rgb(56, 93, 148); */
 	/* border: 1px solid rgb(14, 128, 124); */
 	background: rgb(49, 57, 63);
@@ -439,7 +555,7 @@
   }
 
 
-  .UserBarCreateCommsbuttonSelected{
+  .NavbarCreateCommsbuttonSelected{
 	border: 1px solid rgb(200, 224, 224);
   }
 
@@ -450,7 +566,7 @@
 
 
 
-  .UserBarCommsButtonrow{
+  .NavbarCommsButtonrow{
 	border: 1px solid rgb(58, 213, 252);
 
 	width: 40.8vw;
@@ -461,5 +577,56 @@
 	display: flex;
 	justify-content: flex-start;
 	align-items: center;
+
+}
+
+
+
+
+
+
+
+
+@media (max-width: 768px) {
+
+	.NavBarMainrow{
+	  	/* border: 1px solid rgb(255, 0, 0); */
+
+		  width: 100vw;
+		  padding-top: 0.1vh;
+	}
+  
+
+
+
+  .NavBarDashboardMiniContainerrow{
+	/* border: 1px solid rgb(0, 0, 0); */
+
+	width: 8.8vw;
+	height: 4vh;
+
+  }
+
+  .NavBarDashboardMiniContainerButtonrow{
+	/* border: 1px solid rgb(255, 242, 242); */
+
+	width: 8vw;
+	height: 4vh;
+
+  }
+
+
+
+
+  .NavBarDashboardProposalsbutton {
+	/* border: 1px solid rgb(9, 255, 0); */
+
+	width: 8vw;
+	height: 4vh;
+
+  }
+
+
+
 
 }

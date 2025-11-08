@@ -166,19 +166,19 @@ const [hasInitializedFromURL, setHasInitializedFromURL] = useState(false);
 			<div className='ProposalsLeftLayerButtonsContainerrow'>
 				
 
-				<button className={`IndivLeftLayerButton ${(proposalsLeftModuleLayer === "all") ? 'IndivLeftLayerButtonSelected' : '' }` }
+				<button className={`ProposalsLeftLayerButton ${(proposalsLeftModuleLayer === "all") ? 'ProposalsLeftLayerButtonSelected' : '' }` }
 						onClick={() => handleLayerClick("all")}
 				>
 					<span>All</span>
 				</button>
-				<button className={`IndivLeftLayerButton ${(proposalsLeftModuleLayer === "governance") ? 'IndivLeftLayerButtonSelected' : '' }` }
+				<button className={`ProposalsLeftLayerButton ${(proposalsLeftModuleLayer === "governance") ? 'ProposalsLeftLayerButtonSelected' : '' }` }
 						onClick={() => handleLayerClick("governance")}
 				>
 					<span>Governance</span>
 				</button>
 
 
-				<button className={`IndivLeftLayerButton ${(proposalsLeftModuleLayer === "projects") ? 'IndivLeftLayerButtonSelected' : '' }` }
+				<button className={`ProposalsLeftLayerButton ${(proposalsLeftModuleLayer === "projects") ? 'ProposalsLeftLayerButtonSelected' : '' }` }
 						onClick={() => handleLayerClick("projects")}
 				>
 					<span>Projects</span>

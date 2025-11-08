@@ -155,4 +155,16 @@ export type RootState = {
 
 	};
 
+
+
+
+	navbar:{
+
+		selectedDashboard: string,
+
+	};
+
+
+
+
 };

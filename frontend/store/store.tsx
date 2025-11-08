@@ -4,6 +4,7 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import proposalsReducer from './ProposalsSlice';
 
+import navbarReducer from './navbarslice';
 
 
 const store = configureStore ({
@@ -11,6 +12,7 @@ const store = configureStore ({
 	reducer: {
 
 		proposals: proposalsReducer,
+		navbar: navbarReducer,
 
 	},
 });

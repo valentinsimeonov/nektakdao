@@ -56,10 +56,12 @@ query proposals($id: String, $category: String ) {
 
 
 const MUTATION_CREATE_PROPOSAL = gql`
-mutation createMessage($body: String!, $coinId: String!, $profileEmail: String!) {
-  createMessage(body: $body, coinId: $coinId, profileEmail: $profileEmail)
+mutation createProposal($category: String!, $title: String!, $description: String!, $mission: String!, $budget: String!, $implement: String!, $created_at: String!) {
+  createProposal(category: $category, title: $title, description: $description, mission: $mission, budget: $budget, implement: $implement, created_at: $created_at)
   }
 `;
+
+
 
 
 

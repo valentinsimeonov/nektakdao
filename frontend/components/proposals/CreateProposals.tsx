@@ -177,7 +177,8 @@ export default function CreateProposals(): JSX.Element {
       setImplementBody("");
       setImageUrl(null);
       setAvatarFile(null);
-
+      setCategoryType("");
+      
 			console.log('Proposal sent successfully.');
       
 		  } else {

@@ -4,6 +4,7 @@
 
 type Proposal {
   id: String!
+  category: String
   proposal_uuid: String
   tx_hash: String
   chain_proposal_id: String
@@ -38,4 +39,9 @@ scalar Timestamp
 
 type Query {
   allProposals: [Proposal]!
+  Tcoins(id: String, category: String): [Proposal]!
+}
+
+type Mutation {
+  createProposal(category: String!, title: String!, description: String!, mission: String!, budget: String!, implement: String!, created_at: String!): Boolean!
 }

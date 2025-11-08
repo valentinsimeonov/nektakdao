@@ -94,17 +94,17 @@ services:
 
 
 
-  # nginx2:
-  #   image: nginx:1.19.8-alpine
-  #   restart: always
-  #   build:
-  #     context: ./nginx2
-  #     dockerfile: Dockerfile
-  #   container_name: ${NGINX_HOST}
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - "${NGINX_PORT}:${NGINX_PORT}"
+  nginx2:
+    image: nginx:1.19.8-alpine
+    restart: always
+    build:
+      context: ./nginx2
+      dockerfile: Dockerfile
+    container_name: ${NGINX_HOST}
+    env_file:
+      - .env
+    ports:
+      - "${NGINX_PORT}:${NGINX_PORT}"
 
 volumes:
   db_data:

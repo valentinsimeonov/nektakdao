@@ -10,6 +10,7 @@ import { RedisService } from './redis.service';
 import { Proposal } from 'src/entity/proposal.entity';
 import { ProposalService} from 'src/proposal/proposal.service';
 import { ProposalResolver} from 'src/proposal/proposal.resolver';
+import { pubSub } from '../config/pubsub.provider';
 
 
 @Module({
@@ -23,6 +24,12 @@ import { ProposalResolver} from 'src/proposal/proposal.resolver';
   providers: [
     RedisService, 
     ProposalService,
+    {
+      provide: 'PUB_SUB',
+      useValue: pubSub,
+    },
+
+
     ProposalResolver,
   ],
   exports: [ProposalService,  RedisService],

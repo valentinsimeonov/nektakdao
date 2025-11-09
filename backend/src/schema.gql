@@ -3,7 +3,7 @@
 # ------------------------------------------------------
 
 type Proposal {
-  id: String!
+  id: ID!
   category: String
   proposal_uuid: String
   tx_hash: String
@@ -39,7 +39,7 @@ scalar Timestamp
 
 type Query {
   allProposals: [Proposal]!
-  Tcoins(id: String, category: String): [Proposal]!
+  proposals(id: String, category: String): [Proposal]!
 }
 
 type Mutation {

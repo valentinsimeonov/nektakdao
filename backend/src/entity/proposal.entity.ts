@@ -1,13 +1,20 @@
-import { Field, Int, ObjectType, Float } from '@nestjs/graphql';
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+//proposal.entity.ts
+
+
+import { Field, ID, Int, ObjectType, Float } from '@nestjs/graphql';
+import { Entity, PrimaryColumn, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 
 
 @Entity()
 @ObjectType()
 export class Proposal {
-  @PrimaryColumn()
-  @Field()
+  // @PrimaryColumn()
+  // @Field()
+  // id: string;
+
+  @PrimaryGeneratedColumn('uuid')
+  @Field(() => ID)
   id: string;
 
   @Column({ type: 'text', nullable: true })
@@ -96,10 +103,6 @@ export class Proposal {
   @Column('numeric', { nullable: true })
   block_number: number | null;
 
-
-  // @Field(() => Float, {nullable: true})
-  // @Column('numeric', { nullable: true })
-  // confirmations: number | null;
 
   @Field(() => Float, {nullable: true})
   @Column('numeric', { nullable: true })

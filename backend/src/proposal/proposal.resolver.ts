@@ -1,4 +1,4 @@
-//Proposal.resolver.ts
+//proposal.resolver.ts
 import { Args, Int, Query, Resolver, Subscription, Mutation } from '@nestjs/graphql';
 import { ProposalService } from './proposal.service';
 
@@ -27,7 +27,7 @@ export class ProposalResolver {
 
 
 
-  @Query(() => [Proposal], { name: 'Tcoins', nullable: 'items' })
+  @Query(() => [Proposal], { name: 'proposals', nullable: 'items' })
   queryProposals(
     @Args('id', { nullable: true }) id?: string,
     @Args('category', { nullable: true }) category?: string,

@@ -1,10 +1,8 @@
 //proposal.resolver.ts
-import { Args, Int, Query, Resolver, Subscription, Mutation } from '@nestjs/graphql';
+import { Args, Int, Query, Resolver, Subscription, Mutation, Float } from '@nestjs/graphql';
 import { ProposalService } from './proposal.service';
-
 import { Inject } from '@nestjs/common';
 import { Proposal } from 'src/entity/proposal.entity';
-
 import { PubSub } from 'graphql-subscriptions';
 
 
@@ -14,6 +12,10 @@ export class ProposalResolver {
   constructor(private readonly ProposalService: ProposalService,
     @Inject('PUB_SUB') private readonly pubSub: PubSub,
   ) {}
+
+
+  
+
 
 
 /*                     Proposal                   */
@@ -47,17 +49,39 @@ export class ProposalResolver {
     @Args('budget') budget: string,
     @Args('implement') implement: string,
     @Args('created_at') created_at: string,
+    @Args('proposal_uuid') proposal_uuid: string,
+    @Args('tx_hash') tx_hash: string,
+    @Args('chain_proposal_id') chain_proposal_id: string,
+    @Args('proposer_wallet') proposer_wallet: string,
+    @Args('description_raw') description_raw: string,
+    @Args('description_json') description_json: string,
+    @Args('governor_address') governor_address: string,
+    @Args('chain') chain: string,
+    @Args('raw_receipt') raw_receipt: string,
+    @Args('event_payload') event_payload: string,
+    @Args('status') status: string,
+
+    @Args('voting_start_block', { type: () => Float, nullable: true }) voting_start_block?: number,
+    @Args('voting_end_block', { type: () => Float, nullable: true }) voting_end_block?: number,
+    @Args('block_number', { type: () => Float, nullable: true }) block_number?: number,
+
 
   ): Promise<boolean> { 
-    const newMessage = await this.ProposalService.createProposal(category, title, description, mission,  budget, implement, created_at );
+    const newProposal = await this.ProposalService.createProposal(category, title, description, mission,  budget, implement, created_at, proposal_uuid, tx_hash, chain_proposal_id, proposer_wallet, description_raw, description_json, governor_address, chain, raw_receipt, event_payload, status, voting_start_block ?? null, voting_end_block ?? null, block_number ?? null
+ );
 
     // Publish new message event to Redis
-    console.log('Publishing new message to Redis:', newMessage);
-    this.pubSub.publish('proposalAdded', { proposalAdded: newMessage });
+    console.log('Publishing new message to Redis:', newProposal);
+    this.pubSub.publish('proposalAdded', { proposalAdded: newProposal });
 
     return true; 
   }
 
 
+
+
+
+
+  
 
 }

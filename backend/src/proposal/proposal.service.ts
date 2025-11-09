@@ -39,7 +39,7 @@ public async findProposals(where: FindOptionsWhere<Proposal>) {
 
 
 
-async createProposal(category: string, title: string, description: string, mission: string,  budget: string, implement: string, created_at: string): Promise<Proposal> {
+async createProposal(category: string, title: string, description: string, mission: string,  budget: string, implement: string, created_at: string, proposal_uuid: string, tx_hash: string, chain_proposal_id: string, proposer_wallet: string, description_raw: string, description_json: string, governor_address: string, chain: string, raw_receipt: string, event_payload: string, status: string, voting_start_block: number | null, voting_end_block: number | null, block_number: number | null): Promise<Proposal> {
 
 
   const newProposal = this.proposalRepo.create({

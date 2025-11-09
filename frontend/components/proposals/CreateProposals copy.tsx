@@ -222,11 +222,11 @@ export default function CreateProposals(): JSX.Element {
       setMissionBody("");
       setBudgetBody("");
       setImplementBody("");
-      // setImageUrl(null);
-      // setAvatarFile(null);
+      setImageUrl(null);
+      setAvatarFile(null);
       setCategoryType("");
       
-			console.log('Proposal sent successfully: ', data);
+			console.log('Proposal sent successfully.');
       
 		  } else {
 			console.error('Failed to send proposal.');
@@ -249,12 +249,10 @@ export default function CreateProposals(): JSX.Element {
 
   /*/// Scroll Into View //*/
   //////////////////////////
-
   const descriptionContainerRef = useRef<HTMLDivElement | null>(null);
   const missionContainerRef = useRef<HTMLDivElement | null>(null);
   const budgetContainerRef = useRef<HTMLDivElement | null>(null);
   const implementContainerRef = useRef<HTMLDivElement | null>(null);
-
 
   // safe scrolling when l2SelectedSubFunc changes
   useEffect(() => {
@@ -301,171 +299,110 @@ export default function CreateProposals(): JSX.Element {
 
 
 
+ /* Helper: attempt to obtain an ethers Signer from window.ethereum using v6 or v5 API */
+  async function getSignerFromWindow(): Promise<any | null> {
+    if (typeof window === "undefined") return null;
+    const anyWindow = window as any;
+    if (!anyWindow.ethereum) return null;
+    try {
+      // ethers v6: BrowserProvider
+      if ((ethers as any).BrowserProvider) {
+        const provider = new (ethers as any).BrowserProvider(anyWindow.ethereum);
+        const signer = await provider.getSigner();
+        return signer;
+      }
+      // ethers v5: providers.Web3Provider
+      if ((ethers as any).providers && (ethers as any).providers.Web3Provider) {
+        const provider = new (ethers as any).providers.Web3Provider(anyWindow.ethereum);
+        return provider.getSigner();
+      }
+      // fallback: nil
+      return null;
+    } catch (e) {
+      console.warn("Could not create signer from window.ethereum:", (e as any)?.message ?? e);
+      return null;
+    }
+  }
 
-
-  /* --- ON-CHAIN PROPOSAL CREATION + LOCAL VERIFICATION --- */
-  async function createOnChainProposalAndVerify(proposal_uuid: string) {
+  /* --- ON-CHAIN PROPOSAL CREATION --- */
+  async function createOnChainProposal() {
     if (!GOVERNOR_ADDRESS) {
       console.error("GOVERNOR_ADDRESS not set (NEXT_PUBLIC_GOVERNOR_ADDRESS).");
       alert("Governance contract address not configured in frontend.");
-      return null;
+      return;
     }
 
+    // Try to obtain a signer: prefer provider-based signer if available via window
     const signer = await getSignerFromWindow();
     if (!signer) {
       alert("Please connect your wallet (MetaMask) in the browser to create an on-chain proposal.");
-      return null;
+      return;
     }
 
     try {
-      // Build description and stringify it
-      const descriptionObj = buildOnChainDescription(proposal_uuid);
-      const descriptionJsonStr = JSON.stringify(descriptionObj);
+      // Build a compact JSON description so the on-chain description contains all fields
+      const descriptionJson = JSON.stringify({
+        title: Titledata,
+        description: DescriptionBody,
+        mission: MissionBody,
+        budget: BudgetBody,
+        implement: ImplementBody,
+        dateCreated: currentDate.toISOString(),
+        category: categoryType,
+      });
 
+      // Minimal safety check: require a title or description
       if (!Titledata && !DescriptionBody) {
         alert("Please provide at least a Title or Description for the proposal.");
-        return null;
+        return;
       }
 
       const govContract = new ethers.Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI, signer);
 
+      // For test proposals we send a single no-op call:
       const targets = TOKEN_ADDRESS ? [TOKEN_ADDRESS] : [ZERO_ADDRESS];
       const values: number[] = [0];
       const calldatas = ["0x"];
-
-      console.log("Sending propose with description:", descriptionObj);
-
-      // Update UI state
-      setFlowStatus("PENDING_TX");
-      setIsSubmitting(true);
+      console.log("Creating on-chain proposal with:", {
+        targets,
+        values,
+        calldatas,
+        descriptionJson,
+      });
 
       // send transaction
-      const tx = await govContract.propose(targets, values, calldatas, descriptionJsonStr);
+      const tx = await govContract.propose(targets, values, calldatas, descriptionJson);
       console.log("Propose tx sent:", tx.hash);
-      setLastTxHash(tx.hash);
+      const receipt = await tx.wait();
+      console.log("Propose tx mined:", receipt.transactionHash);
 
-      // wait for receipt (mined)
-      const receipt = await tx.wait(); // waits for 1 confirmation by default
-      console.log("Receipt:", receipt);
-
-      // quick on-chain status check
-      if (receipt.status === 0) {
-        // transaction failed
-        setFlowStatus("FAILED_TX");
-        setIsSubmitting(false);
-        alert("Transaction failed on-chain (status 0). The backend will mark this as FAILED_TX.");
-        return { receipt, success: false, reason: "RECEIPT_STATUS_0" };
-      }
-
-      // update status while backend verification runs
-      setFlowStatus("AWAITING_CONFIRMATIONS");
-
-      // parse logs to find ProposalCreated
-      let parsedEvent: any = null;
-      let parsedDescriptionString: string | null = null;
-      let chainProposalId: string | null = null;
-      let parsedEventPayload: any = null;
-
-      for (const log of receipt.logs) {
-        try {
-          const parsed = govContract.interface.parseLog(log);
-          if (parsed && parsed.name === "ProposalCreated") {
-            parsedEvent = parsed;
-            // Depending on ABI the description arg may be named 'description' or be last arg
-            // Try common access patterns
-            // ethers parseLog returns .args which is both array-like and object-like
-            const args = parsed.args;
-            // prefer named fields
-            parsedDescriptionString =
-              args?.description ??
-              args?.[args.length - 1] ??
-              args?.[args.length - 2] ??
-              null;
-
-            // proposal id might be first arg "id" or args[0]
-            const idArg = args?.id ?? args?.[0] ?? null;
-            chainProposalId = idArg ? idArg.toString() : null;
-
-            // store full raw decoded event payload
-            parsedEventPayload = {
-              name: parsed.name,
-              args: parsed.args,
-            };
-
-            break;
+      // Parse ProposalCreated event to get proposal id
+      let proposalId: string | null = null;
+      try {
+        for (const log of receipt.logs) {
+          try {
+            const parsed = govContract.interface.parseLog(log);
+            if (parsed && parsed.name === "ProposalCreated") {
+              proposalId = parsed.args[0].toString();
+              console.log("Decoded ProposalCreated -> id:", proposalId);
+              break;
+            }
+          } catch {
+            // ignore non-matching logs
           }
-        } catch (err) {
-          // ignore non-matching logs
         }
+      } catch (e) {
+        console.warn("Could not parse logs for ProposalCreated:", (e as any)?.message ?? e);
       }
 
-      // If we didn't find the event, treat as mismatch/error but still return receipt to backend for manual review
-      if (!parsedEvent) {
-        setFlowStatus("MISMATCH");
-        setIsSubmitting(false);
-        alert(
-          "Could not find ProposalCreated event in transaction logs. The backend will receive the raw receipt for manual review."
-        );
-        return { receipt, success: false, reason: "NO_PROPOSAL_CREATED_LOG", parsedEventPayload: null };
-      }
-
-      // If we have a description string attempt to parse JSON
-      let parsedDescriptionJson: any = null;
-      if (parsedDescriptionString) {
-        try {
-          parsedDescriptionJson =
-            typeof parsedDescriptionString === "string"
-              ? JSON.parse(parsedDescriptionString)
-              : parsedDescriptionString;
-        } catch (e) {
-          // parsing failed
-          parsedDescriptionJson = null;
-        }
-      }
-
-      // verify the proposal_uuid is present and matches
-      const onChainUuid = parsedDescriptionJson?.proposal_uuid ?? null;
-      if (!onChainUuid || onChainUuid !== proposal_uuid) {
-        setFlowStatus("MISMATCH");
-        setLastChainProposalId(chainProposalId);
-        setIsSubmitting(false);
-        alert(
-          "On-chain description is missing or has a different proposal_uuid. The backend will be sent the raw receipt and event payload for manual review."
-        );
-        return {
-          receipt,
-          success: false,
-          reason: "UUID_MISMATCH",
-          chainProposalId,
-          parsedDescriptionString,
-          parsedDescriptionJson,
-          parsedEventPayload,
-        };
-      }
-
-      // Success: on-chain proposal created and UUID matches
-      setFlowStatus("AWAITING_CONFIRMATIONS");
-      setLastChainProposalId(chainProposalId);
-
-      return {
-        receipt,
-        success: true,
-        chainProposalId,
-        parsedDescriptionString,
-        parsedDescriptionJson,
-        parsedEventPayload,
-      };
+      alert(
+        `Proposal created on-chain!\nTx: ${receipt.transactionHash}\nProposalId: ${proposalId ?? "(not found in logs)"}`
+      );
+      return { txHash: receipt.transactionHash, proposalId };
     } catch (err: any) {
       console.error("Error creating on-chain proposal:", err);
-      setFlowStatus("FAILED_TX");
-      setIsSubmitting(false);
-      if ((err as any)?.code === 4001) {
-        // user rejected signature
-        alert("Signature rejected by user.");
-      } else {
-        alert("On-chain proposal failed: " + (err?.message ?? String(err)));
-      }
-      return { success: false, reason: "EXCEPTION", error: err };
+      alert("On-chain proposal failed: " + (err?.message ?? String(err)));
+      return null;
     }
   }
 
@@ -475,163 +412,54 @@ export default function CreateProposals(): JSX.Element {
 
 
 
-
-
-
-
-
-  /* Send verified data to backend (only call this after on-chain success or purposeful failure) */
-  async function sendVerificationToBackend(payload: any) {
-    try {
-      // Choose the endpoint you use for storing proposals. You previously used:
-      // POST http://localhost:5000/proposals/create
-      // Here we send JSON with a verification payload.
-      const url = "http://localhost:5000/proposals/create";
-      const resp = await axios.post(url, payload, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      return resp.data;
-    } catch (err: any) {
-      console.error("Error sending verification to backend:", err?.response ?? err);
-      throw err;
-    }
-  }
-
-
-
-
-
-  /* Integrated create handler: build UUID, create on-chain proposal, then POST verification payload to backend */
+  /* Integrated create handler: submit to backend AND on-chain (if signer) */
   const handleCreateClick = async () => {
-    // Basic validation
-    if (!Titledata && !DescriptionBody) {
-      alert("Please provide at least a Title or Description for the proposal.");
-      return;
+
+    	
+		try {
+		  await createProposal({
+			variables: {
+
+        title: Titledata,
+        description: DescriptionBody,
+        mission: MissionBody,
+        budget: BudgetBody,
+        implement: ImplementBody,
+        created_at: currentDate,
+        // avatarFile,
+        category: categoryType
+			}
+		  });
+		} catch (err) {
+		  console.error("Error sending message:", err);
+		}
+
+    // await createProposal(
+    //   Titledata,
+    //   DescriptionBody,
+    //   MissionBody,
+    //   BudgetBody,
+    //   ImplementBody,
+    //   currentDate,
+    //   avatarFile,
+    //   categoryType
+    // );
+
+    // create on-chain proposal if user connected (attempt via window signer)
+    if (isConnected) {
+      await createOnChainProposal();
+    } else {
+      console.log("Wallet not connected; skipping on-chain creation.");
     }
 
-    // Generate UUID early
-    const proposal_uuid = typeof (globalThis as any).crypto?.randomUUID === "function"
-      ? (globalThis as any).crypto.randomUUID()
-      : fallbackUUIDv4();
-    console.log("Generated proposal_uuid:", proposal_uuid);
-
-    // create on-chain and verify locally
-    setFlowStatus("PENDING_TX");
-    setIsSubmitting(true);
-
-    const onChainResult = await createOnChainProposalAndVerify(proposal_uuid);
-
-    // If onChainResult === null -> signer missing or early abort
-    if (!onChainResult) {
-      setIsSubmitting(false);
-      setFlowStatus("IDLE");
-      return;
-    }
-
-    // Build payload to send to backend always (include status, raw receipt, event payload)
-    const {
-      receipt,
-      success,
-      chainProposalId,
-      parsedDescriptionString,
-      parsedDescriptionJson,
-      parsedEventPayload,
-      reason,
-    } = onChainResult as any;
-
-    const payload = {
-      proposal_uuid,
-      tx_hash: receipt?.transactionHash ?? null,
-      chain_proposal_id: chainProposalId ?? null,
-      proposer_wallet: parsedEventPayload?.args?.proposer ?? null, // may be undefined; backend should verify from receipt/logs
-      description_raw: parsedDescriptionString ?? JSON.stringify(buildOnChainDescription(proposal_uuid)),
-      description_json: parsedDescriptionJson ?? null,
-      title: Titledata,
-      description: DescriptionBody,
-      mission: MissionBody,
-      budget: BudgetBody,
-      implement: ImplementBody,
-      governor_address: GOVERNOR_ADDRESS,
-      chain: (await (async () => {
-        try {
-          // try to read chainId from provider
-          const signer = await getSignerFromWindow();
-          if (signer?.provider && signer.provider.getNetwork) {
-            const net = await signer.provider.getNetwork();
-            return `${net?.name ?? "unknown"} (${net?.chainId ?? "?"})`;
-          }
-        } catch { /* ignore */ }
-        return "unknown";
-      })()),
-      voting_start_block: parsedEventPayload?.args?.startBlock ? Number(parsedEventPayload.args.startBlock.toString()) : null,
-      voting_end_block: parsedEventPayload?.args?.endBlock ? Number(parsedEventPayload.args.endBlock.toString()) : null,
-      block_number: receipt?.blockNumber ?? null,
-      created_at: currentDate.toISOString(),
-      raw_receipt: receipt ?? null,
-      event_payload: parsedEventPayload ?? null,
-      status: success ? "AWAITING_CONFIRMATIONS" : (reason === "UUID_MISMATCH" ? "MISMATCH" : "FAILED_TX"),
-      category: categoryType,
-    };
-
-    try {
-
-
-
-
-      const resp = await createProposal({ variables: payload });
-      console.log("GraphQL mutation response:", resp);
-
-      const data = resp?.data ?? null;
-
-      const created =
-        data?.createProposal === true ||
-        (data?.createProposal && typeof data.createProposal === "object") ||
-        (data && Object.keys(data).length > 0);
-
-      if (created) {
-        setFlowStatus("CONFIRMED");
-      } else {
-        setFlowStatus(payload.status === "AWAITING_CONFIRMATIONS" ? "AWAITING_CONFIRMATIONS" : "MANUAL_REVIEW");
-      }
-
-
-
-      // const backendResp = await createProposal({payload});
-      // console.log("Backend verification response:", backendResp);
-      
-      // const created = backendResp?.data?.createProposal ?? backendResp?.data?.createProposalExt ?? backendResp?.data;
-      // if (created === true || (backendResp?.data && Object.keys(backendResp.data).length > 0)) {
-
-      //   setFlowStatus("CONFIRMED");
-      // } else {
-      //   // backend didn't confirm automatically; likely backend saved with AWATING_CONFIRMATIONS/MISMATCH
-      //   setFlowStatus(payload.status === "AWAITING_CONFIRMATIONS" ? "AWAITING_CONFIRMATIONS" : "MANUAL_REVIEW");
-      // }
-
-
-
-
-
-
-    } catch (err) {
-      // network/backend error - leave it to backend job to retry later; mark manual review
-      setFlowStatus("MANUAL_REVIEW");
-      console.error("Failed to call GraphQL verification payload to backend:", err);
-      alert("Failed to send verification to backend. Record may still exist on-chain");
-    } finally {
-      setIsSubmitting(false);
-    }
-
-    // Optional: clear form fields if you want (or keep for retry/edits)
+    // optional: reset fields or notify redux
     setTitledata("");
     setDescriptionBody("");
     setMissionBody("");
     setBudgetBody("");
     setImplementBody("");
-    // setImageUrl(null);
-    // setAvatarFile(null);
+    setImageUrl(null);
+    setAvatarFile(null);
   };
 
 
@@ -641,20 +469,6 @@ export default function CreateProposals(): JSX.Element {
   //////////////////////////////////////////////////////
 
 
-
-  // small helper to render status text
-  function statusText() {
-    switch (flowStatus) {
-      case "IDLE": return "Idle";
-      case "PENDING_TX": return "Waiting for wallet signature / broadcasting transaction...";
-      case "AWAITING_CONFIRMATIONS": return "Transaction mined — verifying on-chain data...";
-      case "CONFIRMED": return "Proposal confirmed and saved.";
-      case "FAILED_TX": return "Transaction failed on chain.";
-      case "MISMATCH": return "On-chain data mismatch — manual review required.";
-      case "MANUAL_REVIEW": return "Saved for manual review.";
-      default: return "";
-    }
-  }
 
 
 
@@ -755,25 +569,13 @@ export default function CreateProposals(): JSX.Element {
 
 
 
-      <div style={{ marginTop: 12, color: "white", fontSize: 13 }}>
-        <div>Status: {statusText()}</div>
-        {lastTxHash && (
-          <div>
-            Tx: <a href={`https://explorer.base-sepolia.example/tx/${lastTxHash}`} target="_blank" rel="noreferrer">{lastTxHash}</a>
-          </div>
-        )}
-        {lastChainProposalId && <div>On-chain proposal id: {lastChainProposalId}</div>}
-      </div>
-
-      <div className="CreateProposalsChannelCard2VotingButtonsrow" style={{ marginTop: 12 }}>
-        <button
-          className="MakeProposalButtonbutton"
-          onClick={handleCreateClick}
-          disabled={isSubmitting}
-        >
-          <span>{isSubmitting ? "Processing..." : "Create"}</span>
+      <div className="CreateProposalsChannelCard2VotingButtonsrow">
+        <button className="MakeProposalButtonbutton" onClick={handleCreateClick}>
+          <span>Create</span>
         </button>
       </div>
+
+
     </div>
   );
 }

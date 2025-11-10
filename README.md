@@ -200,12 +200,11 @@ Now we are building the Technical Floor(Backend) of the Building(App).
 
 ## Sprint 4 - DEV Version
 
-### 1. Backend
+### 1. Frontend and Backend - Research
 
     Research and Design On Chain and Off Chain Data Flow between Frontend, Backend, Database and L2
 
-
-    Implement Flow Stage 1:
+    Research, Data Flow - Stage 1:
 
     Frontend: 
     1. User connects with Wallet to Frontend 
@@ -237,7 +236,7 @@ Now we are building the Technical Floor(Backend) of the Building(App).
 
 
 
-#### We are tying to prevent a couple of issues, and also improve some, here are a couple:
+    We are tying to prevent a couple of issues, and also improve some, here are a couple:
 
     1. Preventing Ethos voting rather than Logos Voting (people voting GO because of who made the proposal, rather than what does the Proposal propose)
 
@@ -252,21 +251,74 @@ Now we are building the Technical Floor(Backend) of the Building(App).
     6. We are avoiding adding more complexity by not bringing in SIWE.
 
 
-We will tweak these issues some more depending on the Executors, either a double stage proposal or Triple Timelock(Proposal, Executor, Feedback).
+    We will tweak these issues some more depending on the Executors, either a double stage proposal or Triple Timelock(Proposal, Executor, Feedback).
 
-We will cross that bridge when we come to it.
+    We will cross that bridge when we come to it.
 
 
 
-### 2. Database
+### 2. Frontend - Implementation
+
+    Implemention Create Proposal Data Flow Stage 1 - Part 1 - Frontend:
+
+    Frontend: 
+    1. User connects with Wallet to Frontend 
+    2. User builds proposal in UI and makes proposal using their wallet 
+    3. Frontend sends the txHash, unique UUID and Wallet Address of Proposal and Proposals fields(metadata) to Backend. 
+
+
+### 3. Backend
+
+    GraphQL System created
+    Full Proposal Entity with Off Chain and On Chain Data
+
+
+### 4. Database
     Connect Database to Backend
     Accomodate Proposal Entity
 
-#### 3. Frontend
+### 5. Frontend
 
-    GraphQL instead of Axios
-    Make proposal Module
-    View proposals Module
+
+    Make proposal Module - GraphQL instead of Axios
+    View proposals Module - New UI with SortBy System
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Sprint 5 - DEV Version
+
+
+### 1. Backend
+
+    Implement Create Proposal Data Flow Stage 1 - Part 2 - Backend:
+
+    Backend: 
+    4. Backend accepts metadata (title, body) and stores it Backend also acepts the Transaction Hash and Unique UUID and Wallet Address.
+    5. Backend then verifies that txHash and wallet address indeed corresponds to a ProposalCreated for the governor contract and that the on-chain description matches the metadata. If verified, backend persists the metadata + txHash + wallet address 
+    6. Backend also verifies in the Database that that txHash and uniqueUUID and wallet address is not recorded already (we prevent clone attacks, Ta ta ta tan ta ta tan ta ta, ta ta ta ta tatan ta ta ta )
+
+    Frontend:
+    7. The Frontend does not show the Proposal Creator when the Frontend retrieves the Proposals in order to show users(All Proposals)
+
+
+
+
+
 
 
 

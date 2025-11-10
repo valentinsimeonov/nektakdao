@@ -27,6 +27,7 @@ type Proposal {
   attachments: String
   raw_receipt: String
   event_payload: String
+  description_json: String
   created_at: Timestamp
   updated_at: Timestamp
   confirmed_at: Timestamp
@@ -43,5 +44,5 @@ type Query {
 }
 
 type Mutation {
-  createProposal(category: String!, title: String!, description: String!, mission: String!, budget: String!, implement: String!, created_at: String!, proposal_uuid: String!, tx_hash: String!, chain_proposal_id: String!, proposer_wallet: String!, description_raw: String!, description_json: String!, governor_address: String!, chain: String!, raw_receipt: String!, event_payload: String!, status: String!, voting_start_block: Float, voting_end_block: Float, block_number: Float): Boolean!
+  createProposal(proposal_uuid: String, tx_hash: String, chain_proposal_id: String, proposer_wallet: String, description_raw: String, description_json: String, title: String, description: String, mission: String, budget: String, implement: String, governor_address: String, chain: String, voting_start_block: Float, voting_end_block: Float, block_number: Float, raw_receipt: String, event_payload: String, status: String, category: String, created_at: String): Boolean!
 }

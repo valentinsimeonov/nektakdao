@@ -3,37 +3,13 @@
 
 import "./CreateProposals.css";
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
-
-/* Redux */
 import { RootState } from "../../store/types";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  l2extendleftpanel,
-  l2selectedsubfunc,
-  l2extendrightpanel,
-  l2videoon,
-  l2resetfunc,
-  l2resetcategorybuttons,
-  l2cat,
-  l2selectedcategory,
-  l2selectl1,
-  dropdownbutton,
-  shortproposalselected,
-  createnewproposal,
-} from "../../store/ProposalsSlice";
-
-
-import{ MUTATION_CREATE_PROPOSAL } from '../../api/proposalsQuery';
+import { MUTATION_CREATE_PROPOSAL } from '../../api/proposalsQuery';
 import { useMutation } from "@apollo/client";
-
-
-
-
-
-/* Wagmi / ethers */
 import { useAccount } from "wagmi";
-import { ethers } from "ethers";
+import { BrowserProvider, Contract, type JsonRpcSigner, keccak256, toUtf8Bytes } from "ethers";
+
 
 /* Minimal ABIs used for on-chain proposal */
 const GOVERNOR_ABI = [
@@ -57,25 +33,17 @@ function fallbackUUIDv4() {
   });
 }
 
-/* Helper: attempt to obtain an ethers Signer from window.ethereum using v6 or v5 API */
-async function getSignerFromWindow(): Promise<any | null> {
+/* Helper: attempt to obtain an ethers Signer from window.ethereum using ethers v6 BrowserProvider */
+async function getSignerFromWindow(): Promise<JsonRpcSigner | null> {
   if (typeof window === "undefined") return null;
   const anyWindow = window as any;
   if (!anyWindow.ethereum) return null;
   try {
     // ethers v6: BrowserProvider
-    if ((ethers as any).BrowserProvider) {
-      const provider = new (ethers as any).BrowserProvider(anyWindow.ethereum);
-      const signer = await provider.getSigner();
-      return signer;
-    }
-    // ethers v5: providers.Web3Provider
-    if ((ethers as any).providers && (ethers as any).providers.Web3Provider) {
-      const provider = new (ethers as any).providers.Web3Provider(anyWindow.ethereum);
-      return provider.getSigner();
-    }
-    // fallback: nil
-    return null;
+    const provider = new BrowserProvider(anyWindow.ethereum);
+    // getSigner returns a JsonRpcSigner (v6)
+    const signer = await provider.getSigner();
+    return signer;
   } catch (e) {
     console.warn("Could not create signer from window.ethereum:", (e as any)?.message ?? e);
     return null;
@@ -273,24 +241,34 @@ export default function CreateProposals(): JSX.Element {
 
 
 
+  ////////////////////////////////////////////////////////////
+  /////// Form validation (pre-sign)
+  ////////////////////////////////////////////////////////////
+  const isNonEmpty = (s?: string) => !!s && s.trim().length > 0;
+  const isFormValid = React.useMemo(() => {
+    return (
+      isNonEmpty(Titledata) &&
+      isNonEmpty(categoryType) &&
+      isNonEmpty(DescriptionBody) &&
+      isNonEmpty(MissionBody) &&
+      isNonEmpty(BudgetBody) &&
+      isNonEmpty(ImplementBody)
+    );
+  }, [Titledata, categoryType, DescriptionBody, MissionBody, BudgetBody, ImplementBody]);
+
+  // compute missing fields for UX feedback
+  const missingFields = React.useMemo(() => {
+    const arr: string[] = [];
+    if (!isNonEmpty(Titledata)) arr.push("Title");
+    if (!isNonEmpty(categoryType)) arr.push("Category");
+    if (!isNonEmpty(DescriptionBody)) arr.push("Description");
+    if (!isNonEmpty(MissionBody)) arr.push("Mission");
+    if (!isNonEmpty(BudgetBody)) arr.push("Budget");
+    if (!isNonEmpty(ImplementBody)) arr.push("Implementation");
+    return arr;
+  }, [Titledata, categoryType, DescriptionBody, MissionBody, BudgetBody, ImplementBody]);
 
 
-
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-
-  const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      const file = event.target.files[0];
-      setAvatarFile(file);
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImageUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
 
 
@@ -304,200 +282,257 @@ export default function CreateProposals(): JSX.Element {
 
 
   /* --- ON-CHAIN PROPOSAL CREATION + LOCAL VERIFICATION --- */
-  async function createOnChainProposalAndVerify(proposal_uuid: string) {
-    if (!GOVERNOR_ADDRESS) {
-      console.error("GOVERNOR_ADDRESS not set (NEXT_PUBLIC_GOVERNOR_ADDRESS).");
-      alert("Governance contract address not configured in frontend.");
-      return null;
-    }
+async function createOnChainProposalAndVerify(proposal_uuid: string) {
+  if (!GOVERNOR_ADDRESS) {
+    alert("Governance contract address not configured in frontend.");
+    return null;
+  }
+  const signer = await getSignerFromWindow();
+  if (!signer) {
+    alert("Please connect your wallet (MetaMask) in the browser to create an on-chain proposal.");
+    return null;
+  }
 
-    const signer = await getSignerFromWindow();
-    if (!signer) {
-      alert("Please connect your wallet (MetaMask) in the browser to create an on-chain proposal.");
-      return null;
-    }
+  try {
+    const descriptionObj = buildOnChainDescription(proposal_uuid);
+    const descriptionJsonStr = JSON.stringify(descriptionObj);
+
+    const govContract = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI, signer);
+    const govIface = govContract.interface as any; 
+
+    const signature = "ProposalCreated(uint256,address,address[],uint256[],bytes[],uint256,uint256,string)";
+    const proposalCreatedTopic = keccak256(toUtf8Bytes(signature));
+    console.log("Computed ProposalCreated topic:", proposalCreatedTopic);
+
+
+
+
+    const targets = TOKEN_ADDRESS ? [TOKEN_ADDRESS] : [ZERO_ADDRESS];
+    const values: number[] = [0];
+    const calldatas = ["0x"];
+
+    setFlowStatus("PENDING_TX");
+    setIsSubmitting(true);
+
+    const tx = await govContract.propose(targets, values, calldatas, descriptionJsonStr);
+    console.log("Propose tx sent:", tx.hash);
+    setLastTxHash(tx.hash);
+
+    const receipt = await tx.wait();
+    console.log("Receipt:", receipt);
+
+
+    console.log("Receipt:", receipt);
+
+    // compact safe-log summarizer
+    const summarizeLog = (log: any) => ({
+      address: log?.address,
+      topics: Array.isArray(log?.topics) ? log.topics.map((t: any) => String(t)) : [],
+      data: typeof log?.data === "string" ? log.data : String(log?.data),
+    });
 
     try {
-      // Build description and stringify it
-      const descriptionObj = buildOnChainDescription(proposal_uuid);
-      const descriptionJsonStr = JSON.stringify(descriptionObj);
+      console.log("=== receipt.logs summary ===");
+      console.log((receipt.logs || []).map((l: any) => summarizeLog(l)));
+    } catch (e) {
+      console.warn("Could not stringify receipt.logs:", e);
+    }
 
-      if (!Titledata && !DescriptionBody) {
-        alert("Please provide at least a Title or Description for the proposal.");
-        return null;
+    // 1) Try govContract.interface.parseLog for each log (your existing attempt)
+    let parsedEvent: any = null;
+    let parsedDescriptionString: string | null = null;
+    let parsedDescriptionJson: any = null;
+    let chainProposalId: string | null = null;
+    let parsedEventPayload: any = null;
+
+    for (const log of receipt.logs || []) {
+      try {
+        const decoded = govContract.interface.parseLog(log);
+        console.log("parseLog SUCCESS for log:", summarizeLog(log), "decoded.name:", decoded?.name);
+        if (decoded && decoded.name === "ProposalCreated") {
+          parsedEvent = decoded;
+          const args = decoded.args;
+          parsedDescriptionString =
+            args?.description ??
+            args?.[args.length - 1] ??
+            args?.[args.length - 2] ??
+            null;
+          const idArg = args?.id ?? args?.[0] ?? null;
+          chainProposalId = idArg ? idArg.toString() : null;
+          parsedEventPayload = { name: decoded.name, args: decoded.args };
+          break;
+        }
+      } catch (e) {
+        // ignore non-matching logs
       }
+    }
 
-      const govContract = new ethers.Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI, signer);
-
-      const targets = TOKEN_ADDRESS ? [TOKEN_ADDRESS] : [ZERO_ADDRESS];
-      const values: number[] = [0];
-      const calldatas = ["0x"];
-
-      console.log("Sending propose with description:", descriptionObj);
-
-      // Update UI state
-      setFlowStatus("PENDING_TX");
-      setIsSubmitting(true);
-
-      // send transaction
-      const tx = await govContract.propose(targets, values, calldatas, descriptionJsonStr);
-      console.log("Propose tx sent:", tx.hash);
-      setLastTxHash(tx.hash);
-
-      // wait for receipt (mined)
-      const receipt = await tx.wait(); // waits for 1 confirmation by default
-      console.log("Receipt:", receipt);
-
-      // quick on-chain status check
-      if (receipt.status === 0) {
-        // transaction failed
-        setFlowStatus("FAILED_TX");
-        setIsSubmitting(false);
-        alert("Transaction failed on-chain (status 0). The backend will mark this as FAILED_TX.");
-        return { receipt, success: false, reason: "RECEIPT_STATUS_0" };
-      }
-
-      // update status while backend verification runs
-      setFlowStatus("AWAITING_CONFIRMATIONS");
-
-      // parse logs to find ProposalCreated
-      let parsedEvent: any = null;
-      let parsedDescriptionString: string | null = null;
-      let chainProposalId: string | null = null;
-      let parsedEventPayload: any = null;
-
-      for (const log of receipt.logs) {
-        try {
-          const parsed = govContract.interface.parseLog(log);
-          if (parsed && parsed.name === "ProposalCreated") {
-            parsedEvent = parsed;
-            // Depending on ABI the description arg may be named 'description' or be last arg
-            // Try common access patterns
-            // ethers parseLog returns .args which is both array-like and object-like
-            const args = parsed.args;
-            // prefer named fields
-            parsedDescriptionString =
-              args?.description ??
-              args?.[args.length - 1] ??
-              args?.[args.length - 2] ??
-              null;
-
-            // proposal id might be first arg "id" or args[0]
-            const idArg = args?.id ?? args?.[0] ?? null;
-            chainProposalId = idArg ? idArg.toString() : null;
-
-            // store full raw decoded event payload
-            parsedEventPayload = {
-              name: parsed.name,
-              args: parsed.args,
-            };
-
-            break;
+    // 2) FALLBACK: decode the transaction input (the description is the 4th arg of propose)
+    // this is the quickest reliable fallback — it recovers exactly what the signer sent.
+    if (!parsedDescriptionString) {
+      try {
+        // tx.data should exist on the ContractTransaction returned by ethers Contract method
+        const txData = (tx as any).data ?? (tx as any).raw?.data ?? (tx as any).data;
+        if (txData) {
+          const parsedTx = govContract.interface.parseTransaction({ data: txData, value: (tx as any).value ?? 0 });
+          console.log("parseTransaction succeeded. fn:", parsedTx?.name, "args:", parsedTx?.args);
+          // propose(targets, values, calldatas, description) -> description is index 3
+          const descriptionFromInput = parsedTx?.args?.[3] ?? parsedTx?.args?.description ?? null;
+          if (descriptionFromInput) {
+            parsedDescriptionString = descriptionFromInput;
+            try {
+              parsedDescriptionJson = typeof parsedDescriptionString === "string"
+                ? JSON.parse(parsedDescriptionString)
+                : parsedDescriptionString;
+              console.log("Recovered description JSON from tx input:", parsedDescriptionJson);
+            } catch (e) {
+              console.log("Recovered description string (not JSON):", parsedDescriptionString);
+            }
           }
-        } catch (err) {
-          // ignore non-matching logs
+        } else {
+          console.warn("No tx.data found to parseTransaction fallback.");
         }
+      } catch (txParseErr) {
+        console.warn("parseTransaction fallback failed:", txParseErr);
       }
+    }
 
-      // If we didn't find the event, treat as mismatch/error but still return receipt to backend for manual review
-      if (!parsedEvent) {
-        setFlowStatus("MISMATCH");
-        setIsSubmitting(false);
-        alert(
-          "Could not find ProposalCreated event in transaction logs. The backend will receive the raw receipt for manual review."
-        );
-        return { receipt, success: false, reason: "NO_PROPOSAL_CREATED_LOG", parsedEventPayload: null };
-      }
-
-      // If we have a description string attempt to parse JSON
-      let parsedDescriptionJson: any = null;
-      if (parsedDescriptionString) {
+    // 3) If parseLog failed above, show which topics were emitted and check the ERC1967 implementation slot
+    if (!parsedEvent) {
+      console.log("No parsed ProposalCreated found by parseLog. Listing logs and first topics:");
+      for (const log of receipt.logs || []) {
         try {
-          parsedDescriptionJson =
-            typeof parsedDescriptionString === "string"
-              ? JSON.parse(parsedDescriptionString)
-              : parsedDescriptionString;
+          const firstTopic = (log.topics && log.topics[0]) ? String(log.topics[0]) : null;
+          console.log("Log address:", log.address, "firstTopic:", firstTopic);
         } catch (e) {
-          // parsing failed
-          parsedDescriptionJson = null;
+          console.warn("Error reading log topics:", e);
         }
       }
 
-      // verify the proposal_uuid is present and matches
-      const onChainUuid = parsedDescriptionJson?.proposal_uuid ?? null;
-      if (!onChainUuid || onChainUuid !== proposal_uuid) {
-        setFlowStatus("MISMATCH");
-        setLastChainProposalId(chainProposalId);
-        setIsSubmitting(false);
-        alert(
-          "On-chain description is missing or has a different proposal_uuid. The backend will be sent the raw receipt and event payload for manual review."
-        );
-        return {
-          receipt,
-          success: false,
-          reason: "UUID_MISMATCH",
-          chainProposalId,
-          parsedDescriptionString,
-          parsedDescriptionJson,
-          parsedEventPayload,
-        };
+    // Read ERC1967 implementation slot to discover the real implementation address:
+    try {
+      const implSlot = "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc";
+      
+      // ethers v6: provider lives under .runner
+      const runner = govContract.runner as any;
+      const providerAny = runner?.provider ?? runner;
+
+      if (providerAny && providerAny.getStorageAt) {
+        const implRaw = await providerAny.getStorageAt(GOVERNOR_ADDRESS, implSlot);
+        const implAddr = "0x" + implRaw.slice(-40);
+        console.log("ERC1967 implementation address (from proxy storage):", implAddr);
+      } else {
+        console.warn("Provider.getStorageAt not available to read implementation slot.");
       }
+    } catch (e) {
+      console.warn("Failed to read proxy implementation slot:", e);
+    }
+    }
 
-      // Success: on-chain proposal created and UUID matches
-      setFlowStatus("AWAITING_CONFIRMATIONS");
+    // If we recovered descriptionJson, you can extract proposal_uuid now:
+    if (parsedDescriptionJson) {
+      const onChainUuid = parsedDescriptionJson?.proposal_uuid ?? null;
+      console.log("Recovered onChainUuid from descriptionJson:", onChainUuid);
+    } else if (parsedDescriptionString) {
+      console.log("Recovered description string but not JSON:", parsedDescriptionString);
+    } else {
+      console.log("No description recovered from logs or tx input fallback.");
+    }
+
+    // === end of patch ===
+
+
+
+
+
+    if (receipt.status === 0) {
+      setFlowStatus("FAILED_TX");
+      setIsSubmitting(false);
+      alert("Transaction failed on-chain (status 0).");
+      return { txHash: tx.hash, receipt, success: false, reason: "RECEIPT_STATUS_0" };
+    }
+
+    setFlowStatus("AWAITING_CONFIRMATIONS");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // if (!parsedEvent) {
+    //   setFlowStatus("MISMATCH");
+    //   setIsSubmitting(false);
+    //   alert("Could not find ProposalCreated event in transaction logs. The backend will receive the raw receipt for manual review.");
+    //   return { txHash: tx.hash, receipt, success: false, reason: "NO_PROPOSAL_CREATED_LOG", parsedEventPayload: null };
+    // }
+
+    // parse JSON description if present
+    // let parsedDescriptionJson: any = null;
+    // if (parsedDescriptionString) {
+    //   try {
+    //     parsedDescriptionJson = typeof parsedDescriptionString === "string" ? JSON.parse(parsedDescriptionString) : parsedDescriptionString;
+    //   } catch (_) {
+    //     parsedDescriptionJson = null;
+    //   }
+    // }
+
+    const onChainUuid = parsedDescriptionJson?.proposal_uuid ?? null;
+    if (!onChainUuid || onChainUuid !== proposal_uuid) {
+      setFlowStatus("MISMATCH");
       setLastChainProposalId(chainProposalId);
-
+      setIsSubmitting(false);
+      alert("On-chain description missing or proposal_uuid mismatch.");
       return {
+        txHash: tx.hash,
         receipt,
-        success: true,
+        success: false,
+        reason: "UUID_MISMATCH",
         chainProposalId,
         parsedDescriptionString,
         parsedDescriptionJson,
         parsedEventPayload,
       };
-    } catch (err: any) {
-      console.error("Error creating on-chain proposal:", err);
-      setFlowStatus("FAILED_TX");
-      setIsSubmitting(false);
-      if ((err as any)?.code === 4001) {
-        // user rejected signature
-        alert("Signature rejected by user.");
-      } else {
-        alert("On-chain proposal failed: " + (err?.message ?? String(err)));
-      }
-      return { success: false, reason: "EXCEPTION", error: err };
     }
+
+    setFlowStatus("AWAITING_CONFIRMATIONS");
+    setLastChainProposalId(chainProposalId);
+
+    return {
+      txHash: tx.hash,
+      receipt,
+      success: true,
+      chainProposalId,
+      parsedDescriptionString,
+      parsedDescriptionJson,
+      parsedEventPayload,
+    };
+
+  } catch (err: any) {
+    console.error("Error creating on-chain proposal:", err);
+    setFlowStatus("FAILED_TX");
+    setIsSubmitting(false);
+    if (err?.code === 4001) alert("Signature rejected by user.");
+    else alert("On-chain proposal failed: " + (err?.message ?? String(err)));
+    return { success: false, reason: "EXCEPTION", error: err };
   }
+}
 
 
 
 
 
-
-
-
-
-
-
-
-  /* Send verified data to backend (only call this after on-chain success or purposeful failure) */
-  async function sendVerificationToBackend(payload: any) {
-    try {
-      // Choose the endpoint you use for storing proposals. You previously used:
-      // POST http://localhost:5000/proposals/create
-      // Here we send JSON with a verification payload.
-      const url = "http://localhost:5000/proposals/create";
-      const resp = await axios.post(url, payload, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      return resp.data;
-    } catch (err: any) {
-      console.error("Error sending verification to backend:", err?.response ?? err);
-      throw err;
-    }
-  }
 
 
 
@@ -505,9 +540,18 @@ export default function CreateProposals(): JSX.Element {
 
   /* Integrated create handler: build UUID, create on-chain proposal, then POST verification payload to backend */
   const handleCreateClick = async () => {
-    // Basic validation
-    if (!Titledata && !DescriptionBody) {
-      alert("Please provide at least a Title or Description for the proposal.");
+ 
+ 
+    // Strict pre-sign validation
+    if (!isFormValid) {
+      // show helpful list of missing fields
+      alert("Please fill the required fields before creating the proposal:\n" + missingFields.join(", "));
+      return;
+    }
+
+    // Ensure wallet connected before attempting sign
+    if (!isConnected) {
+      alert("Please connect your wallet before creating the proposal.");
       return;
     }
 
@@ -524,14 +568,18 @@ export default function CreateProposals(): JSX.Element {
     const onChainResult = await createOnChainProposalAndVerify(proposal_uuid);
 
     // If onChainResult === null -> signer missing or early abort
-    if (!onChainResult) {
-      setIsSubmitting(false);
-      setFlowStatus("IDLE");
-      return;
-    }
+if (!onChainResult || !onChainResult.success) {
+  // either signer missing or on-chain verification failed — leave for manual review
+  setIsSubmitting(false);
+  setFlowStatus(onChainResult && onChainResult.reason === "UUID_MISMATCH" ? "MISMATCH" : "MANUAL_REVIEW");
+  console.warn("On-chain creation didn't complete successfully:", onChainResult);
+  return;
+}
+
 
     // Build payload to send to backend always (include status, raw receipt, event payload)
     const {
+      txHash,
       receipt,
       success,
       chainProposalId,
@@ -543,7 +591,7 @@ export default function CreateProposals(): JSX.Element {
 
     const payload = {
       proposal_uuid,
-      tx_hash: receipt?.transactionHash ?? null,
+      tx_hash: txHash ?? receipt?.transactionHash ?? null,
       chain_proposal_id: chainProposalId ?? null,
       proposer_wallet: parsedEventPayload?.args?.proposer ?? null, // may be undefined; backend should verify from receipt/logs
       description_raw: parsedDescriptionString ?? JSON.stringify(buildOnChainDescription(proposal_uuid)),
@@ -577,10 +625,32 @@ export default function CreateProposals(): JSX.Element {
 
     try {
 
+      const variables = {
+        proposal_uuid: payload.proposal_uuid,
+        tx_hash: payload.tx_hash,
+        chain_proposal_id: payload.chain_proposal_id,
+        proposer_wallet: payload.proposer_wallet ?? null,
+        description_raw: payload.description_raw ?? null,
+        description_json: payload.description_json ? JSON.stringify(payload.description_json) : null,
+        title: payload.title ?? null,
+        description: payload.description ?? null,
+        mission: payload.mission ?? null,
+        budget: payload.budget ?? null,
+        implement: payload.implement ?? null,
+        governor_address: payload.governor_address ?? null,
+        chain: payload.chain ?? null,
+        voting_start_block: payload.voting_start_block ?? null,
+        voting_end_block: payload.voting_end_block ?? null,
+        block_number: payload.block_number ?? null,
+        created_at: payload.created_at ?? null,
+        raw_receipt: payload.raw_receipt ? JSON.stringify(payload.raw_receipt) : null,
+        event_payload: payload.event_payload ? JSON.stringify(payload.event_payload) : null,
+        status: payload.status ?? null,
+        category: payload.category ?? null,
+      };
 
 
-
-      const resp = await createProposal({ variables: payload });
+      const resp = await createProposal({ variables });
       console.log("GraphQL mutation response:", resp);
 
       const data = resp?.data ?? null;
@@ -595,25 +665,6 @@ export default function CreateProposals(): JSX.Element {
       } else {
         setFlowStatus(payload.status === "AWAITING_CONFIRMATIONS" ? "AWAITING_CONFIRMATIONS" : "MANUAL_REVIEW");
       }
-
-
-
-      // const backendResp = await createProposal({payload});
-      // console.log("Backend verification response:", backendResp);
-      
-      // const created = backendResp?.data?.createProposal ?? backendResp?.data?.createProposalExt ?? backendResp?.data;
-      // if (created === true || (backendResp?.data && Object.keys(backendResp.data).length > 0)) {
-
-      //   setFlowStatus("CONFIRMED");
-      // } else {
-      //   // backend didn't confirm automatically; likely backend saved with AWATING_CONFIRMATIONS/MISMATCH
-      //   setFlowStatus(payload.status === "AWAITING_CONFIRMATIONS" ? "AWAITING_CONFIRMATIONS" : "MANUAL_REVIEW");
-      // }
-
-
-
-
-
 
     } catch (err) {
       // network/backend error - leave it to backend job to retry later; mark manual review
@@ -765,11 +816,22 @@ export default function CreateProposals(): JSX.Element {
         {lastChainProposalId && <div>On-chain proposal id: {lastChainProposalId}</div>}
       </div>
 
+
+
+      {/* Required-fields hint */}
+      {!isFormValid && (
+        <div style={{ marginTop: 12, color: "#ffb3b3", fontSize: 13 }}>
+          <strong>Required:</strong> please fill {missingFields.join(", ")} to enable Create.
+        </div>
+      )}
+
+
       <div className="CreateProposalsChannelCard2VotingButtonsrow" style={{ marginTop: 12 }}>
         <button
           className="MakeProposalButtonbutton"
           onClick={handleCreateClick}
-          disabled={isSubmitting}
+          disabled={!isFormValid || isSubmitting}
+          title={!isFormValid ? `Fill required fields: ${missingFields.join(", ")}` : undefined}
         >
           <span>{isSubmitting ? "Processing..." : "Create"}</span>
         </button>
@@ -777,7 +839,6 @@ export default function CreateProposals(): JSX.Element {
     </div>
   );
 }
-
 
 
 

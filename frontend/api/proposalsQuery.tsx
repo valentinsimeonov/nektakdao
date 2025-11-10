@@ -60,21 +60,19 @@ query proposals($id: String, $category: String ) {
 
 
 
-/* GraphQL mutation: extended createProposal accepting verification payload */
-/* NOTE: adjust server-side schema names/types if necessary */
 const MUTATION_CREATE_PROPOSAL = gql`
 mutation createProposal(
   $proposal_uuid: String!,
-  $tx_hash: String,
+  $tx_hash: String!,
   $chain_proposal_id: String,
   $proposer_wallet: String,
   $description_raw: String,
   $description_json: String,
-  $title: String,
-  $description: String,
-  $mission: String,
-  $budget: String,
-  $implement: String,
+  $title: String!,
+  $description: String!,
+  $mission: String!,
+  $budget: String!,
+  $implement: String!,
   $governor_address: String,
   $chain: String,
   $voting_start_block: Float,
@@ -84,7 +82,7 @@ mutation createProposal(
   $raw_receipt: String,
   $event_payload: String,
   $status: String,
-  $category: String
+  $category: String!
 ) {
   createProposal(
     proposal_uuid: $proposal_uuid,

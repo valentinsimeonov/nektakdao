@@ -249,7 +249,7 @@ Now we are building the Technical Floor(Backend) of the Building(App).
 
     2. IF the Proposal is not in line with the Community Charter(Values, Morals) then we block the respective Wallet Addres(we can tell the Wallet Address becuase it is recorded on chain, by using the Transcation Hash)
 
-    6. We are avoiding adding more complexity by not bringing in SIWE. Old saying from 42: "Keep it simple, Stupid"
+    6. We are avoiding adding more complexity by not bringing in SIWE.
 
 
 We will tweak these issues some more depending on the Executors, either a double stage proposal or Triple Timelock(Proposal, Executor, Feedback).

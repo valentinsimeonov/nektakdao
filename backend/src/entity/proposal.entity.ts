@@ -9,10 +9,6 @@ import { Entity, PrimaryColumn, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 @ObjectType()
 export class Proposal {
-  // @PrimaryColumn()
-  // @Field()
-  // id: string;
-
   @PrimaryGeneratedColumn('uuid')
   @Field(() => ID)
   id: string;
@@ -21,13 +17,11 @@ export class Proposal {
   @Field(() => String, { nullable: true })
   category: string | null;
 
-  // @Column({ type: 'text', nullable: true, unique: true })
-  @Column({ type: 'text', nullable: true})
+  @Column({ type: 'text', nullable: true, unique: true })
   @Field(() => String, {nullable: true})
   proposal_uuid: string;
 
-  // @Column({ type: 'text', nullable: true, unique: true })
-  @Column({ type: 'text', nullable: true})
+  @Column({ type: 'text', nullable: true, unique: true })
   @Field(() => String, {nullable: true})
   tx_hash: string;
 
@@ -143,12 +137,15 @@ export class Proposal {
   @Field(() => String, { nullable: true })
   raw_receipt: any | null;
 
-  // decoded, structured JSON object representing the entire decoded event fields
-  // No Wallet address here
+
   @Column({ type: 'jsonb', nullable: true })
   @Field(() => String, { nullable: true })
   event_payload: any | null;
 
+    // parsed on-chain description JSON (jsonb)
+  @Column({ type: 'jsonb', nullable: true })
+  @Field(() => String, { nullable: true })
+  description_json: any | null;
 
 
 

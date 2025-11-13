@@ -302,7 +302,10 @@ Now we are building the Technical Floor(Backend) of the Building(App).
 
 ## Sprint 5 - DEV Version
 
+### 0. Contracts Security Course - Patrick Collins
+    Continue
 
+    
 ### 1. Backend
 
     Implement Create Proposal Data Flow Stage 1 - Part 2 - Backend:

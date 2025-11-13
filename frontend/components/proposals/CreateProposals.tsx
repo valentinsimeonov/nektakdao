@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { MUTATION_CREATE_PROPOSAL } from '../../api/proposalsQuery';
 import { useMutation } from "@apollo/client";
 import { useAccount } from "wagmi";
-import { BrowserProvider, Contract, type JsonRpcSigner, keccak256, toUtf8Bytes } from "ethers";
+import { BrowserProvider, Contract, type JsonRpcSigner, keccak256, toUtf8Bytes, getAddress } from "ethers";
 
 
 /* Minimal ABIs used for on-chain proposal */
@@ -298,7 +298,7 @@ async function createOnChainProposalAndVerify(proposal_uuid: string) {
     const descriptionJsonStr = JSON.stringify(descriptionObj);
 
     const govContract = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI, signer);
-    const govIface = govContract.interface as any; 
+    // const govIface = govContract.interface as any; 
 
     const signature = "ProposalCreated(uint256,address,address[],uint256[],bytes[],uint256,uint256,string)";
     const proposalCreatedTopic = keccak256(toUtf8Bytes(signature));
@@ -429,6 +429,134 @@ async function createOnChainProposalAndVerify(proposal_uuid: string) {
     }
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////
+////////// Extract proposer_wallet with fallbacks and normalize
+//////////////////////////////////////////////////////////////////////
+
+
+      let proposer_wallet: string | null = null;
+      let proposer_source: "event" | "tx" | "provider" | null = null;
+
+      // Provider helper (try to pick a provider object we can call)
+      const runnerAny = (govContract as any).runner as any;
+      const providerFromSigner = (signer as any).provider as any;
+      const providerAny = providerFromSigner ?? runnerAny?.provider ?? new BrowserProvider((window as any).ethereum);
+
+      // 1) Prefer the event argument if we decoded it
+      if (parsedEvent) {
+        try {
+          // many ABIs place proposer as the 2nd arg, but we'll check by name first
+          const evArgs: any = parsedEvent.args ?? {};
+          const maybeProposer = evArgs?.proposer ?? evArgs?.[1] ?? null;
+          if (maybeProposer) {
+            try {
+              proposer_wallet = getAddress(String(maybeProposer));
+              proposer_source = "event";
+            } catch (normErr) {
+              // if getAddress fails, just keep raw string
+              proposer_wallet = String(maybeProposer);
+              proposer_source = "event";
+            }
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+
+      // 2) fall back to tx.from or receipt.from
+      if (!proposer_wallet) {
+        try {
+          const txFrom = (tx as any).from ?? receipt?.from ?? null;
+          if (txFrom) {
+            try {
+              proposer_wallet = getAddress(String(txFrom));
+              proposer_source = "tx";
+            } catch (normErr) {
+              proposer_wallet = String(txFrom);
+              proposer_source = "tx";
+            }
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+
+      // 3) provider lookup fallback (authoritative)
+      if (!proposer_wallet) {
+        try {
+          if (providerAny && typeof providerAny.getTransaction === "function") {
+            const fetchedTx = await providerAny.getTransaction(tx.hash);
+            const fetchedFrom = fetchedTx?.from ?? null;
+            if (fetchedFrom) {
+              try {
+                proposer_wallet = getAddress(String(fetchedFrom));
+                proposer_source = "provider";
+              } catch (normErr) {
+                proposer_wallet = String(fetchedFrom);
+                proposer_source = "provider";
+              }
+            }
+          }
+        } catch (e) {
+          console.warn("Provider.getTransaction fallback failed:", e);
+        }
+      }
+
+      // chain id (best-effort)
+      let chainId: number | null = null;
+      try {
+        if (providerAny && typeof providerAny.getNetwork === "function") {
+          const net = await providerAny.getNetwork();
+          chainId = Number(net?.chainId ?? null);
+        } else if ((signer as any).provider && typeof (signer as any).provider.getNetwork === "function") {
+          const net = await (signer as any).provider.getNetwork();
+          chainId = Number(net?.chainId ?? null);
+        }
+      } catch (e) {
+        console.warn("Failed to read chainId from provider:", e);
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // If we recovered descriptionJson, you can extract proposal_uuid now:
     if (parsedDescriptionJson) {
       const onChainUuid = parsedDescriptionJson?.proposal_uuid ?? null;
@@ -503,8 +631,12 @@ async function createOnChainProposalAndVerify(proposal_uuid: string) {
         parsedDescriptionString,
         parsedDescriptionJson,
         parsedEventPayload,
+        proposer_wallet,
+        proposer_source,
+        chainId,
       };
     }
+
 
     setFlowStatus("AWAITING_CONFIRMATIONS");
     setLastChainProposalId(chainProposalId);
@@ -517,7 +649,12 @@ async function createOnChainProposalAndVerify(proposal_uuid: string) {
       parsedDescriptionString,
       parsedDescriptionJson,
       parsedEventPayload,
+      proposer_wallet,
+      proposer_source,
+      chainId,
     };
+
+
 
   } catch (err: any) {
     console.error("Error creating on-chain proposal:", err);
@@ -587,13 +724,33 @@ if (!onChainResult || !onChainResult.success) {
       parsedDescriptionJson,
       parsedEventPayload,
       reason,
+      proposer_wallet,
+      proposer_source,
+      chainId,
     } = onChainResult as any;
+
+
+
+    const providerChainString = await (async () => {
+      try {
+        const signer = await getSignerFromWindow();
+        if (signer?.provider && typeof signer.provider.getNetwork === "function") {
+          const net = await signer.provider.getNetwork();
+          return `${net?.name ?? "unknown"} (${net?.chainId ?? "?"})`;
+        }
+      } catch { /* ignore */ }
+      return "unknown";
+    })();
+
+
+
 
     const payload = {
       proposal_uuid,
       tx_hash: txHash ?? receipt?.transactionHash ?? null,
       chain_proposal_id: chainProposalId ?? null,
-      proposer_wallet: parsedEventPayload?.args?.proposer ?? null, // may be undefined; backend should verify from receipt/logs
+      proposer_wallet: proposer_wallet ?? parsedEventPayload?.args?.proposer ?? null,
+      proposer_source: proposer_source ?? null,
       description_raw: parsedDescriptionString ?? JSON.stringify(buildOnChainDescription(proposal_uuid)),
       description_json: parsedDescriptionJson ?? null,
       title: Titledata,
@@ -602,17 +759,8 @@ if (!onChainResult || !onChainResult.success) {
       budget: BudgetBody,
       implement: ImplementBody,
       governor_address: GOVERNOR_ADDRESS,
-      chain: (await (async () => {
-        try {
-          // try to read chainId from provider
-          const signer = await getSignerFromWindow();
-          if (signer?.provider && signer.provider.getNetwork) {
-            const net = await signer.provider.getNetwork();
-            return `${net?.name ?? "unknown"} (${net?.chainId ?? "?"})`;
-          }
-        } catch { /* ignore */ }
-        return "unknown";
-      })()),
+      chain: providerChainString,
+      chain_id: chainId ?? null,
       voting_start_block: parsedEventPayload?.args?.startBlock ? Number(parsedEventPayload.args.startBlock.toString()) : null,
       voting_end_block: parsedEventPayload?.args?.endBlock ? Number(parsedEventPayload.args.endBlock.toString()) : null,
       block_number: receipt?.blockNumber ?? null,
@@ -624,12 +772,12 @@ if (!onChainResult || !onChainResult.success) {
     };
 
     try {
-
       const variables = {
         proposal_uuid: payload.proposal_uuid,
         tx_hash: payload.tx_hash,
         chain_proposal_id: payload.chain_proposal_id,
         proposer_wallet: payload.proposer_wallet ?? null,
+        proposer_source: payload.proposer_source ?? null,
         description_raw: payload.description_raw ?? null,
         description_json: payload.description_json ? JSON.stringify(payload.description_json) : null,
         title: payload.title ?? null,
@@ -639,6 +787,7 @@ if (!onChainResult || !onChainResult.success) {
         implement: payload.implement ?? null,
         governor_address: payload.governor_address ?? null,
         chain: payload.chain ?? null,
+        chain_id: payload.chain_id ?? null,
         voting_start_block: payload.voting_start_block ?? null,
         voting_end_block: payload.voting_end_block ?? null,
         block_number: payload.block_number ?? null,
@@ -648,6 +797,7 @@ if (!onChainResult || !onChainResult.success) {
         status: payload.status ?? null,
         category: payload.category ?? null,
       };
+      console.log("Variables to send to Backend", variables);
 
 
       const resp = await createProposal({ variables });

@@ -6,93 +6,6 @@
 
 
 
-// interface Post {
-//   id: number;
-//   title: string;
-//   description: string;
-//   mission: string;
-//   budget: string;
-//   implement: string;
-//   votesUp: number;
-//   votesDown: number;
-//   shareMore: number;
-//   dateCreated: Date;
-//   avatar: string;
-//   avatarUrl?: string;
-//   category: string[];
-// }
-
-
-
-
-
-
-
-  // const [post, setPost] = useState<Post | null>(null);
-
-
-
-  const PostData = async (
-    Titledata: string,
-    DescriptionBody: string,
-    MissionBody: string,
-    BudgetBody: string,
-    ImplementBody: string,
-    currentDate: Date,
-    avatarFile: File | null,
-    categoryType: string
-  ) => {
-    try {
-      const formData = new FormData();
-      formData.append("title", Titledata);
-      formData.append("description", DescriptionBody);
-      formData.append("mission", MissionBody);
-      formData.append("budget", BudgetBody);
-      formData.append("implement", ImplementBody);
-      formData.append("dateCreated", currentDate.toISOString());
-      formData.append("category[]", categoryType);
-
-      if (avatarFile) {
-        formData.append("avatar", avatarFile);
-      }
-      console.log(
-        "F-Inside CreateProposal.tsx  -- PostData --, avatarFile variable holds:",
-        avatarFile
-      );
-
-      const response = await axios.post(
-        "http://localhost:5000/proposals/create",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      console.log("F - CreateProposal -- useEffect -- formData: ", formData);
-
-      setPost(response.data);
-      console.log("F-Inside CreateProposal.tsx, response variable:", response);
-    } catch (err: any) {
-      console.error("Error fetching posts:", err.message || err);
-    }
-  };
-
-  useEffect(() => {
-    console.log("F - CreateProposal -- useEffect -- posts: ", post);
-  }, [post]);
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 {/* 
@@ -113,10 +26,6 @@
         </div>
 
  */}
-
-
-
-
 
 
 
@@ -158,4 +67,50 @@ mutation createProposal($category: String!, $title: String!, $description: Strin
 
 
 
+
+
+
+
+
+
+
+
+
+
+//   @Mutation(() => Boolean) 
+//   async createProposal(
+//     @Args('category') category: string,
+//     @Args('title') title: string,
+//     @Args('description') description: string,
+//     @Args('mission') mission: string,
+//     @Args('budget') budget: string,
+//     @Args('implement') implement: string,
+//     @Args('created_at') created_at: string,
+//     @Args('proposal_uuid') proposal_uuid: string,
+//     @Args('tx_hash') tx_hash: string,
+//     @Args('chain_proposal_id') chain_proposal_id: string,
+//     @Args('proposer_wallet') proposer_wallet: string,
+//     @Args('description_raw') description_raw: string,
+//     @Args('description_json') description_json: string,
+//     @Args('governor_address') governor_address: string,
+//     @Args('chain') chain: string,
+//     @Args('raw_receipt') raw_receipt: string,
+//     @Args('event_payload') event_payload: string,
+//     @Args('status') status: string,
+
+//     @Args('voting_start_block', { type: () => Float, nullable: true }) voting_start_block?: number,
+//     @Args('voting_end_block', { type: () => Float, nullable: true }) voting_end_block?: number,
+//     @Args('block_number', { type: () => Float, nullable: true }) block_number?: number,
+
+
+//   ): Promise<boolean> { 
+//     const newProposal = await this.ProposalService.createProposal(category, title, description, mission,  budget, implement, created_at, proposal_uuid, tx_hash, chain_proposal_id, proposer_wallet, description_raw, description_json, governor_address, chain, raw_receipt, event_payload, status, voting_start_block ?? null, voting_end_block ?? null, block_number ?? null
+//  );
+
+//     // Publish new message event to Redis
+//     console.log('Publishing new message to Redis:', newProposal);
+//     this.pubSub.publish('proposalAdded', { proposalAdded: newProposal });
+
+//     return true; 
+//   }
 

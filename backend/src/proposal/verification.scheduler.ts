@@ -3,15 +3,15 @@ import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/commo
 import { VerificationService } from './verification.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { StagingReport } from 'src/entity/staging_report.entity';
-import { ProposalService } from 'src/proposal/proposal.service';
+import { StagingReport } from '../entity/staging_report.entity';
+import { ProposalService } from '../proposal/proposal.service';
 
 @Injectable()
 export class VerificationScheduler implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(VerificationScheduler.name);
   private intervalHandle: NodeJS.Timeout | null = null;
-  // poll every N milliseconds
-  private pollIntervalMs = Number(process.env.VERIFICATION_POLL_MS ?? 60_000); // 60s default
+  // poll every N milliseconds (read either env var for compatibility)
+  private pollIntervalMs = Number(process.env.VERIFICATION_POLL_MS ?? process.env.POLL_INTERVAL_MS ?? 60_000);
   // how many staging items to process per tick
   private batchSize = Number(process.env.VERIFICATION_BATCH_SIZE ?? 20);
 
@@ -37,9 +37,9 @@ export class VerificationScheduler implements OnModuleInit, OnModuleDestroy {
     });
   }
 
+  // ... runOnce remains the same as before (unchanged) ...
   async runOnce(): Promise<void> {
     try {
-      // Fetch a small batch of pending staging reports
       const pendingStaging = await this.stagingRepo.find({
         where: { status: 'PENDING' },
         take: this.batchSize,

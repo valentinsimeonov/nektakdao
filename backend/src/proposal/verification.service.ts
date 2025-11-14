@@ -1,7 +1,7 @@
 // src/proposals/verification.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Proposal } from 'src/entity/proposal.entity';
+import { Proposal } from '../entity/proposal.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getAddress, Interface, JsonRpcProvider } from 'ethers';
 import * as dotenv from 'dotenv';
@@ -52,17 +52,33 @@ export type PreVerifyResult =
 @Injectable()
 export class VerificationService {
   private readonly logger = new Logger(VerificationService.name);
-  private provider: JsonRpcProvider;
+  // provider is optional: when not configured we will not attempt RPC calls on receive
+  private provider: JsonRpcProvider | null = null;
   private confirmationsThreshold: number;
 
   constructor(
     @InjectRepository(Proposal)
     private readonly proposalRepo: Repository<Proposal>,
   ) {
-    const url = process.env.CHAIN_RPC_URL || process.env.RPC_URL || 'http://localhost:8545';
-    this.provider = new JsonRpcProvider(url);
+    // IMPORTANT: do NOT default to localhost:8545 (this causes ethers to repeatedly attempt network detection).
+    // Only create a JsonRpcProvider if a real RPC URL is provided via env.
+    const url = process.env.CHAIN_RPC_URL || process.env.RPC_URL || null;
+    if (url) {
+      try {
+        this.provider = new JsonRpcProvider(url);
+        this.logger.log(`VerificationService initialized; RPC=${url}`);
+      } catch (err) {
+        this.logger.warn(`Failed to construct JsonRpcProvider for url=${url}: ${String(err)} - disabling on-receive pre-verification`);
+        this.provider = null;
+      }
+    } else {
+      this.logger.log('No CHAIN_RPC_URL / RPC_URL configured; on-receive pre-verification disabled (incoming proposals will be staged).');
+      this.provider = null;
+    }
+
+    // prefer CONFIRMATIONS_REQUIRED env name, fallback to CONFIRMATIONS_THRESHOLD then 5
     this.confirmationsThreshold = Number(process.env.CONFIRMATIONS_REQUIRED ?? process.env.CONFIRMATIONS_THRESHOLD ?? 5);
-    this.logger.log(`VerificationService initialized; RPC=${url}; confirmationsThreshold=${this.confirmationsThreshold}`);
+    this.logger.log(`confirmationsThreshold=${this.confirmationsThreshold}`);
   }
 
   private nowISO() {
@@ -77,11 +93,20 @@ export class VerificationService {
 
   /**
    * Pre-verify an incoming payload BEFORE persisting to proposals table.
-   * Returns a PreVerifyResult that indicates what action caller should take.
+   * If provider is not configured or unreachable, this function returns TX_NOT_FOUND
+   * so caller will stage the payload instead of failing the request.
    */
   async preVerifyPayload(incoming: any): Promise<PreVerifyResult> {
     const trace: TraceStep[] = [];
-    // normalize incoming proposer/governor for trace
+
+    // If no provider configured, immediately return TX_NOT_FOUND so the caller stages the payload.
+    if (!this.provider) {
+      trace.push({ ts: this.nowISO(), step: 'no_rpc_provider', ok: false, info: { reason: 'no CHAIN_RPC_URL / RPC_URL configured' } });
+      this.logger.warn('preVerifyPayload: no RPC provider configured - returning TX_NOT_FOUND so payload will be staged');
+      return { outcome: 'TX_NOT_FOUND', trace, reason: 'no_rpc_provider' };
+    }
+
+    // Normalize incoming proposer for traceability
     let normalizedProposer: string | null = null;
     if (incoming?.proposer_wallet) {
       try {
@@ -102,14 +127,16 @@ export class VerificationService {
       return { outcome: 'TX_NOT_FOUND', trace, reason: 'no_tx_hash' };
     }
 
-    // fetch transaction
+    // fetch transaction (guard with try/catch for RPC errors)
     let fetchedTx: any = null;
     try {
       fetchedTx = await this.provider.getTransaction(txHash);
       trace.push({ ts: this.nowISO(), step: 'getTransaction', ok: true, info: { found: !!fetchedTx } });
     } catch (err) {
       trace.push({ ts: this.nowISO(), step: 'getTransaction', ok: false, info: { err: String(err) } });
-      return { outcome: 'RPC_ERROR', trace, reason: String(err) };
+      this.logger.warn(`preVerifyPayload: RPC getTransaction failed (${String(err)}). Will instruct caller to stage payload.`);
+      // treat provider errors as "stage the payload" (don't block the frontend)
+      return { outcome: 'TX_NOT_FOUND', trace, reason: 'rpc_getTransaction_failed' };
     }
 
     if (!fetchedTx) {
@@ -117,14 +144,15 @@ export class VerificationService {
       return { outcome: 'TX_NOT_FOUND', trace, reason: 'tx_not_on_rpc' };
     }
 
-    // try to fetch receipt
+    // fetch receipt
     let receipt: any = null;
     try {
       receipt = await this.provider.getTransactionReceipt(txHash);
       trace.push({ ts: this.nowISO(), step: 'getTransactionReceipt', ok: true, info: { found: !!receipt } });
     } catch (err) {
       trace.push({ ts: this.nowISO(), step: 'getTransactionReceipt', ok: false, info: { err: String(err) } });
-      return { outcome: 'RPC_ERROR', trace, reason: String(err) };
+      this.logger.warn(`preVerifyPayload: RPC getTransactionReceipt failed (${String(err)}). Will instruct caller to stage payload.`);
+      return { outcome: 'TX_NOT_FOUND', trace, reason: 'rpc_getTransactionReceipt_failed' };
     }
 
     if (!receipt) {
@@ -146,15 +174,11 @@ export class VerificationService {
       confirmations = receipt.blockNumber ? currentBlock - receipt.blockNumber + 1 : 0;
       const hasEnoughConfs = confirmations >= this.confirmationsThreshold;
       trace.push({ ts: this.nowISO(), step: 'confirmations', ok: hasEnoughConfs, info: { confirmations, threshold: this.confirmationsThreshold } });
-      if (!hasEnoughConfs) {
-        // still valid tx, but not enough confirmations
-        // Attempt to decode logs for authoritative proposer even if insufficient confs (useful)
-      }
     } catch (err) {
       trace.push({ ts: this.nowISO(), step: 'confirmations_fetch_failed', ok: false, info: { err: String(err) } });
     }
 
-    // try decode logs to find authoritative proposer
+    // attempt to decode logs for authoritative proposer
     let authoritativeProposer: string | null = null;
     try {
       if (Array.isArray(receipt.logs) && receipt.logs.length > 0) {
@@ -235,7 +259,6 @@ export class VerificationService {
     }
 
     if (receipt && receipt.status === 1 && confirmations < this.confirmationsThreshold) {
-      // transaction mined and successful but not enough confirmations -> await
       return { outcome: 'AWAITING_CONFIRMATIONS', trace, receipt, authoritativeProposer, confirmations };
     }
 
@@ -243,22 +266,17 @@ export class VerificationService {
       return { outcome: 'MISMATCH', trace, receipt, authoritativeProposer, confirmations };
     }
 
-    // fallback: if we've gotten here but didn't return, treat as awaiting confirmations
+    // fallback
     return { outcome: 'AWAITING_CONFIRMATIONS', trace, receipt, authoritativeProposer, confirmations };
   }
 
   /**
    * Legacy verification function (post-persist) kept for worker usage.
-   * You may keep the existing verifyProposal implementation for scheduled retries.
+   * Example usage: scheduler calls verifyProposal for persisted rows.
    */
   async verifyProposal(proposal: Proposal): Promise<Proposal> {
-    // Existing implementation (not repeated here for brevity).
-    // You can keep/adjust the current verifyProposal logic.
-    // For brevity in this file snippet, call a simpler wrapper or reuse preVerifyPayload.
-    // Here we call preVerifyPayload and then update the persisted Proposal accordingly.
     const incoming = { ...proposal };
     const pre = await this.preVerifyPayload(incoming);
-    // apply results back to proposal and save
     let updated: any = { ...proposal };
 
     if (pre.outcome === 'CONFIRMED') {
@@ -279,7 +297,6 @@ export class VerificationService {
       updated.raw_receipt = (pre as any).receipt ?? updated.raw_receipt;
       updated.proposer_verified = { trace: pre.trace, verified: false, authoritativeProposer: (pre as any).authoritativeProposer ?? null };
     } else {
-      // tx_not_found / RPC_ERROR -> keep awaiting
       updated.status = 'AWAITING_CONFIRMATIONS';
       updated.proposer_verified = { trace: pre.trace, verified: false };
     }
@@ -287,11 +304,13 @@ export class VerificationService {
     const saved = await this.proposalRepo.save(updated);
     this.logger.log(`verifyProposal updated ${saved.proposal_uuid} => ${saved.status}`);
     return saved;
+
+
   }
 
 
 
 
+
+
 }
-
-

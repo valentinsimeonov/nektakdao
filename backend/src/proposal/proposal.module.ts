@@ -11,12 +11,17 @@ import { Proposal } from 'src/entity/proposal.entity';
 import { ProposalService} from 'src/proposal/proposal.service';
 import { ProposalResolver} from 'src/proposal/proposal.resolver';
 import { pubSub } from '../config/pubsub.provider';
+import { VerificationService } from './verification.service';
+import { VerificationScheduler } from './verification.scheduler';
+import { StagingReport } from '../entity/staging_report.entity';
+
+
 
 
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([Proposal]),
+    TypeOrmModule.forFeature([Proposal, StagingReport]),
     ScheduleModule,
     PluginModule,
     HttpModule,
@@ -28,9 +33,12 @@ import { pubSub } from '../config/pubsub.provider';
       provide: 'PUB_SUB',
       useValue: pubSub,
     },
-
-
     ProposalResolver,
+  
+    VerificationService,
+    VerificationScheduler,
+  
+  
   ],
   exports: [ProposalService,  RedisService],
 })

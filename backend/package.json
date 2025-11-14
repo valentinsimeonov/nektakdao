@@ -55,7 +55,8 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.17",
-    "undici": "^7.3.0"
+    "undici": "^7.3.0",
+    "ethers": "^6.15.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

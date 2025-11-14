@@ -1,5 +1,5 @@
 //proposal.resolver.ts
-import { Args, Query, Resolver, Subscription, Mutation, Float } from '@nestjs/graphql';
+import { Args, Query, Resolver, Subscription, Mutation, Float, Int } from '@nestjs/graphql';
 import { ProposalService } from './proposal.service';
 import { Inject } from '@nestjs/common';
 import { Proposal } from 'src/entity/proposal.entity';
@@ -41,6 +41,7 @@ export class ProposalResolver {
 
 
 
+//proposal.resolver.ts
 
   @Mutation(() => Boolean)
   async createProposal(
@@ -48,9 +49,10 @@ export class ProposalResolver {
     @Args('tx_hash', { nullable: true }) tx_hash?: string,
     @Args('chain_proposal_id', { nullable: true }) chain_proposal_id?: string,
     @Args('proposer_wallet', { nullable: true }) proposer_wallet?: string,
+    @Args('proposer_source', { nullable: true }) proposer_source?: string,
+
     @Args('description_raw', { nullable: true }) description_raw?: string,
     @Args('description_json', { nullable: true }) description_json?: string,
-
 
     @Args('title', { nullable: true }) title?: string,
     @Args('description', { nullable: true }) description?: string,
@@ -61,9 +63,14 @@ export class ProposalResolver {
 
     @Args('governor_address', { nullable: true }) governor_address?: string,
     @Args('chain', { nullable: true }) chain?: string,
-    @Args('voting_start_block', { type: () => Float, nullable: true }) voting_start_block?: number,
-    @Args('voting_end_block', { type: () => Float, nullable: true }) voting_end_block?: number,
-    @Args('block_number', { type: () => Float, nullable: true }) block_number?: number,
+    @Args('chain_id', { type: () => Int, nullable: true }) chain_id?: number,
+
+    @Args('voting_start_block', { type: () => Int, nullable: true }) voting_start_block?: number,
+    @Args('voting_end_block', { type: () => Int, nullable: true }) voting_end_block?: number,
+    @Args('block_number', { type: () => Int, nullable: true }) block_number?: number,
+
+
+
     @Args('raw_receipt', { nullable: true }) raw_receipt?: string,
     @Args('event_payload', { nullable: true }) event_payload?: string,
     @Args('status', { nullable: true }) status?: string,
@@ -75,6 +82,7 @@ export class ProposalResolver {
       tx_hash,
       chain_proposal_id,
       proposer_wallet,
+      proposer_source,
       description_raw,
       description_json,
       title,
@@ -84,6 +92,7 @@ export class ProposalResolver {
       implement,
       governor_address,
       chain,
+      chain_id,
       voting_start_block,
       voting_end_block,
       block_number,

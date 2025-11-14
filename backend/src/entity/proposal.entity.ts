@@ -79,33 +79,40 @@ export class Proposal {
   proposer_wallet: string | null;
 
 
+  @Column({ type: 'text', nullable: true })
+  @Field(() => String, { nullable: true })
+  proposer_source: string | null;
 
 
 
 
-  @Field(() => Float, {nullable: true})
-  @Column('numeric', { nullable: true })
+
+
+
+
+ @Field(() => Int, { nullable: true })
+  @Column('int', { nullable: true })
   voting_start_block: number | null;
 
-
-  @Field(() => Float, {nullable: true})
-  @Column('numeric', { nullable: true })
+  @Field(() => Int, { nullable: true })
+  @Column('int', { nullable: true })
   voting_end_block: number | null;
 
-
-  @Field(() => Float, {nullable: true})
-  @Column('numeric', { nullable: true })
+  @Field(() => Int, { nullable: true })
+  @Column('int', { nullable: true })
   block_number: number | null;
 
-
-  @Field(() => Float, {nullable: true})
-  @Column('numeric', { nullable: true })
+  @Field(() => Int, { nullable: true })
+  @Column('int', { nullable: true })
   votesUp: number | null;
 
-
-  @Field(() => Float, {nullable: true})
-  @Column('numeric', { nullable: true })
+  @Field(() => Int, { nullable: true })
+  @Column('int', { nullable: true })
   votesDown: number | null;
+
+  @Field(() => Int, { nullable: true })
+  @Column('int', { nullable: true })
+  chain_id: number | null;
 
 
   // @Field(() => Float, {nullable: true})
@@ -113,7 +120,6 @@ export class Proposal {
   // shareMore: number | null;
 
 
-  // The new 'status' field — enum as text in DB
   @Column({
     type: 'enum',
     enum: ['PENDING_TX', 'AWAITING_CONFIRMATIONS', 'CONFIRMED', 'FAILED_TX', 'MISMATCH', 'REJECTED', 'MANUAL_REVIEW'],
@@ -147,7 +153,10 @@ export class Proposal {
   @Field(() => String, { nullable: true })
   description_json: any | null;
 
-
+  // proposer verification / trace (jsonb)
+  @Column({ type: 'jsonb', nullable: true })
+  @Field(() => String, { nullable: true })
+  proposer_verified: any | null;
 
 
 
@@ -173,3 +182,6 @@ export class Proposal {
 
 
 }
+
+
+

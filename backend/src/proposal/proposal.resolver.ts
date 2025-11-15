@@ -4,7 +4,7 @@ import { ProposalService } from './proposal.service';
 import { Inject } from '@nestjs/common';
 import { Proposal } from 'src/entity/proposal.entity';
 import { PubSub } from 'graphql-subscriptions';
-
+import { CreateProposalResult } from './createProposalResult.dto';
 
 
 @Resolver(() => Proposal)
@@ -41,9 +41,9 @@ export class ProposalResolver {
 
 
 
-//proposal.resolver.ts
+//src/proposal/proposal.resolver.ts
 
-  @Mutation(() => Boolean)
+  @Mutation(() => CreateProposalResult)
   async createProposal(
     @Args('proposal_uuid', { nullable: true }) proposal_uuid?: string,
     @Args('tx_hash', { nullable: true }) tx_hash?: string,
@@ -76,7 +76,7 @@ export class ProposalResolver {
     @Args('status', { nullable: true }) status?: string,
     @Args('category', { nullable: true }) category?: string,
     @Args('created_at', { nullable: true }) created_at?: string,
-  ): Promise<boolean> {
+  ): Promise<CreateProposalResult> {
     const payload = {
       proposal_uuid,
       tx_hash,
@@ -103,11 +103,52 @@ export class ProposalResolver {
       created_at,
     };
 
-    const newProposal = await this.ProposalService.createProposal(payload);
+   
+    const saved = await this.ProposalService.createProposal(payload);
 
-    console.log('Publishing new message to Redis:', newProposal);
-    this.pubSub.publish('proposalAdded', { proposalAdded: newProposal });
+    // saved can be a Proposal (persisted) or a StagingReport
+    // Only publish to Redis when it's a Proposal and status is AWAITING_CONFIRMATIONS or CONFIRMED
+    const publishableStatuses = new Set(['AWAITING_CONFIRMATIONS', 'CONFIRMED']);
 
-    return true;
+    // detect if it's staging or proposal by presence of fields used in Proposal entity
+    const isStaging = (saved && (saved as any).payload !== undefined && (saved as any).status === 'PENDING');
+
+    if (!isStaging) {
+      // it's a Proposal
+      const proposal: any = saved as any;
+      const statusStr = String(proposal.status ?? 'PENDING_TX');
+      if (publishableStatuses.has(statusStr)) {
+        console.log('Publishing new message to Redis:', proposal);
+        this.pubSub.publish('proposalAdded', { proposalAdded: proposal });
+      } else {
+        // do not publish; frontend will be told the status and can show appropriate message
+        console.log(`Not publishing proposal id=${proposal.id} status=${statusStr}`);
+      }
+      return {
+        ok: true,
+        status: String(proposal.status ?? 'PENDING_TX'),
+        id: proposal.id ?? null,
+        message: null,
+      };
+    } else {
+      // staging case
+      const staging: any = saved as any;
+      const status = staging.status ?? 'PENDING';
+      return {
+        ok: false,
+        status,
+        id: staging.id ?? null,
+        message: 'Proposal staged — awaiting on-chain confirmation or RPC availability.',
+      };
+    }
+
+
   }
+
+
+
+
+
 }
+
+

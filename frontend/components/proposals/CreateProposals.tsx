@@ -52,6 +52,31 @@ async function getSignerFromWindow(): Promise<JsonRpcSigner | null> {
 
 
 
+// ---------- Small Modal component ----------
+function ResultModal({ open, onClose, payload }: { open: boolean; onClose: () => void; payload: { ok: boolean; status?: string | null; id?: string | null; message?: string | null } | null }) {
+  if (!open) return null;
+  const title = payload?.ok ? 'Proposal saved' : 'Proposal result';
+  return (
+  <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+  <div style={{ background: '#0f172a', color: 'white', padding: 20, width: 420, borderRadius: 8, boxShadow: '0 8px 40px rgba(2,6,23,0.7)' }}>
+  <h3 style={{ marginTop: 0 }}>{title}</h3>
+  <div style={{ marginBottom: 12, fontSize: 14 }}>
+  <div><strong>Status:</strong> {payload?.status ?? 'UNKNOWN'}</div>
+  {payload?.id && <div style={{ marginTop: 6 }}><strong>ID:</strong> {payload.id}</div>}
+  {payload?.message && <div style={{ marginTop: 6, color: '#ffd6b3' }}>{payload.message}</div>}
+  </div>
+  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+  <button onClick={onClose} style={{ background: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.12)', padding: '6px 12px', borderRadius: 6 }}>Close</button>
+  </div>
+  </div>
+</div>
+);
+}
+
+
+
+
+
 
 
 
@@ -71,7 +96,6 @@ export default function CreateProposals(): JSX.Element {
 
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
-  const [categoryType, setCategoryType] = useState("");
 
 
   const [Titledata, setTitledata] = useState("");
@@ -79,6 +103,7 @@ export default function CreateProposals(): JSX.Element {
   const [MissionBody, setMissionBody] = useState("");
   const [BudgetBody, setBudgetBody] = useState("");
   const [ImplementBody, setImplementBody] = useState("");
+  const [categoryType, setCategoryType] = useState("");
 
 
 
@@ -99,7 +124,8 @@ export default function CreateProposals(): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
 
-
+const [modalOpen, setModalOpen] = useState(false);
+const [modalPayload, setModalPayload] = useState<any>(null);
 
 
   const handleTitleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,7 +204,15 @@ export default function CreateProposals(): JSX.Element {
 
 
 
-
+  // GraphQL mutation hook
+  type CreateResp = {
+    createProposal: {
+    ok: boolean;
+    status?: string | null;
+    id?: string | null;
+    message?: string | null;
+    } | null;
+  };
 
 
 	  const [createProposal, { loading, error }] = useMutation(MUTATION_CREATE_PROPOSAL, {
@@ -710,9 +744,10 @@ if (!onChainResult || !onChainResult.success) {
   setIsSubmitting(false);
   setFlowStatus(onChainResult && onChainResult.reason === "UUID_MISMATCH" ? "MISMATCH" : "MANUAL_REVIEW");
   console.warn("On-chain creation didn't complete successfully:", onChainResult);
+  setModalPayload({ ok: false, status: onChainResult?.reason ?? 'ONCHAIN_FAILED', message: 'On-chain proposal failed or needs review' });
+  setModalOpen(true);
   return;
-}
-
+  }
 
     // Build payload to send to backend always (include status, raw receipt, event payload)
     const {
@@ -801,40 +836,42 @@ if (!onChainResult || !onChainResult.success) {
 
 
       const resp = await createProposal({ variables });
-      console.log("GraphQL mutation response:", resp);
+     console.log('GraphQL mutation response:', resp);
+     const result = resp?.data?.createProposal ?? null;
 
-      const data = resp?.data ?? null;
-
-      const created =
-        data?.createProposal === true ||
-        (data?.createProposal && typeof data.createProposal === "object") ||
-        (data && Object.keys(data).length > 0);
-
-      if (created) {
-        setFlowStatus("CONFIRMED");
+      if (result && result.ok) {
+        // Success path: backend persisted / accepted the proposal
+        setFlowStatus(result.status === 'CONFIRMED' ? 'CONFIRMED' : 'AWAITING_CONFIRMATIONS');
+        setModalPayload({ ok: true, status: result.status ?? null, id: result.id ?? null, message: result.message ?? null });
+      } else if (result) {
+        // Backend returned an object but ok === false (staged, mismatch, rejected, etc)
+        setFlowStatus(result.status === 'AWAITING_CONFIRMATIONS' ? 'AWAITING_CONFIRMATIONS' : 'MANUAL_REVIEW');
+        setModalPayload({
+          ok: result.ok ?? false,
+          status: result.status ?? null,
+          id: result.id ?? null,
+          message: result.message ?? 'Staged or requires manual review',
+        });
       } else {
-        setFlowStatus(payload.status === "AWAITING_CONFIRMATIONS" ? "AWAITING_CONFIRMATIONS" : "MANUAL_REVIEW");
+        // Unexpected / older backend shape (maybe returned boolean or nothing)
+        setModalPayload({ ok: false, status: 'UNKNOWN', id: null, message: 'Unexpected response from server' });
+        setFlowStatus('MANUAL_REVIEW');
       }
-
-    } catch (err) {
-      // network/backend error - leave it to backend job to retry later; mark manual review
-      setFlowStatus("MANUAL_REVIEW");
-      console.error("Failed to call GraphQL verification payload to backend:", err);
+    } catch (err: any) {
+      setModalPayload({ ok: false, status: 'ERROR', id: null, message: err?.message ?? String(err) });
+      setFlowStatus('MANUAL_REVIEW');
+       console.error("Failed to call GraphQL verification payload to backend:", err);
       alert("Failed to send verification to backend. Record may still exist on-chain");
     } finally {
+      // show the modal to the user with the result and re-enable UI
+      setModalOpen(true);
       setIsSubmitting(false);
+      // Optionally clear form
+      setTitledata(''); setDescriptionBody(''); setMissionBody(''); setBudgetBody(''); setImplementBody(''); setCategoryType('');
     }
 
-    // Optional: clear form fields if you want (or keep for retry/edits)
-    setTitledata("");
-    setDescriptionBody("");
-    setMissionBody("");
-    setBudgetBody("");
-    setImplementBody("");
-    // setImageUrl(null);
-    // setAvatarFile(null);
-  };
 
+  }
 
 
 
@@ -974,6 +1011,9 @@ if (!onChainResult || !onChainResult.success) {
           <strong>Required:</strong> please fill {missingFields.join(", ")} to enable Create.
         </div>
       )}
+
+      <ResultModal open={modalOpen} onClose={()=>setModalOpen(false)} payload={modalPayload} />
+
 
 
       <div className="CreateProposalsChannelCard2VotingButtonsrow" style={{ marginTop: 12 }}>

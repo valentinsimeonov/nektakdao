@@ -35,6 +35,8 @@ type TraceStep = {
   info?: any;
 };
 
+
+
 export type PreVerifyResult =
   | {
       outcome: 'CONFIRMED' | 'AWAITING_CONFIRMATIONS' | 'FAILED_TX' | 'MISMATCH';
@@ -42,12 +44,21 @@ export type PreVerifyResult =
       receipt?: any;
       authoritativeProposer?: string | null;
       confirmations?: number;
+      // optional on-chain parsed description fields — present when we parsed ProposalCreated.description
+      description_raw?: string | null;
+      description_json?: any | null;
     }
   | {
       outcome: 'TX_NOT_FOUND' | 'RPC_ERROR';
       trace: TraceStep[];
       reason?: string;
+      description_raw?: string | null;
+      description_json?: any | null;
     };
+
+
+
+
 
 @Injectable()
 export class VerificationService {
@@ -60,7 +71,6 @@ export class VerificationService {
     @InjectRepository(Proposal)
     private readonly proposalRepo: Repository<Proposal>,
   ) {
-    // IMPORTANT: do NOT default to localhost:8545 (this causes ethers to repeatedly attempt network detection).
     // Only create a JsonRpcProvider if a real RPC URL is provided via env.
     const url = process.env.CHAIN_RPC_URL || process.env.RPC_URL || null;
     if (url) {
@@ -178,8 +188,16 @@ export class VerificationService {
       trace.push({ ts: this.nowISO(), step: 'confirmations_fetch_failed', ok: false, info: { err: String(err) } });
     }
 
+
+
+
+
+
     // attempt to decode logs for authoritative proposer
+    // Try parse logs for ProposalCreated and extract description
     let authoritativeProposer: string | null = null;
+    let parsedDescriptionRaw: string | null = null;
+    let parsedDescriptionJson: any = null;
     try {
       if (Array.isArray(receipt.logs) && receipt.logs.length > 0) {
         const iface = new Interface(GOVERNOR_ABI);
@@ -187,20 +205,35 @@ export class VerificationService {
           try {
             const parsed = iface.parseLog(l);
             if (parsed && parsed.name === 'ProposalCreated') {
+              // args: id, proposer, targets, values, calldatas, startBlock, endBlock, description
               const maybe = parsed.args?.proposer ?? parsed.args?.[1] ?? null;
+              const desc = parsed.args?.description ?? parsed.args?.[7] ?? null;
               if (maybe) {
                 try {
                   authoritativeProposer = getAddress(String(maybe));
                   trace.push({ ts: this.nowISO(), step: 'parse_log_proposer', ok: true, info: { authoritativeProposer } });
-                  break;
                 } catch (normErr) {
                   authoritativeProposer = String(maybe);
                   trace.push({ ts: this.nowISO(), step: 'parse_log_proposer_normalize_failed', ok: false, info: { raw: maybe } });
                 }
               }
+              if (desc) {
+                parsedDescriptionRaw = String(desc);
+                trace.push({ ts: this.nowISO(), step: 'parse_log_description_raw', ok: true, info: { length: parsedDescriptionRaw.length } });
+                // try to parse as json
+                try {
+                  const dj = JSON.parse(parsedDescriptionRaw);
+                  parsedDescriptionJson = dj;
+                  trace.push({ ts: this.nowISO(), step: 'parse_log_description_json', ok: true, info: { keys: Object.keys(dj) } });
+                } catch (parseErr) {
+                  trace.push({ ts: this.nowISO(), step: 'parse_log_description_json_parse_failed', ok: false, info: { err: String(parseErr) } });
+                }
+              }
+              // Found the relevant event; stop searching further logs
+              break;
             }
-          } catch {
-            // ignore non-matching logs
+          } catch (err) {
+            // ignore non-matching log parse errors
           }
         }
       } else {
@@ -209,6 +242,9 @@ export class VerificationService {
     } catch (err) {
       trace.push({ ts: this.nowISO(), step: 'parse_logs_failed', ok: false, info: { err: String(err) } });
     }
+
+
+
 
     // fallback authoritative proposer -> tx.from
     if (!authoritativeProposer) {
@@ -238,13 +274,17 @@ export class VerificationService {
       trace.push({ ts: this.nowISO(), step: 'compare_proposers_missing', ok: false, info: { normalizedProposer, authoritativeProposer } });
     }
 
+
+
+
+
     // description_json uuid check if present in incoming
     try {
       if (incoming?.description_json && typeof incoming.description_json === 'object') {
         const descUuid = (incoming.description_json as any)?.proposal_uuid ?? null;
         if (descUuid && incoming?.proposal_uuid && descUuid !== incoming.proposal_uuid) {
           trace.push({ ts: this.nowISO(), step: 'description_uuid_mismatch', ok: false, info: { descUuid, payloadUuid: incoming.proposal_uuid } });
-          return { outcome: 'MISMATCH', trace, receipt, authoritativeProposer, confirmations };
+          return { outcome: 'MISMATCH', trace, receipt, authoritativeProposer, confirmations, description_raw: parsedDescriptionRaw, description_json: parsedDescriptionJson };
         } else if (descUuid && incoming?.proposal_uuid && descUuid === incoming.proposal_uuid) {
           trace.push({ ts: this.nowISO(), step: 'description_uuid_match', ok: true, info: { descUuid } });
         }
@@ -253,22 +293,25 @@ export class VerificationService {
       trace.push({ ts: this.nowISO(), step: 'description_uuid_check_error', ok: false, info: { err: String(err) } });
     }
 
-    // Final outcome selection
+    // Final outcome selection and attach parsed description fields so caller can use them
     if (receipt && receipt.status === 1 && verified && confirmations >= this.confirmationsThreshold) {
-      return { outcome: 'CONFIRMED', trace, receipt, authoritativeProposer, confirmations };
+      return { outcome: 'CONFIRMED', trace, receipt, authoritativeProposer, confirmations, description_raw: parsedDescriptionRaw, description_json: parsedDescriptionJson };
     }
 
     if (receipt && receipt.status === 1 && confirmations < this.confirmationsThreshold) {
-      return { outcome: 'AWAITING_CONFIRMATIONS', trace, receipt, authoritativeProposer, confirmations };
+      return { outcome: 'AWAITING_CONFIRMATIONS', trace, receipt, authoritativeProposer, confirmations, description_raw: parsedDescriptionRaw, description_json: parsedDescriptionJson };
     }
 
     if (receipt && receipt.status === 1 && !verified) {
-      return { outcome: 'MISMATCH', trace, receipt, authoritativeProposer, confirmations };
+      return { outcome: 'MISMATCH', trace, receipt, authoritativeProposer, confirmations, description_raw: parsedDescriptionRaw, description_json: parsedDescriptionJson };
     }
 
-    // fallback
-    return { outcome: 'AWAITING_CONFIRMATIONS', trace, receipt, authoritativeProposer, confirmations };
+    return { outcome: 'AWAITING_CONFIRMATIONS', trace, receipt, authoritativeProposer, confirmations, description_raw: parsedDescriptionRaw, description_json: parsedDescriptionJson };
   }
+
+
+
+
 
   /**
    * Legacy verification function (post-persist) kept for worker usage.
@@ -314,3 +357,7 @@ export class VerificationService {
 
 
 }
+
+
+
+

@@ -66,7 +66,7 @@ public async findProposals(where: FindOptionsWhere<Proposal>) {
     }
 
     // Pre-verify BEFORE persisting
-    let pre: PreVerifyResult;
+    let pre: PreVerifyResult & any;
     try {
       pre = await this.verificationService.preVerifyPayload(incoming);
     } catch (err) {
@@ -75,7 +75,7 @@ public async findProposals(where: FindOptionsWhere<Proposal>) {
       pre = { outcome: 'TX_NOT_FOUND', trace: [{ ts: new Date().toISOString(), step: 'preVerify_failed', ok: false, info: { err: String(err) } }], reason: 'verification_error' } as any;
     }
 
-    // handle the different outcomes
+    // If no provider / tx not found - we stage the incoming proposal
     if (pre.outcome === 'TX_NOT_FOUND') {
       // Create a staging report (do not persist in proposals yet)
       const expiresAt = new Date(Date.now() + (Number(process.env.MAX_WAIT_MS ?? 10 * 60 * 1000)));
@@ -114,7 +114,7 @@ public async findProposals(where: FindOptionsWhere<Proposal>) {
       existing = await this.proposalRepo.findOne({ where: { tx_hash: incoming.tx_hash } });
     }
 
-    // Prepare fields to persist
+    // Parse raw_receipt/event payloads (incoming or from pre)
     const safeDescriptionRaw = safeString(incoming.description_raw, MAX_JSON_STRING);
     const parsedRawReceipt = (() => {
       try {
@@ -133,6 +133,7 @@ public async findProposals(where: FindOptionsWhere<Proposal>) {
       }
     })();
 
+    // Build base using incoming as fallback; we'll overwrite with on-chain if available
     const base: Partial<Proposal> = {
       category: incoming.category ?? null,
       title: safeString(incoming.title) ?? null,
@@ -158,6 +159,38 @@ public async findProposals(where: FindOptionsWhere<Proposal>) {
       block_number: incoming.block_number ?? null,
     };
 
+
+     // --- PREFER ON-CHAIN METADATA WHEN AVAILABLE ---
+    // The verification service may expose parsedDescriptionRaw and parsedDescriptionJson
+    // (we added those fields on preVerifyPayload). If present, overwrite base metadata
+    try {
+      if (pre && pre.description_raw) {
+        base.description_raw = safeString(pre.description_raw, MAX_JSON_STRING) ?? base.description_raw;
+      }
+      if (pre && pre.description_json && typeof pre.description_json === 'object') {
+        // overwrite structured fields from on-chain JSON
+        const dj = pre.description_json as any;
+        if (dj.title) base.title = safeString(dj.title);
+        if (dj.description) base.description = safeString(dj.description);
+        if (dj.mission) base.mission = safeString(dj.mission);
+        if (dj.budget) base.budget = safeString(dj.budget);
+        if (dj.implement) base.implement = safeString(dj.implement);
+        if (dj.category) base.category = safeString(dj.category);
+        // keep raw parsed JSON too
+        base.description_json = dj;
+      } else if (pre && pre.description_raw && !pre.description_json) {
+        // we have a raw on-chain description string but not structured JSON
+        // put the raw text into description_raw and keep frontend structured fields only as fallback
+        base.description_raw = safeString(pre.description_raw, MAX_JSON_STRING) ?? base.description_raw;
+      }
+    } catch (err) {
+      // If anything fails, just keep existing base (incoming values)
+      this.logger.warn(`Failed to apply on-chain metadata to base: ${String(err)}`);
+    }
+
+
+
+
     // Decide status based on preVerify result
     if (pre.outcome === 'CONFIRMED') {
       base.status = 'CONFIRMED';
@@ -181,15 +214,27 @@ public async findProposals(where: FindOptionsWhere<Proposal>) {
       (base as any).proposer_verified = { trace: pre.trace, verified: false };
     }
 
+
+
+
+
+    // --- DEDUP / CLONING PREVENTION RULE ---
+    // If existing and existing.proposer_verified.verified === true then do not overwrite (first verified wins)
+    if (existing && existing.proposer_verified && existing.proposer_verified.verified === true) {
+      // If incoming matches same keys (proposal_uuid or tx_hash) and this row is verified,
+      // we consider this a duplicate/attempt and return existing without updating.
+      this.logger.log(`Existing verified proposal found id=${existing.id} proposal_uuid=${existing.proposal_uuid} tx_hash=${existing.tx_hash}; refusing to overwrite with new incoming payload.`);
+      return existing;
+    }
+
+    // If we reach here and we have existing (unverified), merge/upgrade
     if (existing) {
-      // Merge: prefer non-empty incoming values
       const merged: any = { ...existing, ...base };
       merged.updated_at = new Date();
       const saved = await this.proposalRepo.save(merged);
       this.logger.log(`Updated existing proposal id=${saved.id} proposal_uuid=${saved.proposal_uuid} status=${saved.status}`);
-      // If we updated and the status is AWAITING_CONFIRMATIONS or CONFIRMED, optionally remove any staging report
+      // mark staging moved if appropriate
       if (saved.status === 'CONFIRMED' || saved.status === 'AWAITING_CONFIRMATIONS') {
-        // Move or mark staging reports as MOVED if any matched
         if (incoming.proposal_uuid || incoming.tx_hash) {
           try {
             const toUpdate = await this.stagingRepo.findOne({ where: [{ proposal_uuid: incoming.proposal_uuid }, { tx_hash: incoming.tx_hash }] });
@@ -203,12 +248,16 @@ public async findProposals(where: FindOptionsWhere<Proposal>) {
       return saved;
     }
 
-    // Create new proposal
+
+
+
+
+
+    // Create new proposal (no existing)
     const newProposal = this.proposalRepo.create(base);
     const saved = await this.proposalRepo.save(newProposal);
     this.logger.log(`Created new proposal id=${saved.id} proposal_uuid=${saved.proposal_uuid} status=${saved.status}`);
 
-    // If this was created from pre-verify with AWAITING_CONFIRMATIONS or CONFIRMED, mark matching staging as moved
     if (saved.status === 'CONFIRMED' || saved.status === 'AWAITING_CONFIRMATIONS') {
       try {
         const toUpdate = await this.stagingRepo.findOne({ where: [{ proposal_uuid: saved.proposal_uuid }, { tx_hash: saved.tx_hash }] });
@@ -220,6 +269,7 @@ public async findProposals(where: FindOptionsWhere<Proposal>) {
     }
 
     return saved;
+    
   }
 
 

@@ -59,33 +59,32 @@ query proposals($id: String, $category: String ) {
 
 
 
-
 const MUTATION_CREATE_PROPOSAL = gql`
-mutation createProposal(
-  $proposal_uuid: String!,
-  $tx_hash: String!,
-  $chain_proposal_id: String,
-  $proposer_wallet: String,
-  $proposer_source: String,
-  $description_raw: String,
-  $description_json: String,
-  $title: String!,
-  $description: String!,
-  $mission: String!,
-  $budget: String!,
-  $implement: String!,
-  $governor_address: String,
-  $chain: String,
-  $chain_id: Int,
-  $voting_start_block: Int,
-  $voting_end_block: Int,
-  $block_number: Int,
-  $created_at: String,
-  $raw_receipt: String,
-  $event_payload: String,
-  $status: String,
-  $category: String!
-) {
+  mutation createProposal(
+    $proposal_uuid: String!,
+    $tx_hash: String!,
+    $chain_proposal_id: String,
+    $proposer_wallet: String,
+    $proposer_source: String,
+    $description_raw: String,
+    $description_json: String,
+    $title: String!,
+    $description: String!,
+    $mission: String!,
+    $budget: String!,
+    $implement: String!,
+    $governor_address: String,
+    $chain: String,
+    $chain_id: Int,
+    $voting_start_block: Int,
+    $voting_end_block: Int,
+    $block_number: Int,
+    $created_at: String,
+    $raw_receipt: String,
+    $event_payload: String,
+    $status: String,
+    $category: String!
+  ) {
   createProposal(
     proposal_uuid: $proposal_uuid,
     tx_hash: $tx_hash,
@@ -110,11 +109,16 @@ mutation createProposal(
     event_payload: $event_payload,
     status: $status,
     category: $category
-  )
+  ) {
+
+  
+    ok
+    status
+    id
+    message
+  }
 }
 `;
-
-
 
 
 

@@ -17,6 +17,8 @@ export class StagingReport {
   @Field(() => String, { nullable: true })
   tx_hash: string | null;
 
+
+
   // full incoming payload (truncated / sanitized may be applied before saving)
   @Column({ type: 'jsonb', nullable: true })
   payload: any | null;
@@ -25,11 +27,17 @@ export class StagingReport {
   @Column({ type: 'jsonb', nullable: true })
   verification_trace: any | null;
 
+
+
   @Column({ type: 'text', nullable: true })
   status: 'PENDING' | 'RETRYING' | 'EXPIRED' | 'MOVED' | 'FAILED' | null;
 
+
+
   @Column({ type: 'int', default: 0 })
   attempts: number;
+
+
 
   @CreateDateColumn({ type: 'timestamp' })
   first_seen: Date;
@@ -37,6 +45,16 @@ export class StagingReport {
   @UpdateDateColumn({ type: 'timestamp' })
   last_attempt: Date;
 
+
+
   @Column({ type: 'timestamp', nullable: true })
   expires_at: Date | null;
+
+
+
+
 }
+
+
+
+

@@ -319,9 +319,74 @@ Now we are building the Technical Floor(Backend) of the Building(App).
     7. The Frontend does not show the Proposal Creator when the Frontend retrieves the Proposals in order to show users(All Proposals)
 
 
+### Frontend 
+
+    Left Module - Add all user metadata fields
+    Right Module - Proposal Description
 
 
 
+
+
+
+Left Module - fields
+
+Votes Up: Int
+Votes Down: Int
+
+Created: Date
+Status: DURING VOTING | EXECUTING | FEEDBACK
+
+
+
+DropDown:
+
+
+tx_hash : 0x495bsfgDRG5eyh55464dfgfg098rSD
+chain: chain not chain_id
+confirmed: proposal.confirmed
+Technical Status: CONFIRMED | AWAYTING CONFIRMATIONS
+
+Voting Start Block:
+Voting End Block:
+Block number Created:
+Voting Ends: Date
+Executing Ends: Date
+
+
+
+
+
+
+Right Module - fields
+
+
+title 
+description 
+mission 
+budget 
+implement 
+
+
+Votes Up: Int
+Votes Down: Int
+category
+
+
+
+Created: Date
+Status: DURING VOTING | EXECUTING | FEEDBACK
+
+tx_hash : 0x495bsfgDRG5eyh55464dfgfg098rSD
+chain: chain not chain_id
+confirmed: proposal.confirmed
+Technical Status: CONFIRMED | AWAYTING CONFIRMATIONS
+
+Voting Start Block:
+Voting End Block:
+Block number Created:
+Voting Ends: Date
+Executing Ends: Date
 
 
 

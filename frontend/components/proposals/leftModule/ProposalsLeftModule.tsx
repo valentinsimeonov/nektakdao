@@ -299,7 +299,7 @@ return (
 					
 					<div className="ProposalsTitlerow">
 						<span className='ProposalsTitleNamespan'> 
-							{proposal.title} 
+							{proposal && proposal.title !== null ? proposal.title : 'n/a'}
 						</span>
 						<span className='ProposalsTitlePricespan'> 
 
@@ -355,12 +355,14 @@ return (
 
 				<div className="ProposalsTable2row">
 					<div className="ProposalsTableLeftcolumn">
-						<span>PH</span>
-						<span>PH</span>
+						<span>Description</span>
+						<span>Mission</span>
 					</div>
 	
 					<div className="ProposalsTableRightcolumn">
-						
+						{proposal && proposal.description !== null ? proposal.description : 'n/a'}
+						{proposal && proposal.mission !== null ? proposal.mission : 'n/a'}
+
 					</div>
 				</div>
 	

@@ -50,3 +50,60 @@ export function useMediaQuery(query: string): boolean {
 		if (!s || typeof s !== 'string') return '';
 		return s.charAt(0).toUpperCase() + s.slice(1);
 	};
+
+
+
+
+
+		// Helper: removes http:// or https:// and trailing slashes
+		export function removeHttpTags (url?: string | null) {
+		if (!url) return '';
+		return url.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+		};
+
+
+
+
+
+
+    		// Function to parse text and remove HTMLTags
+		export function removeHTMLTags (description: string) {
+			return description.replace(/<\/?a[^>]*>/g, "");
+		};
+	
+
+
+    
+		/**
+ * Splits a long description into smaller readable chunks.
+ * - Keeps paragraphs roughly 3–5 sentences long.
+ * - Preserves bullet lists and line breaks.
+ */
+export function splitDescriptionIntoChunks (text: string, maxSentencesPerChunk = 4): string[] {
+  if (!text) return [];
+
+  // Remove any HTML tags and trim
+  let clean = removeHTMLTags(text).trim();
+
+  // Handle bullet points and manual line breaks first
+  if (clean.includes("•") || clean.includes("\n")) {
+    // Split into segments on bullets or line breaks
+    const lines = clean
+      .split(/\n|•/g)
+      .map(line => line.trim())
+      .filter(Boolean);
+    return lines;
+  }
+
+  // Otherwise, split into sentences
+  const sentences = clean.match(/[^.!?]+[.!?]+/g) || [clean];
+  const chunks: string[] = [];
+
+  for (let i = 0; i < sentences.length; i += maxSentencesPerChunk) {
+    const chunk = sentences.slice(i, i + maxSentencesPerChunk).join(" ").trim();
+    if (chunk) chunks.push(chunk);
+  }
+
+  return chunks;
+};
+

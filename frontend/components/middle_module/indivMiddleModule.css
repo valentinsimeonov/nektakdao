@@ -1,0 +1,358 @@
+  .ProposalsMiddleModuleMaincolumn{
+	/* border: 1px solid red; */
+	
+	display: flex;
+	flex-direction: column;
+
+	width: 57vw;
+	height: 84vh;
+
+	margin-top: 0.1vh;
+
+	background-color: rgba(var(--bg));
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .ProposalsMiddleCardContainerrow{
+	/* border: 1px solid rgb(0, 26, 255); */
+	
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+	width: 57vw;
+	height: 8vh;
+
+	padding-top: 1vh;
+
+
+	box-shadow: 0 2px 2px -2px rgba(var(--border-low));
+
+  }
+
+
+
+	.ProposalsMiddleCardLine{
+	/* border: 1px solid rgb(0, 26, 255); */
+
+	width: 0.1vw;
+	height: 4.2vh;
+
+	/* background-color: rgba(var(--border-low)); */
+		
+	}
+
+  .ProposalsMiddleCardButton{
+	/* border: 1px solid rgb(145, 255, 0); */
+
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+	width: 28vw;
+	height: 4vh;
+
+	padding: 1.8%;
+
+	box-shadow: 0 2px 2px -2px rgba(var(--border-low));
+  }
+  
+  .ProposalsMiddleCardButton:hover{
+	box-shadow: 0 2px 2px -2px rgba(var(--fg-title));
+
+	/* background-color: rgba(var(--primary)); */
+
+
+  }
+
+  .ProposalsMiddleCardButton span{
+
+	color: rgba(var(--fg));
+	font-weight: 600;
+	font-size: 1rem;
+  }
+
+
+  .ProposalsMiddleCardButton:hover span{  
+	color: rgba(var(--fg));
+}
+
+.ProposalsMiddleCardButtonSelected{
+	box-shadow: 0 2.5px 2px -2px rgba(var(--fg-title-high));
+
+	/* background-color: rgba(var(--primary)); */
+
+}
+
+.ProposalsMiddleCardButtonSelected span{
+	color: rgba(var(--fg-high));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .ProposalsMiddleContentContainercolumn{
+	/* border: 1px solid rgb(2, 32, 255); */
+
+	width: 57vw;
+	/* min-height: 10vh; */
+	height: 75.8vh;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+
+
+	overflow-y: auto;
+	overflow-x: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: rgba(var(--accent)) transparent;
+
+	background-color: rgba(var(--bg));
+	box-shadow: 0 0 0 1px rgba(var(--border-low));
+
+	border-radius: var(--border-radius-card);
+
+}
+
+::-webkit-scrollbar {
+width: 5px;
+}
+
+::-webkit-scrollbar-track {
+background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+background: rgb(49, 57, 63);
+}
+
+
+
+
+
+
+
+  .ProposalsMiddleLearnContainercolumn{
+	/* border: 1px solid rgb(0, 255, 123); */
+	/* border: 1px solid rgb(60, 62, 65); */
+
+	width: 57vw;
+	height: auto;
+	/* min-height: 10vh;
+	max-height: 80vh; */
+
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+  }
+
+
+
+
+
+  .ProposalsMiddleGraphContainercolum{
+	/* border: 1px solid rgb(255, 243, 16); */
+
+	display: flex;
+	flex-direction: column;
+
+	width: 57vw;
+	/* height: 41vh; */
+	/* border-top-right-radius: var(--border-radius-card);
+	border-top-left-radius: var(--border-radius-card); */
+
+	background-color: rgba(var(--primary));
+  }
+
+
+  .ProposalsMiddleStatsContainercolum{
+	display: flex;
+	flex-direction: column;
+
+	width: 57vw;
+	height: auto;
+
+	/* margin-bottom: 1vh; */
+
+	background-color: rgba(var(--primary));
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  @media (max-width: 768px) {
+	.ProposalsMiddleModuleMaincolumn{
+	  /* border: 1px solid red; */
+  
+	  width: 100vw;
+	  height: 81vh;
+	  /* height: 70vh; */
+
+	}
+ 
+
+	.ProposalsMiddleCardContainerrow{
+		/* border: 1px solid rgb(0, 26, 255); */
+		
+		width: 100vw;
+		/* height: 11vh; */
+	  }
+	
+	
+	  .ProposalsMiddleCardButton{
+		/* border: 1px solid rgb(145, 255, 0); */
+			
+		width: 21vw;
+		/* height: 4vh; */
+	  }
+	  
+/* 
+	  .ProposalsMiddleCardButton span{
+	
+		color: rgba(var(--fg));
+		
+		font-weight: 600;
+		font-size: 1rem;
+	
+	  }
+	 */
+	  .ProposalsMiddleContentContainercolumn{
+		/* border: 1px solid rgb(2, 32, 255); */
+	
+		width: 99vw;
+		/* height: 73vh; */
+	  }
+	
+	
+	
+	  .ProposalsMiddleLearnContainercolumn{
+		/* border: 1px solid rgb(0, 255, 123); */
+		/* border: 1px solid rgb(60, 62, 65); */
+		width: 98vw;
+	  }
+	
+	  .ProposalsMiddleGraphContainercolum{
+		/* border: 1px solid rgb(255, 243, 16); */
+
+		width: 98vw;
+	  }
+	
+	  .ProposalsMiddleStatsContainercolum{
+
+		width: 98vw;
+	  }
+
+
+}

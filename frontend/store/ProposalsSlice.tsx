@@ -12,7 +12,7 @@ export const proposalsSlice = createSlice ({
 	name: 'proposals',
 
 	initialState: {
-		proposalsLeftModuleLayer: "",
+		proposalsLeftModuleLayer: "projects",
 		proposalsSelectedButton: "",
 
 

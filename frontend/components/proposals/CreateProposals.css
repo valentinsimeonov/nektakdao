@@ -315,6 +315,8 @@
 	outline: none;
 
 	overflow: none;
+
+	color: #ada6a6;
 	
   }
 
@@ -478,10 +480,10 @@
 }
 
 
-
+/* 
 
 .MakeProposalBodyField{
-	/* border: 1px solid rgb(21, 255, 0); */
+	border: 1px solid rgb(21, 255, 0);
 	
 	background: transparent;
 	
@@ -504,6 +506,49 @@
 	font-weight: 600;
 	font-size: 1rem;
   }
+ */
+
+
+
+
+
+
+ /* wrapper around textarea so we can position counter relative to it */
+.CreateProposalsTextarea {
+  position: relative;
+  width: 26.8vw; /* match your .MakeProposalBodyField width */
+  margin-bottom: 1.1rem; /* space to next element */
+}
+
+/* ensure the textarea has room for the counter at the bottom */
+.MakeProposalBodyField {
+  padding: 0.5rem 0.75rem;
+  padding-bottom: 2.2rem; /* increase bottom padding so text doesn't overlap the counter */
+  box-sizing: border-box;
+  width: 100%; /* let wrapper control width */
+  min-height: 50px;
+  resize: none;
+  outline: none;
+  background: transparent;
+  color: rgb(105, 103, 103);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* counter in the bottom-right inside the textarea container */
+.CreateProposalsTextarea .CreateProposalsCharCounter {
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.6); /* or another muted color to match your theme */
+  background: transparent;
+  pointer-events: none; /* don't block clicks into the textarea */
+  user-select: none;
+}
+
+
+
 
 
 

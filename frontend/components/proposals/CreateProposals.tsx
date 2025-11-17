@@ -11,6 +11,102 @@ import { useAccount } from "wagmi";
 import { BrowserProvider, Contract, type JsonRpcSigner, keccak256, toUtf8Bytes, getAddress } from "ethers";
 
 
+
+
+
+
+const TEXTAREA_MAX = 2000;
+
+// shared helper to clamp and set textarea value + keep autosize behaviour
+function setTextareaValueAndAutosize(
+  setter: (v: string) => void,
+  ta: HTMLTextAreaElement,
+  newValue: string
+) {
+  const clamped = newValue.slice(0, TEXTAREA_MAX);
+  setter(clamped);
+  // autosize:
+  ta.style.height = "auto";
+  ta.style.height = `${ta.scrollHeight}px`;
+}
+
+// keydown handler that prevents typing when at limit (but allows navigation, deletion, ctrl/meta combos,
+// and also allows replacement of selected text when the result won't exceed the limit)
+function handleTextareaKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+  const ta = e.currentTarget;
+  const currentLen = ta.value.length;
+  const selStart = ta.selectionStart ?? 0;
+  const selEnd = ta.selectionEnd ?? 0;
+  const selLen = Math.max(0, selEnd - selStart);
+
+  // allow control/meta combos (copy/paste/undo), navigation keys, and deletion:
+  const allowedKeys = new Set([
+    "Backspace", "Delete",
+    "ArrowLeft","ArrowRight","ArrowUp","ArrowDown",
+    "Home","End","PageUp","PageDown",
+    "Tab", // allow tab if you want
+  ]);
+
+  if (e.ctrlKey || e.metaKey) {
+    // allow common shortcuts (Ctrl/Cmd + X/C/V/A/Z/Y)
+    return;
+  }
+  if (allowedKeys.has(e.key)) return;
+
+  // If the user types a normal character and we are already at the limit
+  // but there is a selected range that will be replaced, allow it if the
+  // result would be <= TEXTAREA_MAX.
+  const resultingLength = currentLen - selLen + 1; // +1 for the new typed char
+  if (resultingLength > TEXTAREA_MAX) {
+    e.preventDefault();
+  }
+}
+
+// paste handler to trim incoming paste to available room, preserving selection replacement
+function handleTextareaPaste(
+  e: React.ClipboardEvent<HTMLTextAreaElement>,
+  setter: (v: string) => void
+) {
+  const ta = e.currentTarget;
+  const paste = e.clipboardData.getData("text");
+  if (!paste) return; // nothing to do
+
+  const current = ta.value;
+  const selStart = ta.selectionStart ?? 0;
+  const selEnd = ta.selectionEnd ?? 0;
+  const selLen = Math.max(0, selEnd - selStart);
+
+  const available = TEXTAREA_MAX - (current.length - selLen);
+  if (available <= 0) {
+    // no room at all
+    e.preventDefault();
+    return;
+  }
+
+  // if paste length exceeds available, trim it
+  const toInsert = paste.slice(0, available);
+
+  // build new value
+  const newValue = current.slice(0, selStart) + toInsert + current.slice(selEnd);
+  e.preventDefault(); // we've handled insertion
+  // set value and autosize
+  setTextareaValueAndAutosize(setter, ta, newValue);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Minimal ABIs used for on-chain proposal */
 const GOVERNOR_ABI = [
   "function propose(address[] targets, uint256[] values, bytes[] calldatas, string description) returns (uint256)",
@@ -907,10 +1003,10 @@ if (!onChainResult || !onChainResult.success) {
           <input
             className="MakeProposalTitleField"
             type="text"
-            placeholder="Title"
+            placeholder="Title/Short Description (200 chars)"
             value={Titledata}
             onChange={handleTitleInput}
-            maxLength={42}
+            maxLength={200}
           />
 
           <span className="CreateProposalsChatChannelsShortBody">
@@ -921,6 +1017,7 @@ if (!onChainResult || !onChainResult.success) {
 
       <div className="CreateProposalsChannelCard2rowLong">
         <div className="CreateProposalsChannelCard2NameandDescriptionColumnLong">
+          
           <div className="CreateProposalsCategoryButtonsrow">
             <button
               className={`CreateProposalsCategorybuttons ${
@@ -945,7 +1042,7 @@ if (!onChainResult || !onChainResult.success) {
             </button>
           </div>
 
-          <div ref={descriptionContainerRef}>
+          {/* <div ref={descriptionContainerRef}>
             <br />
             <span>Description</span>
             <textarea
@@ -953,8 +1050,129 @@ if (!onChainResult || !onChainResult.success) {
               placeholder="Please enter a Description"
               value={DescriptionBody}
               onChange={handleDescriptionBody}
+              maxLength={2000}
             />
           </div>
+ */}
+
+
+
+
+
+<div ref={descriptionContainerRef} className="CreateProposalsTextarea">
+  <br />
+  <span>Description</span>
+  <textarea
+    className="MakeProposalBodyField"
+    placeholder="Please enter a Description"
+    value={DescriptionBody}
+    // remove the old handler and use the new inline handler
+    onChange={(e) => {
+      // simple clamp in case some edge got through
+      const ta = e.currentTarget;
+      setTextareaValueAndAutosize(setDescriptionBody, ta, e.target.value);
+    }}
+    onKeyDown={handleTextareaKeyDown}
+    onPaste={(e) => handleTextareaPaste(e, setDescriptionBody)}
+    maxLength={TEXTAREA_MAX} // defensive: still useful for some browsers
+    aria-describedby="description-counter"
+  />
+  <div id="description-counter" className="CreateProposalsCharCounter" aria-live="polite">
+    {DescriptionBody.length} / {TEXTAREA_MAX}
+  </div>
+</div>
+
+
+
+
+
+
+
+<div ref={missionContainerRef} className="CreateProposalsTextarea">
+  <br />
+  <span>Mission</span>
+  <textarea
+    className="MakeProposalBodyField"
+    placeholder="Please enter your Mission"
+    value={MissionBody}
+    // remove the old handler and use the new inline handler
+    onChange={(e) => {
+      // simple clamp in case some edge got through
+      const ta = e.currentTarget;
+      setTextareaValueAndAutosize(setMissionBody, ta, e.target.value);
+    }}
+    onKeyDown={handleTextareaKeyDown}
+    onPaste={(e) => handleTextareaPaste(e, setMissionBody)}
+    maxLength={TEXTAREA_MAX} // defensive: still useful for some browsers
+    aria-describedby="mission-counter"
+  />
+  <div id="mission-counter" className="CreateProposalsCharCounter" aria-live="polite">
+    {MissionBody.length} / {TEXTAREA_MAX}
+  </div>
+</div>
+
+
+
+
+
+
+
+
+<div ref={budgetContainerRef} className="CreateProposalsTextarea">
+  <br />
+  <span>Budget</span>
+  <textarea
+    className="MakeProposalBodyField"
+    placeholder="Please enter Budget details"
+    value={BudgetBody}
+    // remove the old handler and use the new inline handler
+    onChange={(e) => {
+      // simple clamp in case some edge got through
+      const ta = e.currentTarget;
+      setTextareaValueAndAutosize(setBudgetBody, ta, e.target.value);
+    }}
+    onKeyDown={handleTextareaKeyDown}
+    onPaste={(e) => handleTextareaPaste(e, setBudgetBody)}
+    maxLength={TEXTAREA_MAX} // defensive: still useful for some browsers
+    aria-describedby="budget-counter"
+  />
+  <div id="budget-counter" className="CreateProposalsCharCounter" aria-live="polite">
+    {BudgetBody.length} / {TEXTAREA_MAX}
+  </div>
+</div>
+
+
+
+
+
+
+<div ref={implementContainerRef} className="CreateProposalsTextarea">
+  <br />
+  <span>Implementation</span>
+  <textarea
+    className="MakeProposalBodyField"
+    placeholder="Please explain how to Implement"
+    value={ImplementBody}
+    // remove the old handler and use the new inline handler
+    onChange={(e) => {
+      // simple clamp in case some edge got through
+      const ta = e.currentTarget;
+      setTextareaValueAndAutosize(setImplementBody, ta, e.target.value);
+    }}
+    onKeyDown={handleTextareaKeyDown}
+    onPaste={(e) => handleTextareaPaste(e, setImplementBody)}
+    maxLength={TEXTAREA_MAX} // defensive: still useful for some browsers
+    aria-describedby="implement-counter"
+  />
+  <div id="implement-counter" className="CreateProposalsCharCounter" aria-live="polite">
+    {ImplementBody.length} / {TEXTAREA_MAX}
+  </div>
+</div>
+
+
+
+
+{/* 
 
           <div ref={missionContainerRef}>
             <span>Mission</span>
@@ -963,10 +1181,10 @@ if (!onChainResult || !onChainResult.success) {
               placeholder="Please enter your Mission"
               value={MissionBody}
               onChange={handleMissionBody}
-              maxLength={300}
+              maxLength={2000}
             />
-          </div>
-
+          </div> */}
+{/* 
           <div ref={budgetContainerRef}>
             <span>Budget</span>
             <textarea
@@ -974,10 +1192,10 @@ if (!onChainResult || !onChainResult.success) {
               placeholder="Please enter Budget details"
               value={BudgetBody}
               onChange={handleBudgetBody}
-              maxLength={300}
+              maxLength={2000}
             />
-          </div>
-
+          </div> */}
+{/* 
           <div ref={implementContainerRef}>
             <span>Implementation</span>
             <textarea
@@ -985,9 +1203,13 @@ if (!onChainResult || !onChainResult.success) {
               placeholder="Please explain how to Implement"
               value={ImplementBody}
               onChange={handleImplementBody}
-              maxLength={300}
+              maxLength={2000}
             />
           </div>
+ */}
+
+
+
         </div>
       </div>
 

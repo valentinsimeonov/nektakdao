@@ -1,21 +1,21 @@
 //proposalsMiddleModule.tsx
 
-import './proposalsMiddleModule.css';
+import './MiddleModule.css';
 // import Loading from "../loading";
 // import Explanations from './Explanations';
 import DescriptionProposals from './DescriptionProposals';
 import React, { useRef, useEffect, useState } from 'react';
 import Image from 'next/image';
-/* Redux */
 import { RootState } from '../../store/types';
 import { useSelector, useDispatch } from 'react-redux';
 import { proposalsselectedbutton, proposalsextendbottompanel, proposalsmiddlemodulebutton }
 	from '../../store/ProposalsSlice';
-
-	
-
 import { useRouter, useSearchParams } from 'next/navigation'
 import CreateProposals from '../proposals/CreateProposals';
+
+
+
+
 
 export default function ProposalsMiddleModule() {
 
@@ -87,15 +87,15 @@ useEffect(() => {
 		<div className="ProposalsMiddleModuleMaincolumn">
 	
 			<div className="ProposalsMiddleCardContainerrow">
-				<button className={`ProposalsMiddleCardButton ${(proposalsMiddleModuleButton === "explanations") ? 'ProposalsMiddleCardButtonSelected' : '' }` }
+				{/* <button className={`ProposalsMiddleCardButton ${(proposalsMiddleModuleButton === "explanations") ? 'ProposalsMiddleCardButtonSelected' : '' }` }
 						onClick={handleExplanationsButton}>
 					<span> Explanations </span>
-				</button>
+				</button> */}
 
 
-				<div className='ProposalsMiddleCardLine'>
+				{/* <div className='ProposalsMiddleCardLine'>
 
-				</div>
+				</div> */}
 				
 				
 				<button className={`ProposalsMiddleCardButton ${(proposalsMiddleModuleButton === "details") ? 'ProposalsMiddleCardButtonSelected' : '' }` }
@@ -103,7 +103,10 @@ useEffect(() => {
 					<span> Details </span>
 				</button>
 
+				<div className='ProposalsMiddleCardLine'>
 
+				</div>
+				
 				<button className={`ProposalsMiddleCardButton ${(proposalsMiddleModuleButton === "createProposal") ? 'ProposalsMiddleCardButtonSelected' : '' }` }
 						onClick={handleProposalsButton}>
 					<span> Create Proposal </span>

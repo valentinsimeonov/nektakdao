@@ -6,24 +6,19 @@ import React from 'react';
 import './proposals.css';
 import RootLayout from '../../layout';
 import Banner from '../../../components/banner'
-
 import { ApolloProvider } from '@apollo/client';
 import client from '../../../api/apolloclient';
-
 import { RootState } from '../../../store/types';
 import { useSelector, useDispatch } from 'react-redux';
 import { proposalsselectedbutton, proposalsextendbottompanel }
 	from '../../../store/ProposalsSlice';
-
-
 import { useMediaQuery } from "../../../components/Utils";
 // import { indivmiddlemobilevisible } from "../../../store/IndivSlice";
-
 import  ProposalsLeftModuleMain  from "../../../components/proposals/leftModule/ProposalsLeftModuleMain";
 import Navbar from '../../../components/navbar/Navbar';
 import CreateProposals from '../../../components/proposals/CreateProposals';
 import LongCreateProposals from '../../../components/proposals/LongCreateProposals';
-
+import ProposalsMiddleModule from '../../../components/middle_module/MiddleModule';
 
 
 export default function ProposalsPage({
@@ -63,7 +58,7 @@ export default function ProposalsPage({
 
 						{isMobile && mobileOpen && (
 						<div className="ProposalsMobileMiddleContainer">
-							{/* <ProposalsMiddleModule /> */}
+							<ProposalsMiddleModule />
 						</div>
 						)}
 
@@ -78,9 +73,9 @@ export default function ProposalsPage({
 
 						{!isMobile && (
 						<div className='ProposalsMiddleModuleContainer'>
-							<LongCreateProposals />
+							{/* <LongCreateProposals /> */}
 
-							{/* <ProposalsMiddleModule /> */}
+							<ProposalsMiddleModule />
 						</div>
 						)}
 

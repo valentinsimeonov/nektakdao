@@ -215,6 +215,34 @@ const handleProposalSelected = (proposal: ProposalData) => {
 
 
 
+
+///////////////////////////////////////////////
+//////  Copy Transaction Button
+
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+const handleCopy = async (id: string, text: string) => {
+  try {
+    // write to clipboard (client-only; file already "use client")
+    await navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    // clear confirmation after 1.5s
+    setTimeout(() => {
+      setCopiedId(prev => (prev === id ? null : prev));
+    }, 1500);
+  } catch (err) {
+    console.error("Copy failed", err);
+    // you may want to show a toast here
+  }
+};
+
+/////////////////////////////////////////////////
+
+
+
+
+
+
 return (
 	<div className='ProposalsLeftModuleProposalMain' >
 
@@ -287,10 +315,13 @@ return (
 
 						<div className="ProposalsCardNamerow">
 							<div className='ProposalsCardLeftcolumn'>
+								<span>Status</span>
 								<span>Created</span>
+
 							</div>
 							
 							<div className='ProposalsCardRightcolumn'>
+								<span>PH</span>
 								<span>{proposal && proposal.created_at !== null ? formatDateMMDDYYYY(proposal.created_at) : 'n/a'}</span> 
 							</div>
 						</div>
@@ -353,32 +384,125 @@ return (
 				</div>
 					 */}
 
+
+
+
+
+<div className="ProposalsTable2row">
+  <div className="ProposalsTableLeftcolumn">
+    <span>Transaction Hash</span>
+  </div>
+
+  <div className="ProposalsTableRightcolumn">
+    <div
+      className="tx-wrapper"
+      role="group"
+      aria-label="Transaction hash and copy"
+      // prevent click in wrapper from interfering with parent button
+      onClick={(e) => e.stopPropagation()}
+    >
+      <span
+        className="tx-truncate"
+        title={proposal?.tx_hash ?? "n/a"}
+        aria-label={proposal?.tx_hash ?? "n/a"}
+      >
+        {proposal && proposal.tx_hash !== null ? proposal.tx_hash : "n/a"}
+      </span>
+
+      {proposal && proposal.tx_hash ? (
+        <button
+          className="copy-btn"
+          onClick={(e) => {
+            // don't trigger proposal selection
+            e.stopPropagation();
+            handleCopy(proposal.id, proposal.tx_hash!);
+          }}
+          aria-label={`Copy transaction hash`}
+          title="Copy transaction hash"
+        >
+          <span className="copy-icon">
+            {copiedId === proposal.id ? "✓" : "📋"}
+          </span>
+        </button>
+      ) : null}
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
 				<div className="ProposalsTable2row">
 					<div className="ProposalsTableLeftcolumn">
-						<span>Description</span>
-						<span>Mission</span>
+						<span>Chain</span>
+						<span>Confirmed</span>
+
 					</div>
 	
 					<div className="ProposalsTableRightcolumn">
-						{proposal && proposal.description !== null ? proposal.description : 'n/a'}
-						{proposal && proposal.mission !== null ? proposal.mission : 'n/a'}
+						<span>{proposal && proposal.chain !== null ? proposal.chain : 'n/a'}</span>
+						<span>{proposal && proposal.confirmed !== null ? proposal.confirmed : 'n/a'}</span>
 
 					</div>
 				</div>
 	
 
+
+
+
 				<div className="ProposalsTable2row">
 					<div className="ProposalsTableLeftcolumn">
-						<span>PH</span>
-						<span>PH</span>
+						<span>Voting Start Block</span>
+						<span>Voting End Block</span>
 					</div>
 	
 					<div className="ProposalsTableRightcolumn">
-						
-						
+						<span>{proposal && proposal.voting_start_block !== null ? proposal.voting_start_block : 'n/a'}</span>
+						<span>{proposal && proposal.voting_end_block !== null ? proposal.voting_end_block : 'n/a'}</span>
+
 					</div>
 				</div>
 	
+
+
+
+				<div className="ProposalsTable2row">
+					<div className="ProposalsTableLeftcolumn">
+						<span>Block Number Created</span>
+						<span>Technical Status</span>
+
+					</div>
+	
+					<div className="ProposalsTableRightcolumn">
+						<span>{proposal && proposal.block_number !== null ? proposal.block_number : 'n/a'}</span>
+						<span>{proposal && proposal.status !== null ? proposal.status : 'n/a'}</span>
+
+					</div>
+				</div>
+	
+
+
+
+				<div className="ProposalsTable2row">
+					<div className="ProposalsTableLeftcolumn">
+						<span>Voting Ends Date</span>
+						<span>Execution Ends Date</span>
+
+					</div>
+	
+					<div className="ProposalsTableRightcolumn">
+						<span>PH</span>
+						<span>PH</span>
+
+					</div>
+				</div>
+	
+
 
 
 

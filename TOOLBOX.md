@@ -2,6 +2,96 @@
 
 
 
+
+Left Module - fields
+
+Votes Up: Int
+Votes Down: Int
+
+Created: Date
+Status: DURING VOTING | EXECUTING | FEEDBACK
+
+
+
+DropDown:
+
+
+tx_hash : 0x495bsfgDRG5eyh55464dfgfg098rSD
+chain: chain not chain_id
+confirmed: proposal.confirmed
+Technical Status: CONFIRMED | AWAYTING CONFIRMATIONS
+
+Voting Start Block:
+Voting End Block:
+Block number Created:
+Voting Ends: Date
+Executing Ends: Date
+
+
+
+
+
+
+Right Module - fields
+
+
+title 
+description 
+mission 
+budget 
+implement 
+
+
+Votes Up: Int
+Votes Down: Int
+category
+
+
+
+Created: Date
+Status: DURING VOTING | EXECUTING | FEEDBACK
+
+tx_hash : 0x495bsfgDRG5eyh55464dfgfg098rSD
+chain: chain not chain_id
+confirmed: proposal.confirmed
+Technical Status: CONFIRMED | AWAYTING CONFIRMATIONS
+
+Voting Start Block:
+Voting End Block:
+Block number Created:
+Voting Ends: Date
+Executing Ends: Date
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 npx hardhat clean && npx hardhat compile --show-stack-traces
 
 

@@ -229,6 +229,7 @@ const proposal = proposalData[0];
 
 			<div className="ProposalsMiddleShortBodyIcolumn">
 
+
 				{proposal && proposal?.votesUp && ( 
 				<span className='ProposalsMiddleShortBodyIRowspan'> 
 					Votes Up:  {proposal && proposal?.votesUp   ? proposal.votesUp : 'n/a'}
@@ -251,6 +252,10 @@ const proposal = proposalData[0];
 
 
 
+
+
+
+
 				{proposal && proposal.tx_hash != null && proposal.tx_hash !== undefined && ( 
 				<span className='ProposalsMiddleShortBodyIRowspan'> 
 					Transaction Hash:  {proposal && proposal?.tx_hash   ? proposal.tx_hash : 'n/a'}
@@ -268,6 +273,8 @@ const proposal = proposalData[0];
 					Created Date:  {proposal && proposal?.created_at   ? formatDateMMDDYYYY(proposal.created_at) : 'n/a'}
 				</span>
 				)}
+
+
 
 
 
@@ -297,6 +304,11 @@ const proposal = proposalData[0];
 					Voting End Block:  {proposal && proposal?.voting_end_block   ? proposal.voting_end_block : 'n/a'}
 				</span>
 				)}
+
+
+
+
+
 
 				{proposal && proposal?.block_number && ( 
 				<span className='ProposalsMiddleShortBodyIRowspan'> 

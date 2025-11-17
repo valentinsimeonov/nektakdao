@@ -313,7 +313,7 @@ Now we are building the Technical Floor(Backend) of the Building(App).
     Backend: 
     4. Backend accepts metadata (title, body) and stores it Backend also acepts the Transaction Hash and Unique UUID and Wallet Address.
     5. Backend then verifies that txHash and wallet address indeed corresponds to a ProposalCreated for the governor contract and that the on-chain description matches the metadata. If verified, backend persists the metadata + txHash + wallet address 
-    6. Backend also verifies in the Database that that txHash and uniqueUUID and wallet address is not recorded already (we prevent clone attacks, Ta ta ta tan ta ta tan ta ta, ta ta ta ta tatan ta ta ta )
+    6. Backend also verifies in the Database that that txHash and uniqueUUID and wallet address is not recorded already
 
     Frontend:
     7. The Frontend does not show the Proposal Creator when the Frontend retrieves the Proposals in order to show users(All Proposals)
@@ -321,72 +321,42 @@ Now we are building the Technical Floor(Backend) of the Building(App).
 
 ### Frontend 
 
-    Left Module - Add all user metadata fields
-    Right Module - Proposal Description
+    Improve UI
+    Left Module - Add dropdown user metadata fields
+    Right Module - Add dropdown user metadata fields
 
 
 
 
 
 
-Left Module - fields
-
-Votes Up: Int
-Votes Down: Int
-
-Created: Date
-Status: DURING VOTING | EXECUTING | FEEDBACK
-
-
-
-DropDown:
-
-
-tx_hash : 0x495bsfgDRG5eyh55464dfgfg098rSD
-chain: chain not chain_id
-confirmed: proposal.confirmed
-Technical Status: CONFIRMED | AWAYTING CONFIRMATIONS
-
-Voting Start Block:
-Voting End Block:
-Block number Created:
-Voting Ends: Date
-Executing Ends: Date
 
 
 
 
 
+## Sprint 6 - DEV Version
 
-Right Module - fields
-
-
-title 
-description 
-mission 
-budget 
-implement 
+### 0. Contracts Security Course - Patrick Collins
+    Continue
 
 
-Votes Up: Int
-Votes Down: Int
-category
+#### 1. Frontend
+
+    Vote
+
+
+### 2. Contracts
+    
+    Add Voting
+
+
+### 3. Backend
+    
+    Logic for Voting
 
 
 
-Created: Date
-Status: DURING VOTING | EXECUTING | FEEDBACK
-
-tx_hash : 0x495bsfgDRG5eyh55464dfgfg098rSD
-chain: chain not chain_id
-confirmed: proposal.confirmed
-Technical Status: CONFIRMED | AWAYTING CONFIRMATIONS
-
-Voting Start Block:
-Voting End Block:
-Block number Created:
-Voting Ends: Date
-Executing Ends: Date
 
 
 
@@ -404,7 +374,6 @@ Executing Ends: Date
 
 #### 3. Frontend
 
-    Vote
     Queue/execute.
 
 
@@ -434,7 +403,7 @@ Executing Ends: Date
 
 
 
-#### 5. Security & testing - Minimal for Sprint 2(maybe leave as backend if Contracts take too long), more on later Sprints
+#### 5. Security & testing 
 
     Unit tests (Hardhat + Waffle/Chai).
 

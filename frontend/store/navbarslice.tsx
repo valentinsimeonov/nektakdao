@@ -5,7 +5,7 @@ export const NavBarSlice = createSlice({
 
 	initialState: {
 
-		selectedDashboard: "",
+		selectedDashboard: "proposals",
 
 	},
 

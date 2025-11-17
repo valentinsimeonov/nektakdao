@@ -22,11 +22,7 @@ export default function ProposalsMiddleModule() {
 	const proposalsLeftModuleLayer = useSelector((state: RootState) => state.proposals.proposalsLeftModuleLayer);
 	const proposalsSelectedButton = useSelector((state: RootState) => state.proposals.proposalsSelectedButton);
 	const proposalsMiddleModuleButton = useSelector((state: RootState) => state.proposals.proposalsMiddleModuleButton);
-
-
 	const dispatch = useDispatch();
-
-
 	const selectedDashboard = useSelector((state: RootState) => state.navbar.selectedDashboard);
 	
 
@@ -107,7 +103,7 @@ useEffect(() => {
 
 				</div>
 				
-				<button className={`ProposalsMiddleCardButton ${(proposalsMiddleModuleButton === "createProposal") ? 'ProposalsMiddleCardButtonSelected' : '' }` }
+				<button className={`ProposalsMiddleCardButton ${(proposalsMiddleModuleButton === "createProposals") ? 'ProposalsMiddleCardButtonSelected' : '' }` }
 						onClick={handleProposalsButton}>
 					<span> Create Proposal </span>
 				</button>
@@ -135,7 +131,7 @@ useEffect(() => {
 
 
 
-			{ proposalsMiddleModuleButton === "createProposal" &&
+			{ proposalsMiddleModuleButton === "createProposals" &&
 
 			<div className='ProposalsMiddleContentContainercolumn'>
 				<div className="ProposalsMiddleLearnContainercolumn"

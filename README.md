@@ -362,6 +362,54 @@ Now we are building the Technical Floor(Backend) of the Building(App).
 
 
 
+### Research Plan - Contracts, Backend, Frontend
+
+    Contract (Governor) and ERC20Votes are the source of truth for voting power and outcomes. Backend amnd Frontend must verify on Chain (Snapshots) and not trust client vote counts
+
+
+    Persist and expose the on Chain chain_proposal_id in Database, Frontend must use chain_proposal_id to call Contract (Governor) methods.
+
+
+
+    Vote counting by VoteCast event weight values (or getReceipt(...).weight) to compute total, not simple voter counts - TBD
+
+    Processed_events store keyed by txHash and logIndex so the Backend can rescan blocks safely without double-counting
+
+
+
+    Staging when RPC unreachable, scheduler periodically rechecks staging items and scans for missed VoteCast events
+
+
+
+### Implementation:
+
+
+    Backend
+    Proposal on chain metadata is persisted (preVerify -> persist proposalId, startBlock, endBlock, blockNumber, event payload)
+
+    Implement VoteCast event processing (scheduler or blockchain log listener then update votesUp/votesDown)
+
+    Database
+    Index chain_proposal_id
+    Add processed_events table/JSONB column
+
+    Frontend
+    Make Voting in Middle Module - UI
+    Retrieve Voting from Backend from Database
+
+    Contracts
+    Tweak Timelock
+
+
+
+
+
+
+
+
+
+
+
 
 
 

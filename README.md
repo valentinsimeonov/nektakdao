@@ -407,6 +407,61 @@ Now we are building the Technical Floor(Backend) of the Building(App).
 
 
 
+
+
+
+
+What we need right now:
+
+In order for the Backend to send the chain_proposal_id to the Frontend, the Backend needs to retrieve the chain_proposal_id  from On-chain from the receipt.
+This step needs to happen before Step 1(above), it happens after the User has Created the Proposal and the Frontend sends the Proposal Data to the Backend in order for the Backend to Verify the Data.
+After the Backend verifies the newly Created Proposal Data, then it can parse the receipt or other fields that he already has (and has used for verifieying the Newly Created Proposal) in order to retrieve the chain_proposal_id  and save it in the Database.
+
+
+
+
+
+Data Flow
+
+1. Frontend receives All the Proposals and Displays the All the Proposals Data for the Users to see, including chain_proposal_id(the chain_proposal_id is being received  from the Backend along witht all the other Proposal Data. 
+2. Users want to Vote, they click on the Vote Up or Vote Down Button
+3. Frontend checks if Wallet is Connected
+4. Frontend allows the User to Vote if the User has 10 NKT Tokens in their Wallet
+5. Users Sign the Voting Transaction with their Wallet and pays the Gas fee (basically they have Voted on Chain)
+6.Frontend sends the Voting information to the Backend
+7. Backend receives the Voting Information and Verifies on Chain if the information is Valid/True
+8. If the Info is True that the Frontend has sent to the Backend then the Backend persists the Info in the Database
+9. Backend propgates the Voting information for the Respective Proposal to the Frontend 
+10 .User Sees that the Proposal on which the User voted has now the User's Vote
+
+
+
+
+
+ Thus:
+Steps for Implementation:
+
+1. Backend
+We now need for the Backend to retrieve the chain_proposal_id  and save it in the Backend.
+ 2. Fronted 
+Frontend receives All the Proposals and Displays the All the Proposals Data for the Users to see, including chain_proposal_id(the chain_proposal_id is being received  from the Backend along witht all the other Proposal Data. 
+ Users want to Vote, they click on the Vote Up or Vote Down Button
+Frontend checks if Wallet is Connected
+Frontend allows the User to Vote if the User has 10 NKT Tokens in their Wallet
+Frontend sends the Voting information to the Backend
+3. Backend
+ Backend receives the Voting Information and Verifies on Chain if the information is Valid/True
+If the Info is True that the Frontend has sent to the Backend then the Backend persists the Info in the Database
+Backend propgates the Voting information for the Respective Proposal to the Frontend 
+
+
+
+
+
+
+
+
+
 ### BUG - Frontend - Need to fix so that Voting system works
 
     Create Proposal System
@@ -417,6 +472,10 @@ Now we are building the Technical Floor(Backend) of the Building(App).
 
     Create Proposals and Voting Systems
     Enable Subscriptions for GraphQL
+
+
+
+
 
 
 

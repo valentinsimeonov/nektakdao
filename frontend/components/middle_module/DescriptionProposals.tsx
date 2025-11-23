@@ -289,6 +289,11 @@ const proposal = proposalData[0];
 				)}
 				
 
+				{proposal && proposal?.chain_proposal_id && ( 
+				<span className='ProposalsMiddleShortBodyIRowspan'> 
+					Chain Proposal Id:  {proposal && proposal?.chain_proposal_id   ? proposal.chain_proposal_id : 'n/a'}
+				</span>
+				)}
 
 
 

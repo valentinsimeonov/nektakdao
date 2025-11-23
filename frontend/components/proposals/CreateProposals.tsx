@@ -12,9 +12,6 @@ import { BrowserProvider, Contract, type JsonRpcSigner, keccak256, toUtf8Bytes, 
 
 
 
-
-
-
 const TEXTAREA_MAX = 2000;
 
 // shared helper to clamp and set textarea value + keep autosize behaviour
@@ -99,19 +96,14 @@ function handleTextareaPaste(
 
 
 
-
-
-
-
-
-
-
-
 /* Minimal ABIs used for on-chain proposal */
-const GOVERNOR_ABI = [
-  "function propose(address[] targets, uint256[] values, bytes[] calldatas, string description) returns (uint256)",
-  "event ProposalCreated(uint256 id, address proposer, address[] targets, uint256[] values, bytes[] calldatas, uint256 startBlock, uint256 endBlock, string description)",
-];
+ const GOVERNOR_ABI = [
+   "function propose(address[] targets, uint256[] values, bytes[] calldatas, string description) returns (uint256)",
+   "function votingDelay() view returns (uint256)",
+   "function votingPeriod() view returns (uint256)",
+   "event ProposalCreated(uint256 id, address proposer, address[] targets, uint256[] values, bytes[] calldatas, uint256 startBlock, uint256 endBlock, string description)",
+ ];
+
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
@@ -428,7 +420,10 @@ async function createOnChainProposalAndVerify(proposal_uuid: string) {
     const descriptionJsonStr = JSON.stringify(descriptionObj);
 
     const govContract = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI, signer);
-    // const govIface = govContract.interface as any; 
+    
+    // Declare chainProposalId early so we can set it from simulation (callStatic)
+    let chainProposalId: string | null = null;
+
 
     const signature = "ProposalCreated(uint256,address,address[],uint256[],bytes[],uint256,uint256,string)";
     const proposalCreatedTopic = keccak256(toUtf8Bytes(signature));
@@ -441,12 +436,65 @@ async function createOnChainProposalAndVerify(proposal_uuid: string) {
     const values: number[] = [0];
     const calldatas = ["0x"];
 
+    // Predict chain proposal id with callStatic.propose (reliable, works behind proxies).
+    // Also predict start/end blocks using votingDelay() and votingPeriod() as a fallback
+    // in case the ProposalCreated event is not parsed from logs.
+    let predictedStartBlock: number | null = null;
+    let predictedEndBlock: number | null = null;
+
+ try {
+   // callStatic may not exist depending on ethers/provider shape (v5 vs v6 or how the contract was instantiated).
+   // Guard its use: if callStatic.propose exists, simulate; otherwise skip simulation and rely on log parsing.
+   const callStaticAny = (govContract as any).callStatic;
+   if (callStaticAny && typeof callStaticAny.propose === "function") {
+     const simulatedId: any = await callStaticAny.propose(targets, values, calldatas, descriptionJsonStr);
+     if (simulatedId !== undefined && simulatedId !== null) {
+       chainProposalId = simulatedId?.toString?.() ?? String(simulatedId);
+       console.log("Simulated proposal id via callStatic.propose():", chainProposalId);
+       setLastChainProposalId(chainProposalId); // UX hint only
+     }
+   } else {
+     console.debug("callStatic.propose not available on this provider/ethers version; skipping simulation.");
+   }
+ } catch (e) {
+   console.warn("callStatic.propose simulation failed (continuing, will parse logs):", (e as any)?.message ?? e);
+ }
+
+
+
+
+    // Try to predict start/end block using votingDelay and votingPeriod (best-effort).
+    try {
+      const providerForCalls = (signer as any).provider ?? (govContract as any).runner?.provider;
+      if (providerForCalls && typeof providerForCalls.getBlockNumber === "function") {
+        const currentBlock = await providerForCalls.getBlockNumber();
+        try {
+          const vDelay: any = await govContract.votingDelay();
+          const vPeriod: any = await govContract.votingPeriod();
+          const delayNum = Number(vDelay?.toString?.() ?? vDelay ?? 0);
+          const periodNum = Number(vPeriod?.toString?.() ?? vPeriod ?? 0);
+          predictedStartBlock = Number(currentBlock) + delayNum;
+          predictedEndBlock = predictedStartBlock + periodNum;
+          console.log("Predicted start/end blocks:", predictedStartBlock, predictedEndBlock, "(currentBlock:", currentBlock, ")");
+        } catch (inner) {
+          console.warn("Could not read votingDelay/votingPeriod from governor:", inner);
+        }
+      }
+    } catch (e) {
+      console.warn("Predicting start/end blocks failed:", e);
+    }
+
     setFlowStatus("PENDING_TX");
     setIsSubmitting(true);
 
-    const tx = await govContract.propose(targets, values, calldatas, descriptionJsonStr);
-    console.log("Propose tx sent:", tx.hash);
-    setLastTxHash(tx.hash);
+     const tx = await (govContract as any).propose(targets, values, calldatas, descriptionJsonStr);
+     console.log("Propose tx sent:", tx.hash);
+     setLastTxHash(tx.hash);
+
+
+
+
+
 
     const receipt = await tx.wait();
     console.log("Receipt:", receipt);
@@ -472,7 +520,6 @@ async function createOnChainProposalAndVerify(proposal_uuid: string) {
     let parsedEvent: any = null;
     let parsedDescriptionString: string | null = null;
     let parsedDescriptionJson: any = null;
-    let chainProposalId: string | null = null;
     let parsedEventPayload: any = null;
 
     for (const log of receipt.logs || []) {
@@ -727,24 +774,6 @@ async function createOnChainProposalAndVerify(proposal_uuid: string) {
 
 
 
-
-
-    // if (!parsedEvent) {
-    //   setFlowStatus("MISMATCH");
-    //   setIsSubmitting(false);
-    //   alert("Could not find ProposalCreated event in transaction logs. The backend will receive the raw receipt for manual review.");
-    //   return { txHash: tx.hash, receipt, success: false, reason: "NO_PROPOSAL_CREATED_LOG", parsedEventPayload: null };
-    // }
-
-    // parse JSON description if present
-    // let parsedDescriptionJson: any = null;
-    // if (parsedDescriptionString) {
-    //   try {
-    //     parsedDescriptionJson = typeof parsedDescriptionString === "string" ? JSON.parse(parsedDescriptionString) : parsedDescriptionString;
-    //   } catch (_) {
-    //     parsedDescriptionJson = null;
-    //   }
-    // }
 
     const onChainUuid = parsedDescriptionJson?.proposal_uuid ?? null;
     if (!onChainUuid || onChainUuid !== proposal_uuid) {
@@ -1042,45 +1071,30 @@ if (!onChainResult || !onChainResult.success) {
             </button>
           </div>
 
-          {/* <div ref={descriptionContainerRef}>
+
+
+          <div ref={descriptionContainerRef} className="CreateProposalsTextarea">
             <br />
             <span>Description</span>
             <textarea
               className="MakeProposalBodyField"
               placeholder="Please enter a Description"
               value={DescriptionBody}
-              onChange={handleDescriptionBody}
-              maxLength={2000}
+              // remove the old handler and use the new inline handler
+              onChange={(e) => {
+                // simple clamp in case some edge got through
+                const ta = e.currentTarget;
+                setTextareaValueAndAutosize(setDescriptionBody, ta, e.target.value);
+              }}
+              onKeyDown={handleTextareaKeyDown}
+              onPaste={(e) => handleTextareaPaste(e, setDescriptionBody)}
+              maxLength={TEXTAREA_MAX} // defensive: still useful for some browsers
+              aria-describedby="description-counter"
             />
+            <div id="description-counter" className="CreateProposalsCharCounter" aria-live="polite">
+              {DescriptionBody.length} / {TEXTAREA_MAX}
+            </div>
           </div>
- */}
-
-
-
-
-
-<div ref={descriptionContainerRef} className="CreateProposalsTextarea">
-  <br />
-  <span>Description</span>
-  <textarea
-    className="MakeProposalBodyField"
-    placeholder="Please enter a Description"
-    value={DescriptionBody}
-    // remove the old handler and use the new inline handler
-    onChange={(e) => {
-      // simple clamp in case some edge got through
-      const ta = e.currentTarget;
-      setTextareaValueAndAutosize(setDescriptionBody, ta, e.target.value);
-    }}
-    onKeyDown={handleTextareaKeyDown}
-    onPaste={(e) => handleTextareaPaste(e, setDescriptionBody)}
-    maxLength={TEXTAREA_MAX} // defensive: still useful for some browsers
-    aria-describedby="description-counter"
-  />
-  <div id="description-counter" className="CreateProposalsCharCounter" aria-live="polite">
-    {DescriptionBody.length} / {TEXTAREA_MAX}
-  </div>
-</div>
 
 
 
@@ -1088,125 +1102,89 @@ if (!onChainResult || !onChainResult.success) {
 
 
 
-<div ref={missionContainerRef} className="CreateProposalsTextarea">
-  <br />
-  <span>Mission</span>
-  <textarea
-    className="MakeProposalBodyField"
-    placeholder="Please enter your Mission"
-    value={MissionBody}
-    // remove the old handler and use the new inline handler
-    onChange={(e) => {
-      // simple clamp in case some edge got through
-      const ta = e.currentTarget;
-      setTextareaValueAndAutosize(setMissionBody, ta, e.target.value);
-    }}
-    onKeyDown={handleTextareaKeyDown}
-    onPaste={(e) => handleTextareaPaste(e, setMissionBody)}
-    maxLength={TEXTAREA_MAX} // defensive: still useful for some browsers
-    aria-describedby="mission-counter"
-  />
-  <div id="mission-counter" className="CreateProposalsCharCounter" aria-live="polite">
-    {MissionBody.length} / {TEXTAREA_MAX}
-  </div>
-</div>
-
-
-
-
-
-
-
-
-<div ref={budgetContainerRef} className="CreateProposalsTextarea">
-  <br />
-  <span>Budget</span>
-  <textarea
-    className="MakeProposalBodyField"
-    placeholder="Please enter Budget details"
-    value={BudgetBody}
-    // remove the old handler and use the new inline handler
-    onChange={(e) => {
-      // simple clamp in case some edge got through
-      const ta = e.currentTarget;
-      setTextareaValueAndAutosize(setBudgetBody, ta, e.target.value);
-    }}
-    onKeyDown={handleTextareaKeyDown}
-    onPaste={(e) => handleTextareaPaste(e, setBudgetBody)}
-    maxLength={TEXTAREA_MAX} // defensive: still useful for some browsers
-    aria-describedby="budget-counter"
-  />
-  <div id="budget-counter" className="CreateProposalsCharCounter" aria-live="polite">
-    {BudgetBody.length} / {TEXTAREA_MAX}
-  </div>
-</div>
-
-
-
-
-
-
-<div ref={implementContainerRef} className="CreateProposalsTextarea">
-  <br />
-  <span>Implementation</span>
-  <textarea
-    className="MakeProposalBodyField"
-    placeholder="Please explain how to Implement"
-    value={ImplementBody}
-    // remove the old handler and use the new inline handler
-    onChange={(e) => {
-      // simple clamp in case some edge got through
-      const ta = e.currentTarget;
-      setTextareaValueAndAutosize(setImplementBody, ta, e.target.value);
-    }}
-    onKeyDown={handleTextareaKeyDown}
-    onPaste={(e) => handleTextareaPaste(e, setImplementBody)}
-    maxLength={TEXTAREA_MAX} // defensive: still useful for some browsers
-    aria-describedby="implement-counter"
-  />
-  <div id="implement-counter" className="CreateProposalsCharCounter" aria-live="polite">
-    {ImplementBody.length} / {TEXTAREA_MAX}
-  </div>
-</div>
-
-
-
-
-{/* 
-
-          <div ref={missionContainerRef}>
+          <div ref={missionContainerRef} className="CreateProposalsTextarea">
+            <br />
             <span>Mission</span>
             <textarea
               className="MakeProposalBodyField"
               placeholder="Please enter your Mission"
               value={MissionBody}
-              onChange={handleMissionBody}
-              maxLength={2000}
+              // remove the old handler and use the new inline handler
+              onChange={(e) => {
+                // simple clamp in case some edge got through
+                const ta = e.currentTarget;
+                setTextareaValueAndAutosize(setMissionBody, ta, e.target.value);
+              }}
+              onKeyDown={handleTextareaKeyDown}
+              onPaste={(e) => handleTextareaPaste(e, setMissionBody)}
+              maxLength={TEXTAREA_MAX} // defensive: still useful for some browsers
+              aria-describedby="mission-counter"
             />
-          </div> */}
-{/* 
-          <div ref={budgetContainerRef}>
+            <div id="mission-counter" className="CreateProposalsCharCounter" aria-live="polite">
+              {MissionBody.length} / {TEXTAREA_MAX}
+            </div>
+          </div>
+
+
+
+
+
+
+
+
+          <div ref={budgetContainerRef} className="CreateProposalsTextarea">
+            <br />
             <span>Budget</span>
             <textarea
               className="MakeProposalBodyField"
               placeholder="Please enter Budget details"
               value={BudgetBody}
-              onChange={handleBudgetBody}
-              maxLength={2000}
+              // remove the old handler and use the new inline handler
+              onChange={(e) => {
+                // simple clamp in case some edge got through
+                const ta = e.currentTarget;
+                setTextareaValueAndAutosize(setBudgetBody, ta, e.target.value);
+              }}
+              onKeyDown={handleTextareaKeyDown}
+              onPaste={(e) => handleTextareaPaste(e, setBudgetBody)}
+              maxLength={TEXTAREA_MAX} // defensive: still useful for some browsers
+              aria-describedby="budget-counter"
             />
-          </div> */}
-{/* 
-          <div ref={implementContainerRef}>
+            <div id="budget-counter" className="CreateProposalsCharCounter" aria-live="polite">
+              {BudgetBody.length} / {TEXTAREA_MAX}
+            </div>
+          </div>
+
+
+
+
+
+
+          <div ref={implementContainerRef} className="CreateProposalsTextarea">
+            <br />
             <span>Implementation</span>
             <textarea
               className="MakeProposalBodyField"
               placeholder="Please explain how to Implement"
               value={ImplementBody}
-              onChange={handleImplementBody}
-              maxLength={2000}
+              // remove the old handler and use the new inline handler
+              onChange={(e) => {
+                // simple clamp in case some edge got through
+                const ta = e.currentTarget;
+                setTextareaValueAndAutosize(setImplementBody, ta, e.target.value);
+              }}
+              onKeyDown={handleTextareaKeyDown}
+              onPaste={(e) => handleTextareaPaste(e, setImplementBody)}
+              maxLength={TEXTAREA_MAX} // defensive: still useful for some browsers
+              aria-describedby="implement-counter"
             />
+            <div id="implement-counter" className="CreateProposalsCharCounter" aria-live="polite">
+              {ImplementBody.length} / {TEXTAREA_MAX}
+            </div>
           </div>
- */}
+
+
+
 
 
 

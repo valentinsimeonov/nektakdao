@@ -392,7 +392,7 @@ Now we are building the Technical Floor(Backend) of the Building(App).
 
 #### Voting System - Phase 1 - Core Voting - Implementation
 
-
+    0. Frotend shows already Created Proposals
     1. User Connects with Wallet to Frontend
     2. User Votes in UI
     3. User Signes the Voting Transaction with Wallet
@@ -413,7 +413,10 @@ Now we are building the Technical Floor(Backend) of the Building(App).
     chain_proposal_id does not seem to be fetched into the Frontend and it is not sent to the Backend
     We need it for the Voting System
 
+### Frontend and Backend
 
+    Create Proposals and Voting Systems
+    Enable Subscriptions for GraphQL
 
 
 

@@ -364,41 +364,58 @@ Now we are building the Technical Floor(Backend) of the Building(App).
 
 ### Research Plan - Contracts, Backend, Frontend
 
-    Contract (Governor) and ERC20Votes are the source of truth for voting power and outcomes. Backend amnd Frontend must verify on Chain (Snapshots) and not trust client vote counts
+#### Voting System - High Level
+
+##### Phase 1 - Core Voting
+
+    Implement wallet sent votes, backend scanner, DB schema for votes, eligibility check >= 10 NKT using getPastVotes.
+
+    Ensure all on-chain metadata is persisted (chain_proposal_id, start/end blocks).
+
+    Add small backend API or GraphQL field for getReceipt if convenient.
+
+    Instrument DB and event logging to be ready for WorkScore data.
 
 
-    Persist and expose the on Chain chain_proposal_id in Database, Frontend must use chain_proposal_id to call Contract (Governor) methods.
+##### Phase 2 - Anti Plutocracy System
+
+    Work for DAO metric - most probably a second Token, the WorkToken (ERC20Votes-compatible, non-transferable)
+
+    Cycles - Deploy VotingPowerAggregator (IVotes) that sums token and workTokens and applies the formula with the Cycle Multiplier and the Work for DAO metric
 
 
 
-    Vote counting by VoteCast event weight values (or getReceipt(...).weight) to compute total, not simple voter counts - TBD
-
-    Processed_events store keyed by txHash and logIndex so the Backend can rescan blocks safely without double-counting
 
 
 
-    Staging when RPC unreachable, scheduler periodically rechecks staging items and scans for missed VoteCast events
+
+
+#### Voting System - Phase 1 - Core Voting - Implementation
+
+
+    1. User Connects with Wallet to Frontend
+    2. User Votes in UI
+    3. User Signes the Voting Transaction with Wallet
+    4. Frontend verifies the data to send to the Backend
+    5. Backend verifies the data sent from Frontend
+    6. Backend persists data from Frontend
 
 
 
-### Implementation:
 
 
-    Backend
-    Proposal on chain metadata is persisted (preVerify -> persist proposalId, startBlock, endBlock, blockNumber, event payload)
 
-    Implement VoteCast event processing (scheduler or blockchain log listener then update votesUp/votesDown)
 
-    Database
-    Index chain_proposal_id
-    Add processed_events table/JSONB column
 
-    Frontend
-    Make Voting in Middle Module - UI
-    Retrieve Voting from Backend from Database
+### BUG - Frontend - Need to fix so that Voting system works
 
-    Contracts
-    Tweak Timelock
+    Create Proposal System
+    chain_proposal_id does not seem to be fetched into the Frontend and it is not sent to the Backend
+    We need it for the Voting System
+
+
+
+
 
 
 

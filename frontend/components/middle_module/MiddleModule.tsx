@@ -12,6 +12,7 @@ import { proposalsselectedbutton, proposalsextendbottompanel, proposalsmiddlemod
 	from '../../store/ProposalsSlice';
 import { useRouter, useSearchParams } from 'next/navigation'
 import CreateProposals from '../proposals/CreateProposals';
+import ReviewsProposals from './ReviewsProposals';
 
 
 
@@ -123,6 +124,10 @@ useEffect(() => {
 						<DescriptionProposals />			
 				</div>
 
+				<div className="ProposalsMiddleLearnContainercolumn"
+					>
+						<ReviewsProposals />			
+				</div>
 
 				{/* <div ref={sentinelRef} style={{ height: '1px' }} /> */}
 

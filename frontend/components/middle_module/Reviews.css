@@ -1,0 +1,687 @@
+.ProposalsReviewsMaincolumn{
+	/* border: 1px solid red; */
+	
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+
+	width: 57vw;
+	height: 17vh;
+
+	background-color: rgba(var(--objects));
+  }
+
+
+  .ProposalsReviewscolumn{
+	/* border: 1px solid rgb(0, 17, 255); */
+
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+
+/* margin-left: 0.1vw; */
+
+	/* width: 28.5vw; */
+	width: 56.5vw;
+	height: 14vh;
+  }
+
+
+  .ProposalsReviewsAvatarNameVotesrow{
+	/* border: 1px solid rgb(208, 255, 0); */
+
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+
+	/* width: 28.3vw; */
+	width: 56.5vw;
+	height: 5.8vh;
+
+	margin-bottom: 0.1vh;
+
+	/* margin-left: 0.1vw; */
+
+
+	padding-left: 1.5vw;
+
+	box-shadow: 0 0 0 1px rgba(var(--border-low));
+
+  }
+
+  .ProposalsReviewsAvatarrow{
+	/* border: 1px solid rgb(0, 255, 21); */
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+	width: 3vw;
+	height: 4.8vh;
+  }
+
+
+  /* .ProposalsReviewsAvatarrowimg img{
+ProposalsReviewsImageContainer
+	width: 75%;
+	object-fit: cover;
+  } */
+
+
+  .ProposalsReviewsImageContainer {
+	/* border: 1px solid rgba(201, 77, 77, 0.774); */
+
+    position: relative;
+
+	/* width: 3.8vw; 
+	height: 5vh; */
+
+	width: 2.4vw;
+	height: 4.2vh;
+}
+
+.ProposalsReviewsImageContainer img{
+	/* border: 1px solid rgba(201, 77, 77, 0.774); */
+
+	width: 2.4vw;
+	height: 4.2vh;
+
+	object-fit: contain;
+}
+
+
+.ProposalsReviewsImageContainerPlaceholder {
+	/* border: 1px solid rgba(232, 220, 57, 0.774); */
+
+	width: 100%;
+    height: 100%;
+	
+    font-size: 3rem;
+    font-weight: 500;
+    text-align: center;
+    /* color: rgba(var(--fg-title));  */
+	/* color: rgb(86, 65, 59);  */
+	/* color: rgba(86, 65, 59, 0.503);  */
+	color: rgba(var(--fg-title));
+
+    background-color: transparent;
+
+	display: none; /* Initially hidden */
+    align-items: center;
+    justify-content: center;
+}
+
+
+  .ProposalsReviewsNamerow{
+	/* border: 1px solid rgb(225, 0, 255); */
+
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+
+	width: 28vw;
+	height: 4.5vh;
+
+	padding: 1vw;
+  }
+
+  .ProposalsReviewsTitlerow{
+	/* border: 1px solid rgb(255, 0, 0); */
+	
+	/* border-radius: 8px; */
+	/* border-bottom-right-radius: 8px;
+	border-bottom-left-radius: 8px; */
+
+	/* width: 10vw; */
+	height: 2.8vh;
+
+	/* width: 19.6vw;
+	height: 2.8vh; */
+
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+
+  .ProposalsReviewsTitlerow span{
+	
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+
+	color: rgba(var(--fg));
+
+	
+	font-weight: 600;
+	font-size: 1.2rem;
+}
+
+
+
+
+
+
+
+
+
+
+   .ProposalsReviewsVoteButtonsrow{
+	/* border: 1px solid rgb(0, 255, 55); */
+
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: center;
+
+
+	width: 22vw;
+	height: 4.8vh;
+  }
+
+
+
+  .ProposalsReviewsVoteUpButton{
+	/* border: 1px solid rgb(164, 195, 221); */
+
+	width: 9.2vw;
+	height: 4.2vh;
+
+	/* padding: 1%; */
+
+	border-radius: 5px;
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+
+	background-color: rgba(var(--primary));
+
+  }
+
+  .ProposalsReviewsVoteUpButton:hover{
+	/* border: 1px solid rgb(122, 126, 184); */
+
+	background-color: rgba(var(--accent));
+
+  }
+
+
+
+  .ProposalsReviewsIconColumn{
+	/* border: 1px solid rgb(230, 28, 180); */
+
+	width: 2.6vw;
+	height: 4.2vh;
+
+	/* margin-left: 0.3vw; */
+	/* border-radius: 10px; */
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+  }
+
+  .ProposalsReviewsIconColumnimg {
+	/* border: 1px solid rgb(230, 183, 28); */
+
+	width: 2.5vw;
+	height: 4.6vh;
+
+	border-radius: 100%;
+
+	object-fit: fill;
+
+	/* border-radius: 10px; */
+
+	/* display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center; */
+  }
+
+
+
+
+  .ProposalsReviewsNameColumn{
+	/* border: 1px solid rgb(255, 255, 255); */
+
+	width: 6.5vw;
+	height: 4.2vh;
+
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+  }
+
+
+
+  .ProposalsReviewsUpDownTitle{
+	/* border: 1px solid white; */
+
+	width: 6.2vw;
+	height: 3vh;
+
+	margin-top: 1%;
+
+	font-family: 'Roboto', sans-serif;
+	font-size: 1rem;
+	font-weight: bold;
+	/* color: rgba(var(--fg-lowest)); */
+
+	color: rgba(var(--fg-low));
+	/* background: rgb(41, 47, 54); */
+
+	overflow: hidden; 
+	/* text-overflow: ellipsis; */
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .ProposalsReviewsTrustScoreColumn{
+	/* border: 1px solid red; */
+
+	width: 56.5vw;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-end;
+
+	background-color: rgba(var(--primary-low));
+	box-shadow: 0 0 0 1px rgba(var(--border-low));
+
+}
+
+
+
+.ProposalsReviewsTrustScorerow1 {
+	/* border: 1px solid rgb(212, 255, 253); */
+
+	/* width: 28.2vw;  */
+	width: 42vw;
+	height: 3.6vh;
+
+	margin-bottom: 0.5vh;
+	margin-top: 0.5vh;
+
+	display: flex;
+	flex-direction: row;
+  }
+
+  .ProposalsReviewsTrustScorerow1 span {
+	/* border: 1px solid rgb(0, 0, 0); */
+
+	width: 12vw; 
+	height: 3.4vh;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+  	white-space: normal;
+	text-align: center;
+
+	color: rgba(var(--fg));
+	
+	font-weight: 600;
+	font-size: 0.8rem;
+  }
+
+  .ProposalsReviewsTrustScorerow2 {
+	/* border: 1px solid rgb(212, 255, 253); */
+
+	width: 42vw;
+	height: 3.6vh;
+
+	display: flex;
+	flex-direction: row;
+
+/* 
+	border: 1px solid black;
+	border-top: transparent;
+	border-left: transparent;
+	border-right: transparent; */
+  }
+
+  .ProposalsReviewsTrustScorerow2 span {
+	/* border: 2px solid rgb(243, 43, 43); */
+
+	width: 12vw; 
+	height: 3.4vh;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	white-space: normal;
+	text-align: center;
+
+	color: rgba(var(--fg));
+	
+	font-weight: 600;
+	font-size: 0.8rem;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	@media (max-width: 768px) {
+	
+	
+	
+	
+		.ProposalsReviewsMaincolumn{
+			/* border: 1px solid red; */
+
+			width: 98vw;
+		  }
+		
+		
+		  .ProposalsReviewscolumn{
+			/* border: 1px solid rgb(0, 17, 255); */
+
+			width:97vw;
+		  }
+		
+		
+		  .ProposalsReviewsAvatarNameVotesrow{
+			/* border: 1px solid rgb(208, 255, 0); */
+		
+			width: 96vw;
+		  }
+		
+		  .ProposalsReviewsAvatarrow{
+			/* border: 1px solid rgb(0, 255, 21); */
+
+			width: 10vw;
+		  }
+		
+		
+		  /* .ProposalsReviewsAvatarrowimg img{
+		ProposalsReviewsImageContainer
+			width: 75%;
+			object-fit: cover;
+		  } */
+		
+		
+		  .ProposalsReviewsImageContainer {
+			/* border: 1px solid rgba(201, 77, 77, 0.774); */
+
+			width: 8vw;
+			height: 4.2vh;
+		}
+		
+		.ProposalsReviewsImageContainerPlaceholder {
+			/* border: 1px solid rgba(232, 220, 57, 0.774); */
+		
+			width: 8vw;
+			height: 4.2vh;
+		}
+		
+
+		.ProposalsReviewsImageContainer img{
+		/* border: 1px solid rgba(201, 77, 77, 0.774); */
+
+		width: 8vw;
+		}
+
+
+
+		
+		  .ProposalsReviewsNamerow{
+			/* border: 1px solid rgb(225, 0, 255); */
+
+			width: 50vw;
+		  }
+		
+		  .ProposalsReviewsTitlerow{
+			/* border: 1px solid rgb(255, 0, 0); */
+
+			width: 48vw;
+		}
+		
+	
+		
+		
+		
+		
+		
+		
+		   .ProposalsReviewsVoteButtonsrow{
+			/* border: 1px solid rgb(0, 255, 55); */
+		
+			width: 34vw;
+		  }
+		
+		
+		
+		  .ProposalsReviewsVoteUpButton{
+			/* border: 1px solid rgb(86, 89, 129); */
+		
+			width: 15vw;
+		  }
+		
+
+		
+		  .ProposalsReviewsIconColumn{
+			/* border: 1px solid rgb(230, 28, 180); */
+		
+			width: 3vw;
+		  }
+		
+		  .ProposalsReviewsIconColumnimg {
+			/* border: 1px solid rgb(230, 183, 28); */
+		
+			width: 2.7vw;
+			height: 3vh;
+
+		
+			object-fit: cover;
+		
+		  }
+		
+		
+		
+		
+		  .ProposalsReviewsNameColumn{
+			/* border: 1px solid rgb(255, 255, 255); */
+		
+			width: 11.6vw;
+			height: 4.2vh;
+	
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+		  }
+		
+		
+		
+		  .ProposalsReviewsUpDownTitle{
+			/* border: 1px solid white; */
+		
+			width: 11vw;
+			height: 4.2vh;
+		
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+
+			font-family: 'Roboto', sans-serif;
+			font-size: 0.8rem;
+			font-weight: bold;
+			/* line-height: 0; */
+
+		  }
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		  
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		  .ProposalsReviewsTrustScoreColumn{
+			/* border: 1px solid red; */
+		
+			width: 96vw;
+
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+
+		}
+		
+		
+		
+		.ProposalsReviewsTrustScorerow1 {
+			/* border: 1px solid rgb(212, 255, 253); */
+		
+			width: 95vw;
+		  }
+		
+		  .ProposalsReviewsTrustScorerow1 span {
+			/* border: 1px solid rgb(0, 0, 0); */
+		
+			width: 23.6vw; 
+		  }
+		
+		  .ProposalsReviewsTrustScorerow2 {
+			/* border: 1px solid rgb(212, 255, 253); */
+		
+			width: 95vw;
+		  }
+		
+		  .ProposalsReviewsTrustScorerow2 span {
+			/* border: 1px solid rgb(243, 43, 43); */
+		
+			width: 23.6vw; 
+		  }
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+
+
+
+
+
+
+
+
+		
+		
+	
+	}

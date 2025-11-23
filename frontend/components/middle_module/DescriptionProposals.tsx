@@ -68,6 +68,45 @@ const proposal = proposalData[0];
 	return (
 		<div className='ProposalsMiddleLearnContentcolumn'>
 			
+
+
+					
+			<div className="ProposalsMiddleLearnCategoryrow">
+				<div className="ProposalsMiddleTitlerow">
+
+					<button className='ProposalsMiddleTitleButton'
+							// onClick={() => dispatch(explanationsview("proposalsdescription"))}
+					>
+						<span>
+							Title
+						</span>
+					</button>
+
+				</div>
+			</div>
+
+
+
+
+
+			<div className="ProposalsMiddleShortBodyIcolumn">
+
+				<div className='ProposalsMiddleDescriptionRow'>
+				{proposal && proposal.title && (
+					splitDescriptionIntoChunks(proposal.title).map((chunk, idx) => (
+					<p key={idx} className="ProposalsMiddleDescriptionParagraph">
+						{chunk}
+					</p>
+					))
+				)}
+				</div>
+
+			</div>
+
+
+
+
+
 			<div className="ProposalsMiddleLearnCategoryrow">
 				<div className="ProposalsMiddleTitlerow">
 

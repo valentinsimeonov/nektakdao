@@ -125,9 +125,42 @@ const MUTATION_CREATE_PROPOSAL = gql`
 
 
 
+
+
+const MUTATION_PROPOSALS_VOTE_UP = gql`
+  mutation voteUp ($id: String!){
+    voteUp( id: $id){
+      votes_up
+      votes_down
+
+    }
+  }
+`;
+
+
+const MUTATION_PROPOSALS_VOTE_DOWN = gql`
+  mutation voteDown ($id: String!){
+    voteDown( id: $id){
+      votes_up
+      votes_down
+
+    }
+  }
+`;
+
+
+
+
+
+
+
+
 export { 
 	QUERY_PROPOSALS_BY_ID_CATEGORY,
 	MUTATION_CREATE_PROPOSAL,
+
+  MUTATION_PROPOSALS_VOTE_UP,
+  MUTATION_PROPOSALS_VOTE_DOWN,
 
 
 	

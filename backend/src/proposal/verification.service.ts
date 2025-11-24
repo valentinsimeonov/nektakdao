@@ -10,12 +10,31 @@ dotenv.config();
 /**
  * Minimal ABI for ProposalCreated event.
  */
+// const GOVERNOR_ABI = [
+//   {
+//     anonymous: false,
+//     inputs: [
+//       { indexed: false, internalType: 'uint256', name: 'id', type: 'uint256' },
+//       { indexed: true, internalType: 'address', name: 'proposer', type: 'address' },
+//       { indexed: false, internalType: 'address[]', name: 'targets', type: 'address[]' },
+//       { indexed: false, internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
+//       { indexed: false, internalType: 'bytes[]', name: 'calldatas', type: 'bytes[]' },
+//       { indexed: false, internalType: 'uint256', name: 'startBlock', type: 'uint256' },
+//       { indexed: false, internalType: 'uint256', name: 'endBlock', type: 'uint256' },
+//       { indexed: false, internalType: 'string', name: 'description', type: 'string' },
+//     ],
+//     name: 'ProposalCreated',
+//     type: 'event',
+//   },
+// ];
+
+
 const GOVERNOR_ABI = [
   {
     anonymous: false,
     inputs: [
       { indexed: false, internalType: 'uint256', name: 'id', type: 'uint256' },
-      { indexed: true, internalType: 'address', name: 'proposer', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'proposer', type: 'address' },
       { indexed: false, internalType: 'address[]', name: 'targets', type: 'address[]' },
       { indexed: false, internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
       { indexed: false, internalType: 'bytes[]', name: 'calldatas', type: 'bytes[]' },
@@ -27,6 +46,9 @@ const GOVERNOR_ABI = [
     type: 'event',
   },
 ];
+
+
+
 
 type TraceStep = {
   ts: string;
@@ -153,7 +175,7 @@ export class VerificationService {
       return { outcome: 'TX_NOT_FOUND', trace, reason: 'no_tx_hash' };
     }
 
-    // fetch transaction (guard with try/catch for RPC errors)
+    // fetch transaction
     let fetchedTx: any = null;
     try {
       fetchedTx = await this.provider.getTransaction(txHash);
@@ -161,10 +183,8 @@ export class VerificationService {
     } catch (err) {
       trace.push({ ts: this.nowISO(), step: 'getTransaction', ok: false, info: { err: String(err) } });
       this.logger.warn(`preVerifyPayload: RPC getTransaction failed (${String(err)}). Will instruct caller to stage payload.`);
-      // treat provider errors as "stage the payload" (don't block the frontend)
       return { outcome: 'TX_NOT_FOUND', trace, reason: 'rpc_getTransaction_failed' };
     }
-
     if (!fetchedTx) {
       trace.push({ ts: this.nowISO(), step: 'tx_not_found', ok: false, info: { txHash } });
       return { outcome: 'TX_NOT_FOUND', trace, reason: 'tx_not_on_rpc' };
@@ -204,43 +224,60 @@ export class VerificationService {
       trace.push({ ts: this.nowISO(), step: 'confirmations_fetch_failed', ok: false, info: { err: String(err) } });
     }
 
-
-
-
-
-
     // attempt to decode logs for authoritative proposer
-    // Try parse logs for ProposalCreated and extract description
     let authoritativeProposer: string | null = null;
     let parsedDescriptionRaw: string | null = null;
     let parsedDescriptionJson: any = null;
-
     let parsedChainProposalId: string | null = null;
     let parsedStartBlock: number | null = null;
     let parsedEndBlock: number | null = null;
     let parsedEventPayload: any | null = null;
+
     try {
       if (Array.isArray(receipt.logs) && receipt.logs.length > 0) {
         const iface = new Interface(GOVERNOR_ABI);
-        for (const l of receipt.logs) {
+
+        // debug: expected topic (cast to any to avoid types error)
+        try {
+          const expectedTopic = (iface as any).getEventTopic ? (iface as any).getEventTopic('ProposalCreated') : null;
+          this.logger.debug(`preVerifyPayload: expected ProposalCreated topic=${expectedTopic}`);
+        } catch (e) { /* ignore */ }
+
+        // iterate logs and try parseLog for each
+        for (const [i, l] of receipt.logs.entries()) {
           try {
-            const parsed = iface.parseLog(l);
+            // debug sample for first few logs
+            if (i < 3) {
+              try {
+                this.logger.debug(`preVerifyPayload: log[${i}] address=${l.address} topics=${JSON.stringify(Array.isArray(l.topics) ? l.topics.slice(0,5) : l.topics)} dataLen=${String(l.data)?.length ?? 0}`);
+              } catch {}
+            }
+
+            // parse; parseLog may throw if ABI doesn't match this log
+            let parsed: any = null;
+            try {
+              parsed = iface.parseLog(l);
+            } catch (parseErr) {
+              trace.push({
+                ts: this.nowISO(),
+                step: 'parse_log_error',
+                ok: false,
+                info: { err: String(parseErr), logTopics: Array.isArray(l.topics) ? l.topics.slice(0,5) : l.topics, dataLen: String(l.data)?.length ?? 0 },
+              });
+              this.logger.debug(`preVerifyPayload: parseLog failed for receipt log[${i}] (topics[0]=${l.topics?.[0]}). err=${String((parseErr as Error).message ?? parseErr)}`);
+              continue;
+            }
+
             if (parsed && parsed.name === 'ProposalCreated') {
-              // args: id, proposer, targets, values, calldatas, startBlock, endBlock, description
               const maybe = parsed.args?.proposer ?? parsed.args?.[1] ?? null;
               const desc = parsed.args?.description ?? parsed.args?.[7] ?? null;
               const idArg = parsed.args?.id ?? parsed.args?.[0] ?? null;
               const startArg = parsed.args?.startBlock ?? parsed.args?.[5] ?? null;
               const endArg = parsed.args?.endBlock ?? parsed.args?.[6] ?? null;
-              // keep event payload for provenance / auditing
-              parsedEventPayload = {
-                name: parsed.name,
-                args: parsed.args,
-                topic: parsed.topic ?? null,
-              };
 
-              
-              
+              parsedEventPayload = { name: parsed.name, args: parsed.args, topic: parsed.topic ?? null };
+
+              // proposer
               if (maybe) {
                 try {
                   authoritativeProposer = getAddress(String(maybe));
@@ -250,10 +287,11 @@ export class VerificationService {
                   trace.push({ ts: this.nowISO(), step: 'parse_log_proposer_normalize_failed', ok: false, info: { raw: maybe } });
                 }
               }
+
+              // description
               if (desc) {
                 parsedDescriptionRaw = String(desc);
                 trace.push({ ts: this.nowISO(), step: 'parse_log_description_raw', ok: true, info: { length: parsedDescriptionRaw.length } });
-                // try to parse as json
                 try {
                   const dj = JSON.parse(parsedDescriptionRaw);
                   parsedDescriptionJson = dj;
@@ -263,8 +301,7 @@ export class VerificationService {
                 }
               }
 
-
-              // extract canonical numeric values if present
+              // numeric canonical fields
               try {
                 if (idArg !== null && idArg !== undefined) {
                   parsedChainProposalId = typeof idArg === 'object' && idArg.toString ? idArg.toString() : String(idArg);
@@ -284,44 +321,35 @@ export class VerificationService {
                 trace.push({ ts: this.nowISO(), step: 'parse_log_numeric_failed', ok: false, info: String(numErr) });
               }
 
-
-
-
-              // debug: log the parsed event summary *after* extraction so values are present
+              // debug summary and stop searching logs
               try {
                 this.logger.log(`parseLog FOUND ProposalCreated — id=${parsedChainProposalId} start=${parsedStartBlock} end=${parsedEndBlock} descLen=${parsedDescriptionRaw ? parsedDescriptionRaw.length : 0}`);
                 this.logger.debug(`parseLog event_payload (short): ${short(parsedEventPayload, 1000)}`);
               } catch {}
-
-              // Found the relevant event; stop searching further logs
               break;
-
-
-            }
-          } catch (err) {
-            // ignore non-matching log parse errors
+            } // end if parsed.name
+          } catch (outerErr) {
+            trace.push({ ts: this.nowISO(), step: 'parse_log_unexpected_error', ok: false, info: String(outerErr) });
+            this.logger.debug(`preVerifyPayload: unexpected error while parsing a log: ${String(outerErr)}`);
+            continue;
           }
+        } // end for logs
+
+        // if logs present but we didn't find event, log sample
+        if (Array.isArray(receipt.logs) && receipt.logs.length > 0 && !parsedEventPayload) {
+          try {
+            const sample = receipt.logs.slice(0, 3).map((l: any, i: number) => ({ i, address: l.address, topics: Array.isArray(l.topics) ? l.topics.slice(0, 3) : l.topics }));
+            this.logger.debug(`preVerifyPayload: receipt.logs present (${receipt.logs.length}) but no ProposalCreated event parsed. sample logs: ${short(sample, 1000)}`);
+          } catch {}
         }
       } else {
         trace.push({ ts: this.nowISO(), step: 'no_logs', ok: false, info: {} });
         this.logger.debug('preVerifyPayload: receipt has no logs to parse');
       }
-
-     // If logs present but we never matched ProposalCreated, log a little info to help debugging
-      if (Array.isArray(receipt.logs) && receipt.logs.length > 0 && !parsedEventPayload) {
-        try {
-          const sample = receipt.logs.slice(0,3).map((l:any,i:number)=> ({ i, address: l.address, topics: Array.isArray(l.topics) ? l.topics.slice(0,3) : l.topics }));
-          this.logger.debug(`preVerifyPayload: receipt.logs present (${receipt.logs.length}) but no ProposalCreated event parsed. sample logs: ${short(sample, 1000)}`);
-        } catch {}
-      }
-
     } catch (err) {
       trace.push({ ts: this.nowISO(), step: 'parse_logs_failed', ok: false, info: { err: String(err) } });
       this.logger.warn(`preVerifyPayload: parse_logs_failed: ${String(err)}`);
     }
-
-
-
 
     // fallback authoritative proposer -> tx.from
     if (!authoritativeProposer) {
@@ -351,13 +379,7 @@ export class VerificationService {
       trace.push({ ts: this.nowISO(), step: 'compare_proposers_missing', ok: false, info: { normalizedProposer, authoritativeProposer } });
     }
 
-
-
-
-
-
-
-    // description_json uuid check if present in incoming
+    // description_uuid check
     try {
       if (incoming?.description_json && typeof incoming.description_json === 'object') {
         const descUuid = (incoming.description_json as any)?.proposal_uuid ?? null;
@@ -386,8 +408,7 @@ export class VerificationService {
       trace.push({ ts: this.nowISO(), step: 'description_uuid_check_error', ok: false, info: { err: String(err) } });
     }
 
-
-    // Final outcome selection and attach parsed description fields so caller can use them
+    // Final outcome
     if (receipt && receipt.status === 1 && verified && confirmations >= this.confirmationsThreshold) {
       const out: PreVerifyResult = {
         outcome: 'CONFIRMED',
@@ -406,25 +427,23 @@ export class VerificationService {
       return out;
     }
 
-
     if (receipt && receipt.status === 1 && confirmations < this.confirmationsThreshold) {
       const out: PreVerifyResult = {
         outcome: 'AWAITING_CONFIRMATIONS',
         trace,
         receipt,
-       authoritativeProposer,
+        authoritativeProposer,
         confirmations,
         description_raw: parsedDescriptionRaw,
         description_json: parsedDescriptionJson,
         chain_proposal_id: parsedChainProposalId,
-       voting_start_block: parsedStartBlock,
+        voting_start_block: parsedStartBlock,
         voting_end_block: parsedEndBlock,
         event_payload: parsedEventPayload,
       } as PreVerifyResult;
       this.logger.log(`preVerifyPayload -> AWAITING_CONFIRMATIONS (short): chain_proposal_id=${parsedChainProposalId} start=${parsedStartBlock} end=${parsedEndBlock} confirmations=${confirmations}`);
       return out;
     }
-
 
     if (receipt && receipt.status === 1 && !verified) {
       const out: PreVerifyResult = {
@@ -459,13 +478,7 @@ export class VerificationService {
     } as PreVerifyResult;
     this.logger.log(`preVerifyPayload -> default AWAITING_CONFIRMATIONS (short): chain_proposal_id=${parsedChainProposalId} start=${parsedStartBlock} end=${parsedEndBlock} confirmations=${confirmations}`);
     return out;
-
-
-
-
   }
-
-
 
 
 

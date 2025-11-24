@@ -29,14 +29,36 @@ dotenv.config();
 // ];
 
 
+/**
+ * Minimal ABI for ProposalCreated event.
+ *
+ * NOTE: The deployed governor implementation includes an extra `string[] signatures`
+ * parameter between `values` and `calldatas`. The explorer-decoded shape is:
+ *
+ *   ProposalCreated(
+ *     uint256 proposalId,
+ *     address proposer,
+ *     address[] targets,
+ *     uint256[] values,
+ *     string[] signatures,   // present on-chain
+ *     bytes[] calldatas,
+ *     uint256 startBlock,
+ *     uint256 endBlock,
+ *     string description
+ *   )
+ *
+ * We construct a minimal event ABI that matches that deployed signature exactly so
+ * ethers.Interface.parseLog can decode logs reliably.
+ */
 const GOVERNOR_ABI = [
   {
     anonymous: false,
     inputs: [
-      { indexed: false, internalType: 'uint256', name: 'id', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'proposalId', type: 'uint256' },
       { indexed: false, internalType: 'address', name: 'proposer', type: 'address' },
       { indexed: false, internalType: 'address[]', name: 'targets', type: 'address[]' },
       { indexed: false, internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
+      { indexed: false, internalType: 'string[]', name: 'signatures', type: 'string[]' }, // <-- added
       { indexed: false, internalType: 'bytes[]', name: 'calldatas', type: 'bytes[]' },
       { indexed: false, internalType: 'uint256', name: 'startBlock', type: 'uint256' },
       { indexed: false, internalType: 'uint256', name: 'endBlock', type: 'uint256' },
@@ -46,7 +68,6 @@ const GOVERNOR_ABI = [
     type: 'event',
   },
 ];
-
 
 
 
@@ -269,11 +290,20 @@ export class VerificationService {
             }
 
             if (parsed && parsed.name === 'ProposalCreated') {
+              // The implementation we observed on-chain uses:
+              // [proposalId, proposer, targets, values, signatures, calldatas, startBlock, endBlock, description]
+              // We'll attempt to read by both named args and fallback to positional indices to be robust.
+              const idArg = parsed.args?.proposalId ?? parsed.args?.id ?? parsed.args?.[0] ?? null;
               const maybe = parsed.args?.proposer ?? parsed.args?.[1] ?? null;
-              const desc = parsed.args?.description ?? parsed.args?.[7] ?? null;
-              const idArg = parsed.args?.id ?? parsed.args?.[0] ?? null;
-              const startArg = parsed.args?.startBlock ?? parsed.args?.[5] ?? null;
-              const endArg = parsed.args?.endBlock ?? parsed.args?.[6] ?? null;
+              const targetsArg = parsed.args?.targets ?? parsed.args?.[2] ?? null;
+              const valuesArg = parsed.args?.values ?? parsed.args?.[3] ?? null;
+              const signaturesArg = parsed.args?.signatures ?? parsed.args?.[4] ?? null;
+              const calldatasArg = parsed.args?.calldatas ?? parsed.args?.[5] ?? null;
+              const startArg = parsed.args?.startBlock ?? parsed.args?.[6] ?? null;
+              const endArg = parsed.args?.endBlock ?? parsed.args?.[7] ?? null;
+              const desc = parsed.args?.description ?? parsed.args?.[8] ?? null;
+
+
 
               parsedEventPayload = { name: parsed.name, args: parsed.args, topic: parsed.topic ?? null };
 
@@ -320,6 +350,22 @@ export class VerificationService {
               } catch (numErr) {
                 trace.push({ ts: this.nowISO(), step: 'parse_log_numeric_failed', ok: false, info: String(numErr) });
               }
+
+
+              // include signatures/calldatas in event payload for auditing if present
+              try {
+                (parsedEventPayload as any).parsed = {
+                  proposalId: parsedChainProposalId,
+                  proposer: authoritativeProposer,
+                  targets: targetsArg,
+                  values: valuesArg,
+                  signatures: signaturesArg,
+                  calldatas: calldatasArg,
+                };
+              } catch {}
+
+
+
 
               // debug summary and stop searching logs
               try {

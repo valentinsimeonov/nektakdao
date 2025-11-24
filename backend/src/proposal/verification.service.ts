@@ -7,6 +7,39 @@ import { getAddress, Interface, JsonRpcProvider } from 'ethers';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+
+
+
+
+/**
+ * Helper function to safely convert BigInt values to strings for JSON serialization
+ */
+function stringifyBigInts(obj: any): any {
+  if (obj === null || obj === undefined) return obj;
+  
+  if (typeof obj === 'bigint') {
+    return obj.toString();
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(item => stringifyBigInts(item));
+  }
+  
+  if (typeof obj === 'object') {
+    const result: any = {};
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        result[key] = stringifyBigInts(obj[key]);
+      }
+    }
+    return result;
+  }
+  
+  return obj;
+}
+
+
+
 /**
  * Minimal ABI for ProposalCreated event.
  */
@@ -58,7 +91,7 @@ const GOVERNOR_ABI = [
       { indexed: false, internalType: 'address', name: 'proposer', type: 'address' },
       { indexed: false, internalType: 'address[]', name: 'targets', type: 'address[]' },
       { indexed: false, internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
-      { indexed: false, internalType: 'string[]', name: 'signatures', type: 'string[]' }, // <-- added
+      { indexed: false, internalType: 'string[]', name: 'signatures', type: 'string[]' },
       { indexed: false, internalType: 'bytes[]', name: 'calldatas', type: 'bytes[]' },
       { indexed: false, internalType: 'uint256', name: 'startBlock', type: 'uint256' },
       { indexed: false, internalType: 'uint256', name: 'endBlock', type: 'uint256' },
@@ -165,7 +198,13 @@ export class VerificationService {
     const trace: TraceStep[] = [];
 
     const short = (o: any, n = 800) => {
-      try { return JSON.stringify(o, null, 2).slice(0, n); } catch { return String(o); }
+      try {
+        // Use helper to convert BigInts before stringifying
+        const cleaned = stringifyBigInts(o);
+        return JSON.stringify(cleaned, null, 2).slice(0, n);
+      } catch {
+        return String(o);
+      }
     };
 
     // If no provider configured, immediately return TX_NOT_FOUND so the caller stages the payload.
@@ -307,6 +346,25 @@ export class VerificationService {
 
               parsedEventPayload = { name: parsed.name, args: parsed.args, topic: parsed.topic ?? null };
 
+
+              // Convert proposal ID to string
+              if (idArg !== null && idArg !== undefined) {
+                parsedChainProposalId =
+                  typeof idArg === 'bigint'
+                    ? idArg.toString()
+                    : typeof idArg === 'object' && idArg.toString
+                    ? idArg.toString()
+                    : String(idArg);
+                trace.push({
+                  ts: this.nowISO(),
+                  step: 'parse_log_proposal_id',
+                  ok: true,
+                  info: { chain_proposal_id: parsedChainProposalId },
+                });
+              }
+
+
+
               // proposer
               if (maybe) {
                 try {
@@ -333,10 +391,10 @@ export class VerificationService {
 
               // numeric canonical fields
               try {
-                if (idArg !== null && idArg !== undefined) {
-                  parsedChainProposalId = typeof idArg === 'object' && idArg.toString ? idArg.toString() : String(idArg);
-                  trace.push({ ts: this.nowISO(), step: 'parse_log_proposal_id', ok: true, info: { chain_proposal_id: parsedChainProposalId } });
-                }
+                // if (idArg !== null && idArg !== undefined) {
+                //   parsedChainProposalId = typeof idArg === 'object' && idArg.toString ? idArg.toString() : String(idArg);
+                //   trace.push({ ts: this.nowISO(), step: 'parse_log_proposal_id', ok: true, info: { chain_proposal_id: parsedChainProposalId } });
+                // }
                 if (startArg !== null && startArg !== undefined) {
                   const s = Number(startArg?.toString?.() ?? startArg);
                   if (!Number.isNaN(s)) parsedStartBlock = s;
@@ -354,14 +412,28 @@ export class VerificationService {
 
               // include signatures/calldatas in event payload for auditing if present
               try {
-                (parsedEventPayload as any).parsed = {
+                // (parsedEventPayload as any).parsed = {
+                //   proposalId: parsedChainProposalId,
+                //   proposer: authoritativeProposer,
+                //   targets: targetsArg,
+                //   values: valuesArg,
+                //   signatures: signaturesArg,
+                //   calldatas: calldatasArg,
+                // };
+
+                parsedEventPayload = stringifyBigInts({
+                name: parsed.name,
+                args: parsed.args,
+                topic: parsed.topic ?? null,
+                parsed: {
                   proposalId: parsedChainProposalId,
                   proposer: authoritativeProposer,
                   targets: targetsArg,
                   values: valuesArg,
                   signatures: signaturesArg,
                   calldatas: calldatasArg,
-                };
+                },
+              });
               } catch {}
 
 
@@ -434,7 +506,7 @@ export class VerificationService {
           const out: PreVerifyResult = {
             outcome: 'MISMATCH',
             trace,
-            receipt,
+            receipt: stringifyBigInts(receipt),
             authoritativeProposer,
             confirmations,
             description_raw: parsedDescriptionRaw,
@@ -459,7 +531,7 @@ export class VerificationService {
       const out: PreVerifyResult = {
         outcome: 'CONFIRMED',
         trace,
-        receipt,
+        receipt: stringifyBigInts(receipt),
         authoritativeProposer,
         confirmations,
         description_raw: parsedDescriptionRaw,
@@ -477,7 +549,7 @@ export class VerificationService {
       const out: PreVerifyResult = {
         outcome: 'AWAITING_CONFIRMATIONS',
         trace,
-        receipt,
+        receipt: stringifyBigInts(receipt),
         authoritativeProposer,
         confirmations,
         description_raw: parsedDescriptionRaw,
@@ -495,7 +567,7 @@ export class VerificationService {
       const out: PreVerifyResult = {
         outcome: 'MISMATCH',
         trace,
-        receipt,
+        receipt: stringifyBigInts(receipt),
         authoritativeProposer,
         confirmations,
         description_raw: parsedDescriptionRaw,
@@ -512,7 +584,7 @@ export class VerificationService {
     const out: PreVerifyResult = {
       outcome: 'AWAITING_CONFIRMATIONS',
       trace,
-      receipt,
+      receipt: stringifyBigInts(receipt),
       authoritativeProposer,
       confirmations,
       description_raw: parsedDescriptionRaw,

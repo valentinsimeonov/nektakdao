@@ -34,8 +34,16 @@ export class ProposalResolver {
     @Args('id', { nullable: true }) id?: string,
     @Args('category', { nullable: true }) category?: string,
   ) {
-    return this.ProposalService.findProposals({ id, category });
-  }
+    // return this.ProposalService.findProposals({ id, category });
+
+    // Avoid passing empty string `id` to TypeORM (Postgres uuid column rejects "")
+    const where: any = {};
+    if (id && id !== '') where.id = id;
+    if (category && category !== '') where.category = category;
+    return this.ProposalService.findProposals(where);
+   }
+
+
 
 
 

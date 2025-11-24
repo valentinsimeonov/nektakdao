@@ -47,6 +47,13 @@ export type PreVerifyResult =
       // optional on-chain parsed description fields — present when we parsed ProposalCreated.description
       description_raw?: string | null;
       description_json?: any | null;
+
+      // canonical on-chain metadata extracted from ProposalCreated
+      chain_proposal_id?: string | null;
+      voting_start_block?: number | null;
+      voting_end_block?: number | null;
+      // raw parsed ProposalCreated event args for auditing
+      event_payload?: any | null;
     }
   | {
       outcome: 'TX_NOT_FOUND' | 'RPC_ERROR';
@@ -54,6 +61,11 @@ export type PreVerifyResult =
       reason?: string;
       description_raw?: string | null;
       description_json?: any | null;
+
+      chain_proposal_id?: string | null;
+      voting_start_block?: number | null;
+      voting_end_block?: number | null;
+      event_payload?: any | null;
     };
 
 
@@ -108,6 +120,10 @@ export class VerificationService {
    */
   async preVerifyPayload(incoming: any): Promise<PreVerifyResult> {
     const trace: TraceStep[] = [];
+
+    const short = (o: any, n = 800) => {
+      try { return JSON.stringify(o, null, 2).slice(0, n); } catch { return String(o); }
+    };
 
     // If no provider configured, immediately return TX_NOT_FOUND so the caller stages the payload.
     if (!this.provider) {
@@ -198,6 +214,11 @@ export class VerificationService {
     let authoritativeProposer: string | null = null;
     let parsedDescriptionRaw: string | null = null;
     let parsedDescriptionJson: any = null;
+
+    let parsedChainProposalId: string | null = null;
+    let parsedStartBlock: number | null = null;
+    let parsedEndBlock: number | null = null;
+    let parsedEventPayload: any | null = null;
     try {
       if (Array.isArray(receipt.logs) && receipt.logs.length > 0) {
         const iface = new Interface(GOVERNOR_ABI);
@@ -208,6 +229,18 @@ export class VerificationService {
               // args: id, proposer, targets, values, calldatas, startBlock, endBlock, description
               const maybe = parsed.args?.proposer ?? parsed.args?.[1] ?? null;
               const desc = parsed.args?.description ?? parsed.args?.[7] ?? null;
+              const idArg = parsed.args?.id ?? parsed.args?.[0] ?? null;
+              const startArg = parsed.args?.startBlock ?? parsed.args?.[5] ?? null;
+              const endArg = parsed.args?.endBlock ?? parsed.args?.[6] ?? null;
+              // keep event payload for provenance / auditing
+              parsedEventPayload = {
+                name: parsed.name,
+                args: parsed.args,
+                topic: parsed.topic ?? null,
+              };
+
+              
+              
               if (maybe) {
                 try {
                   authoritativeProposer = getAddress(String(maybe));
@@ -229,8 +262,41 @@ export class VerificationService {
                   trace.push({ ts: this.nowISO(), step: 'parse_log_description_json_parse_failed', ok: false, info: { err: String(parseErr) } });
                 }
               }
+
+
+              // extract canonical numeric values if present
+              try {
+                if (idArg !== null && idArg !== undefined) {
+                  parsedChainProposalId = typeof idArg === 'object' && idArg.toString ? idArg.toString() : String(idArg);
+                  trace.push({ ts: this.nowISO(), step: 'parse_log_proposal_id', ok: true, info: { chain_proposal_id: parsedChainProposalId } });
+                }
+                if (startArg !== null && startArg !== undefined) {
+                  const s = Number(startArg?.toString?.() ?? startArg);
+                  if (!Number.isNaN(s)) parsedStartBlock = s;
+                  trace.push({ ts: this.nowISO(), step: 'parse_log_start_block', ok: parsedStartBlock !== null, info: { startBlock: parsedStartBlock } });
+                }
+                if (endArg !== null && endArg !== undefined) {
+                  const e = Number(endArg?.toString?.() ?? endArg);
+                  if (!Number.isNaN(e)) parsedEndBlock = e;
+                  trace.push({ ts: this.nowISO(), step: 'parse_log_end_block', ok: parsedEndBlock !== null, info: { endBlock: parsedEndBlock } });
+                }
+              } catch (numErr) {
+                trace.push({ ts: this.nowISO(), step: 'parse_log_numeric_failed', ok: false, info: String(numErr) });
+              }
+
+
+
+
+              // debug: log the parsed event summary *after* extraction so values are present
+              try {
+                this.logger.log(`parseLog FOUND ProposalCreated — id=${parsedChainProposalId} start=${parsedStartBlock} end=${parsedEndBlock} descLen=${parsedDescriptionRaw ? parsedDescriptionRaw.length : 0}`);
+                this.logger.debug(`parseLog event_payload (short): ${short(parsedEventPayload, 1000)}`);
+              } catch {}
+
               // Found the relevant event; stop searching further logs
               break;
+
+
             }
           } catch (err) {
             // ignore non-matching log parse errors
@@ -238,9 +304,20 @@ export class VerificationService {
         }
       } else {
         trace.push({ ts: this.nowISO(), step: 'no_logs', ok: false, info: {} });
+        this.logger.debug('preVerifyPayload: receipt has no logs to parse');
       }
+
+     // If logs present but we never matched ProposalCreated, log a little info to help debugging
+      if (Array.isArray(receipt.logs) && receipt.logs.length > 0 && !parsedEventPayload) {
+        try {
+          const sample = receipt.logs.slice(0,3).map((l:any,i:number)=> ({ i, address: l.address, topics: Array.isArray(l.topics) ? l.topics.slice(0,3) : l.topics }));
+          this.logger.debug(`preVerifyPayload: receipt.logs present (${receipt.logs.length}) but no ProposalCreated event parsed. sample logs: ${short(sample, 1000)}`);
+        } catch {}
+      }
+
     } catch (err) {
       trace.push({ ts: this.nowISO(), step: 'parse_logs_failed', ok: false, info: { err: String(err) } });
+      this.logger.warn(`preVerifyPayload: parse_logs_failed: ${String(err)}`);
     }
 
 
@@ -278,13 +355,29 @@ export class VerificationService {
 
 
 
+
+
     // description_json uuid check if present in incoming
     try {
       if (incoming?.description_json && typeof incoming.description_json === 'object') {
         const descUuid = (incoming.description_json as any)?.proposal_uuid ?? null;
         if (descUuid && incoming?.proposal_uuid && descUuid !== incoming.proposal_uuid) {
           trace.push({ ts: this.nowISO(), step: 'description_uuid_mismatch', ok: false, info: { descUuid, payloadUuid: incoming.proposal_uuid } });
-          return { outcome: 'MISMATCH', trace, receipt, authoritativeProposer, confirmations, description_raw: parsedDescriptionRaw, description_json: parsedDescriptionJson };
+          const out: PreVerifyResult = {
+            outcome: 'MISMATCH',
+            trace,
+            receipt,
+            authoritativeProposer,
+            confirmations,
+            description_raw: parsedDescriptionRaw,
+            description_json: parsedDescriptionJson,
+            chain_proposal_id: parsedChainProposalId,
+            voting_start_block: parsedStartBlock,
+            voting_end_block: parsedEndBlock,
+            event_payload: parsedEventPayload,
+          } as PreVerifyResult;
+          this.logger.log(`preVerifyPayload -> MISMATCH (short): chain_proposal_id=${parsedChainProposalId} start=${parsedStartBlock} end=${parsedEndBlock} descJsonKeys=${parsedDescriptionJson ? Object.keys(parsedDescriptionJson) : 'none'}`);
+          return out;
         } else if (descUuid && incoming?.proposal_uuid && descUuid === incoming.proposal_uuid) {
           trace.push({ ts: this.nowISO(), step: 'description_uuid_match', ok: true, info: { descUuid } });
         }
@@ -293,20 +386,83 @@ export class VerificationService {
       trace.push({ ts: this.nowISO(), step: 'description_uuid_check_error', ok: false, info: { err: String(err) } });
     }
 
+
     // Final outcome selection and attach parsed description fields so caller can use them
     if (receipt && receipt.status === 1 && verified && confirmations >= this.confirmationsThreshold) {
-      return { outcome: 'CONFIRMED', trace, receipt, authoritativeProposer, confirmations, description_raw: parsedDescriptionRaw, description_json: parsedDescriptionJson };
+      const out: PreVerifyResult = {
+        outcome: 'CONFIRMED',
+        trace,
+        receipt,
+        authoritativeProposer,
+        confirmations,
+        description_raw: parsedDescriptionRaw,
+        description_json: parsedDescriptionJson,
+        chain_proposal_id: parsedChainProposalId,
+        voting_start_block: parsedStartBlock,
+        voting_end_block: parsedEndBlock,
+        event_payload: parsedEventPayload,
+      } as PreVerifyResult;
+      this.logger.log(`preVerifyPayload -> CONFIRMED (short): chain_proposal_id=${parsedChainProposalId} start=${parsedStartBlock} end=${parsedEndBlock} confirmations=${confirmations}`);
+      return out;
     }
+
 
     if (receipt && receipt.status === 1 && confirmations < this.confirmationsThreshold) {
-      return { outcome: 'AWAITING_CONFIRMATIONS', trace, receipt, authoritativeProposer, confirmations, description_raw: parsedDescriptionRaw, description_json: parsedDescriptionJson };
+      const out: PreVerifyResult = {
+        outcome: 'AWAITING_CONFIRMATIONS',
+        trace,
+        receipt,
+       authoritativeProposer,
+        confirmations,
+        description_raw: parsedDescriptionRaw,
+        description_json: parsedDescriptionJson,
+        chain_proposal_id: parsedChainProposalId,
+       voting_start_block: parsedStartBlock,
+        voting_end_block: parsedEndBlock,
+        event_payload: parsedEventPayload,
+      } as PreVerifyResult;
+      this.logger.log(`preVerifyPayload -> AWAITING_CONFIRMATIONS (short): chain_proposal_id=${parsedChainProposalId} start=${parsedStartBlock} end=${parsedEndBlock} confirmations=${confirmations}`);
+      return out;
     }
+
 
     if (receipt && receipt.status === 1 && !verified) {
-      return { outcome: 'MISMATCH', trace, receipt, authoritativeProposer, confirmations, description_raw: parsedDescriptionRaw, description_json: parsedDescriptionJson };
+      const out: PreVerifyResult = {
+        outcome: 'MISMATCH',
+        trace,
+        receipt,
+        authoritativeProposer,
+        confirmations,
+        description_raw: parsedDescriptionRaw,
+        description_json: parsedDescriptionJson,
+        chain_proposal_id: parsedChainProposalId,
+        voting_start_block: parsedStartBlock,
+        voting_end_block: parsedEndBlock,
+        event_payload: parsedEventPayload,
+      } as PreVerifyResult;
+      this.logger.log(`preVerifyPayload -> MISMATCH (verified=false) (short): chain_proposal_id=${parsedChainProposalId} start=${parsedStartBlock} end=${parsedEndBlock} confirmations=${confirmations}`);
+      return out;
     }
 
-    return { outcome: 'AWAITING_CONFIRMATIONS', trace, receipt, authoritativeProposer, confirmations, description_raw: parsedDescriptionRaw, description_json: parsedDescriptionJson };
+    const out: PreVerifyResult = {
+      outcome: 'AWAITING_CONFIRMATIONS',
+      trace,
+      receipt,
+      authoritativeProposer,
+      confirmations,
+      description_raw: parsedDescriptionRaw,
+      description_json: parsedDescriptionJson,
+      chain_proposal_id: parsedChainProposalId,
+      voting_start_block: parsedStartBlock,
+      voting_end_block: parsedEndBlock,
+      event_payload: parsedEventPayload,
+    } as PreVerifyResult;
+    this.logger.log(`preVerifyPayload -> default AWAITING_CONFIRMATIONS (short): chain_proposal_id=${parsedChainProposalId} start=${parsedStartBlock} end=${parsedEndBlock} confirmations=${confirmations}`);
+    return out;
+
+
+
+
   }
 
 

@@ -69,6 +69,19 @@ public async findProposals(where: FindOptionsWhere<Proposal>) {
     let pre: PreVerifyResult & any;
     try {
       pre = await this.verificationService.preVerifyPayload(incoming);
+      
+      
+      // debug: log a short summary of pre result
+      try {
+        const short = (o: any, n = 1000) => {
+          try { return JSON.stringify(o, null, 2).slice(0, n); } catch { return String(o); }
+        };
+        this.logger.log(`preVerifyPayload result (short): outcome=${pre?.outcome} chain_proposal_id=${(pre as any)?.chain_proposal_id} start=${(pre as any)?.voting_start_block} end=${(pre as any)?.voting_end_block} confirmations=${(pre as any)?.confirmations}`);
+        this.logger.debug(`preVerifyPayload.trace (short): ${short(pre?.trace, 2000)}`);
+      } catch {}
+    
+    
+    
     } catch (err) {
       // If verification failed due to RPC error, fallback to staging so we don't lose the payload
       this.logger.warn(`preVerifyPayload failed (RPC error). Falling back to staging. Err: ${String(err)}`);
@@ -183,11 +196,37 @@ public async findProposals(where: FindOptionsWhere<Proposal>) {
         // put the raw text into description_raw and keep frontend structured fields only as fallback
         base.description_raw = safeString(pre.description_raw, MAX_JSON_STRING) ?? base.description_raw;
       }
+
+      // canonical chain values (prefer on-chain over incoming front-end values)
+      if (pre && (pre as any).chain_proposal_id) {
+        try {
+          base.chain_proposal_id = String((pre as any).chain_proposal_id);
+        } catch {}
+      }
+      if (pre && (pre as any).voting_start_block !== undefined && (pre as any).voting_start_block !== null) {
+        base.voting_start_block = Number((pre as any).voting_start_block);
+      }
+      if (pre && (pre as any).voting_end_block !== undefined && (pre as any).voting_end_block !== null) {
+        base.voting_end_block = Number((pre as any).voting_end_block);
+      }
+      if (pre && (pre as any).event_payload) {
+        base.event_payload = (pre as any).event_payload;
+      }
+
+
+
+
+
     } catch (err) {
       // If anything fails, just keep existing base (incoming values)
       this.logger.warn(`Failed to apply on-chain metadata to base: ${String(err)}`);
     }
 
+
+    // debug: show what canonical chain fields we will persist (short)
+    try {
+      this.logger.log(`persisting base (short): chain_proposal_id=${base.chain_proposal_id} voting_start_block=${base.voting_start_block} voting_end_block=${base.voting_end_block} event_payload=${base.event_payload ? 'present' : 'null'}`);
+    } catch {}
 
 
 
@@ -196,11 +235,23 @@ public async findProposals(where: FindOptionsWhere<Proposal>) {
       base.status = 'CONFIRMED';
       (base as any).proposer_verified = { trace: pre.trace, verified: true, authoritativeProposer: (pre as any).authoritativeProposer ?? null };
       (base as any).raw_receipt = (pre as any).receipt ?? base.raw_receipt;
+      // ensure canonical chain fields persisted for confirmed proposals
+      if ((pre as any).chain_proposal_id) base.chain_proposal_id = String((pre as any).chain_proposal_id);
+      if ((pre as any).voting_start_block !== undefined && (pre as any).voting_start_block !== null) base.voting_start_block = Number((pre as any).voting_start_block);
+      if ((pre as any).voting_end_block !== undefined && (pre as any).voting_end_block !== null) base.voting_end_block = Number((pre as any).voting_end_block);
+      if ((pre as any).event_payload) base.event_payload = (pre as any).event_payload;
+
       (base as any).confirmed_at = new Date();
     } else if (pre.outcome === 'AWAITING_CONFIRMATIONS') {
       base.status = 'AWAITING_CONFIRMATIONS';
       (base as any).proposer_verified = { trace: pre.trace, verified: !!((pre as any).authoritativeProposer) };
       (base as any).raw_receipt = (pre as any).receipt ?? base.raw_receipt;
+     // also persist canonical chain id/start/end for awaiting state (helps frontend for voting)
+      if ((pre as any).chain_proposal_id) base.chain_proposal_id = String((pre as any).chain_proposal_id);
+      if ((pre as any).voting_start_block !== undefined && (pre as any).voting_start_block !== null) base.voting_start_block = Number((pre as any).voting_start_block);
+      if ((pre as any).voting_end_block !== undefined && (pre as any).voting_end_block !== null) base.voting_end_block = Number((pre as any).voting_end_block);
+      if ((pre as any).event_payload) base.event_payload = (pre as any).event_payload;
+
     } else if (pre.outcome === 'FAILED_TX') {
       base.status = 'FAILED_TX';
       (base as any).proposer_verified = { trace: pre.trace, verified: false };
@@ -256,8 +307,7 @@ public async findProposals(where: FindOptionsWhere<Proposal>) {
     // Create new proposal (no existing)
     const newProposal = this.proposalRepo.create(base);
     const saved = await this.proposalRepo.save(newProposal);
-    this.logger.log(`Created new proposal id=${saved.id} proposal_uuid=${saved.proposal_uuid} status=${saved.status}`);
-
+    this.logger.log(`Created new proposal id=${saved.id} proposal_uuid=${saved.proposal_uuid} status=${saved.status} chain_proposal_id=${saved.chain_proposal_id} start=${saved.voting_start_block} end=${saved.voting_end_block}`);
     if (saved.status === 'CONFIRMED' || saved.status === 'AWAITING_CONFIRMATIONS') {
       try {
         const toUpdate = await this.stagingRepo.findOne({ where: [{ proposal_uuid: saved.proposal_uuid }, { tx_hash: saved.tx_hash }] });

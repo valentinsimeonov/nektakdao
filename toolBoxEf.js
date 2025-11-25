@@ -1,6 +1,49 @@
 
 
 
+
+
+
+
+
+
+{/* 
+
+
+
+
+				<div className="ProposalsReviewsTrustScoreColumn">
+					<div className="ProposalsReviewsTrustScorerow1">
+						<span>Votes Up</span>
+						<span>Votes Down</span>
+					</div>
+
+					<div className="ProposalsReviewsTrustScorerow2">
+						<span>{proposal && proposal?.votesUp   ? proposal.votesUp : 'n/a'} </span>
+						<span>{proposal && proposal?.votesDown   ? proposal.votesDown : 'n/a'}</span>
+					</div>
+				</div>
+
+ */}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {/* 
 
         <input type="file" onChange={handleAvatarUpload} accept="image/*" />

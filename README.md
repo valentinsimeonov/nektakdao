@@ -483,7 +483,10 @@ Backend propgates the Voting information for the Respective Proposal to the Fron
 
 
 
+### Backlog - Frontend, Backend
 
+    Create Proposals
+    Implement Avatar/Logo for Proposals
 
 
 

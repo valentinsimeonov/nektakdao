@@ -8,9 +8,6 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 
-
-
-
 /**
  * Helper function to safely convert BigInt values to strings for JSON serialization
  */
@@ -42,38 +39,15 @@ function stringifyBigInts(obj: any): any {
 
 /**
  * Minimal ABI for ProposalCreated event.
- */
-// const GOVERNOR_ABI = [
-//   {
-//     anonymous: false,
-//     inputs: [
-//       { indexed: false, internalType: 'uint256', name: 'id', type: 'uint256' },
-//       { indexed: true, internalType: 'address', name: 'proposer', type: 'address' },
-//       { indexed: false, internalType: 'address[]', name: 'targets', type: 'address[]' },
-//       { indexed: false, internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
-//       { indexed: false, internalType: 'bytes[]', name: 'calldatas', type: 'bytes[]' },
-//       { indexed: false, internalType: 'uint256', name: 'startBlock', type: 'uint256' },
-//       { indexed: false, internalType: 'uint256', name: 'endBlock', type: 'uint256' },
-//       { indexed: false, internalType: 'string', name: 'description', type: 'string' },
-//     ],
-//     name: 'ProposalCreated',
-//     type: 'event',
-//   },
-// ];
-
-
-/**
- * Minimal ABI for ProposalCreated event.
  *
- * NOTE: The deployed governor implementation includes an extra `string[] signatures`
- * parameter between `values` and `calldatas`. The explorer-decoded shape is:
+ *  On Chain Data Structure (The explorer-decoded shape is):
  *
  *   ProposalCreated(
  *     uint256 proposalId,
  *     address proposer,
  *     address[] targets,
  *     uint256[] values,
- *     string[] signatures,   // present on-chain
+ *     string[] signatures, 
  *     bytes[] calldatas,
  *     uint256 startBlock,
  *     uint256 endBlock,
@@ -412,15 +386,6 @@ export class VerificationService {
 
               // include signatures/calldatas in event payload for auditing if present
               try {
-                // (parsedEventPayload as any).parsed = {
-                //   proposalId: parsedChainProposalId,
-                //   proposer: authoritativeProposer,
-                //   targets: targetsArg,
-                //   values: valuesArg,
-                //   signatures: signaturesArg,
-                //   calldatas: calldatasArg,
-                // };
-
                 parsedEventPayload = stringifyBigInts({
                 name: parsed.name,
                 args: parsed.args,

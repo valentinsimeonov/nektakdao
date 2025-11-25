@@ -27,3 +27,7 @@ export const wagmiConfig = getDefaultConfig({
   },
   ssr: true, // Enable server-side rendering support
 });
+
+
+
+

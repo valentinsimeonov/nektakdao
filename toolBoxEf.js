@@ -5,6 +5,48 @@
 
 
 
+how to delegate (copy/paste)
+
+If the pre-check says no delegated voting power and you want a quick delegate-to-self button (example snippet):
+
+
+
+
+
+// call this when user clicks "Delegate to self"
+async function delegateToSelf() {
+  const signer = await getSignerFromWindow();
+  if (!signer) { alert('Connect wallet'); return; }
+  const tokenWithSigner = new Contract(TOKEN_ADDRESS, ERC20_ABI, signer);
+  const me = await signer.getAddress();
+  const tx = await tokenWithSigner.delegate(me);
+  console.log('delegate tx', tx.hash);
+  await tx.wait();
+  alert('Delegation confirmed — you can now vote.');
+}
+
+
+
+
+
+Note: delegation consumes gas.
+
+If you paste the new console output after you drop the pre-checks (or in the unlikely event the revert continues and the decoder prints a custom error name/data), I’ll decode the revert and give the final fix (e.g., why the Governor contract rejects it and the exact action to take — delegate, wait for Active window, or change ABI/parameters).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 {/* 

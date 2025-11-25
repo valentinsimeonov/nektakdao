@@ -465,13 +465,12 @@ Backend propgates the Voting information for the Respective Proposal to the Fron
 ### BUG - Frontend - Need to fix so that Voting system works
 
     Create Proposal System
-    chain_proposal_id does not seem to be fetched into the Frontend and it is not sent to the Backend
-    We need it for the Voting System
+    chain_proposal_id, end_block and start_lock does not seem to be fetched into the Frontend and they are not sent to the Backend
+    We need them for the Voting System
 
 ### Frontend and Backend
 
-    Create Proposals and Voting Systems
-    Enable Subscriptions for GraphQL
+    Create Proposals System and Voting System nneds enabling Subscriptions for GraphQL
 
 
 

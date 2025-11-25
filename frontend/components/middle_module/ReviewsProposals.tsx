@@ -9,6 +9,31 @@
 
 
 
+/**
+ *
+ * on-chain Governor reported states for proposals. OpenZeppelin Governor state mapping is:
+
+0 = Pending
+
+1 = Active ← only here can users vote
+
+2 = Canceled
+
+3 = Defeated
+
+4 = Succeeded
+
+5 = Queued
+
+6 = Expired
+
+7 = Executed
+
+ * 
+ * 
+**/
+
+
 import './Reviews.css';
 // import Loading from "../loading";
 import React, { useRef, useEffect, useState, ChangeEvent, KeyboardEvent } from 'react';
@@ -31,18 +56,25 @@ import { BrowserProvider, Contract, getAddress, parseUnits } from 'ethers';
 const ERC20_ABI = [
   'function balanceOf(address) view returns (uint256)',
   'function decimals() view returns (uint8)',
+  'function delegates(address) view returns (address)',
+  'function getVotes(address) view returns (uint256)',   // returns bigint
+  'function delegate(address)',
 ];
 
 const GOVERNOR_ABI_VOTE = [
   'function castVote(uint256 proposalId, uint8 support) returns (uint256)',
+  'function state(uint256) view returns (uint8)',        // OZ: Pending=0, Active=1, Canceled=2, Defeated=3, Succeeded=4, Queued=5, Expired=6, Executed=7
+  'function hasVoted(uint256, address) view returns (bool)',
   'event VoteCast(address indexed voter, uint256 proposalId, uint8 support, uint256 weight)',
 ];
+
+
+
+
 
 /* Environment (set these in NEXT_PUBLIC_*) */
 const GOVERNOR_ADDRESS = process.env.NEXT_PUBLIC_GOVERNOR_ADDRESS || '';
 const TOKEN_ADDRESS = process.env.NEXT_PUBLIC_TOKEN_ADDRESS || '';
-
-
 
 
 /* Helper: attempt to obtain an ethers Signer from window.ethereum using ethers v6 BrowserProvider */
@@ -179,6 +211,11 @@ const ReviewsProposals: React.FC<ReviewsProposalsProps> = () => {
           return;
         }
         const provider = new BrowserProvider(anyWindow.ethereum);
+
+		const net = await provider.getNetwork();
+		console.log("[vote] network", net);
+
+
         const signer = await provider.getSigner().catch(() => null);
         const address = signer ? await signer.getAddress().catch(() => null) : null;
         if (!address) {
@@ -202,10 +239,11 @@ const ReviewsProposals: React.FC<ReviewsProposalsProps> = () => {
 
 	// decimals may be number or bigint depending on provider; balanceOf should be bigint with ethers v6
 	const [decRaw, balRaw] = await Promise.all([
-	tokenContract.decimals().catch(() => 18),
-	tokenContract.balanceOf(address).catch(() => BigInt(0)),
+		tokenContract.decimals().catch(() => 18),
+		tokenContract.balanceOf(address).catch(() => BigInt(0)),
 	]);
 
+	console.log("[balance] decimals, balance raw:", decRaw, balRaw);
 
 	if (!mounted) return;
 	const decimalsNum = Number(decRaw ?? 18);
@@ -218,16 +256,21 @@ const ReviewsProposals: React.FC<ReviewsProposalsProps> = () => {
 
 	const required = parseUnits('10', decimalsNum); // returns bigint in ethers v6
 	setHasRequiredBalance(balBigInt >= required);
+
+	console.log("[balance] decimalsNum, balBigInt, required", decimalsNum, balBigInt, required);
+
+
 	} catch (err) {
-	console.warn('Failed to read token balance:', err);
-	setTokenDecimals(null);
-	setTokenBalance(null);
-	setHasRequiredBalance(false);
+		console.warn('Failed to read token balance:', err);
+		setTokenDecimals(null);
+		setTokenBalance(null);
+		setHasRequiredBalance(false);
 	} finally {
-	if (mounted) setIsCheckingBalance(false);
+		if (mounted) setIsCheckingBalance(false);
 	}
 	}
-	fetchBalance();
+		fetchBalance();
+
 
 
 	const poll = setInterval(fetchBalance, 10000);
@@ -273,116 +316,162 @@ const ReviewsProposals: React.FC<ReviewsProposalsProps> = () => {
 	  
 
 
-  // Main vote handler
+
+
+
+
+		
+
   // support: 1 => For (Vote Up), 0 => Against (Vote Down)
-  const handleVote = async (support: 0 | 1) => {
+
+
+const handleVote = async (support: 0 | 1) => {
+  console.log("[vote] triggered", { support, proposalId: proposal?.chain_proposal_id, hasRequiredBalance, isCheckingBalance });
+
+  try {
+    if (!proposal) { alert('No proposal selected.'); return; }
+    if (!GOVERNOR_ADDRESS) { alert('Governance contract not configured in frontend.'); return; }
+    if (!TOKEN_ADDRESS) { alert('Token contract not configured in frontend.'); return; }
+
+    const signer = await getSignerFromWindow();
+    if (!signer) { alert('Please connect your wallet in the browser to vote.'); return; }
+    const voterAddress = await signer.getAddress().catch(() => null);
+    if (!voterAddress) { alert('Wallet not available.'); return; }
+
+    // Ensure chain_proposal_id present and convert to bigint
+    const chainProposalIdRaw = proposal.chain_proposal_id ?? null;
+    if (!chainProposalIdRaw) { alert('This proposal does not have an on-chain proposal id yet.'); return; }
+
+    let proposalIdBn: bigint;
     try {
-      if (!proposal) {
-        alert('No proposal selected.');
+      proposalIdBn = BigInt(chainProposalIdRaw);
+    } catch (e) {
+      try { proposalIdBn = BigInt(String(chainProposalIdRaw)); }
+      catch { alert('Invalid on-chain proposal id.'); return; }
+    }
+
+    // Prepare provider/contract objects (read-only first)
+    const provider = (signer as any).provider ?? new BrowserProvider((window as any).ethereum);
+    const tokenContract = new Contract(TOKEN_ADDRESS, ERC20_ABI, provider);
+    const govContract = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, provider);
+
+    // --- Pre-check 1: proposal state ---
+    let stateNum: number | null = null;
+    try {
+      const s = await govContract.state(proposalIdBn);
+      stateNum = typeof s === 'bigint' ? Number(s) : Number(s ?? -1);
+      console.log('[vote] proposal state', stateNum);
+    } catch (e) {
+      console.warn('[vote] failed to read proposal state:', e);
+    }
+    if (stateNum !== null && stateNum !== 1) {
+      alert(`Proposal not active (state=${stateNum}). You can only vote while the proposal is Active.`);
+      return;
+    }
+
+    // --- Pre-check 2: has user already voted? ---
+    try {
+      const hv = await govContract.hasVoted(proposalIdBn, voterAddress);
+      console.log('[vote] hasVoted', hv);
+      if (hv === true) {
+        alert('You have already voted on this proposal (on-chain).');
         return;
       }
-      if (!GOVERNOR_ADDRESS) {
-        alert('Governance contract not configured in frontend.');
+    } catch (e) {
+      console.warn('[vote] hasVoted check failed:', e);
+    }
+
+    // --- Pre-check 3: voting power / delegation (ERC20Votes) ---
+    try {
+      const delegated = await tokenContract.delegates(voterAddress).catch(() => null);
+      const votesRaw = await tokenContract.getVotes(voterAddress).catch(() => BigInt(0));
+      // normalize to bigint
+      const votes = typeof votesRaw === 'bigint' ? votesRaw : BigInt(String(votesRaw ?? 0));
+      console.log('[vote] delegates, votes', delegated, votes);
+      if (votes === BigInt(0)) {
+        alert('You have no delegated voting power. If you hold tokens, delegate to yourself first (token.delegate(yourAddress)).');
         return;
       }
-      if (!TOKEN_ADDRESS) {
-        alert('Token contract not configured in frontend.');
-        return;
+    } catch (e) {
+      console.warn('[vote] getVotes/delegates failed:', e);
+    }
+
+    // Use signer for the Tx
+    const govWithSigner = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, signer);
+
+    setIsVoting(true);
+    applyOptimistic(support);
+
+    // Send transaction (this will open MetaMask)
+    let tx: any = null;
+    try {
+      // castVote typing sometimes fights TS; cast to any to call (safe at runtime).
+      tx = await (govWithSigner as any).castVote(proposalIdBn, support);
+      console.log('[vote] tx submitted', tx.hash);
+    } catch (txErr: any) {
+      console.error('[vote] castVote threw', txErr);
+      // try to extract revert data
+      const hex = txErr?.data ?? txErr?.error?.data ?? txErr?.transaction?.data ?? null;
+      if (hex && (govWithSigner as any).interface) {
+        try {
+          const parsed = (govWithSigner as any).interface.parseError(hex);
+          const msg = parsed?.name ? `${parsed.name}(${JSON.stringify(parsed.args)})` : String(parsed);
+          alert('Transaction reverted: ' + msg);
+        } catch (_) {
+          alert('Transaction failed: ' + (txErr?.message ?? String(txErr)));
+        }
+      } else {
+        alert('Transaction failed: ' + (txErr?.message ?? String(txErr)));
       }
-      // ensure wallet
-      const signer = await getSignerFromWindow();
-      if (!signer) {
-        alert('Please connect your wallet in the browser to vote.');
-        return;
-      }
-      const voterAddress = await signer.getAddress().catch(() => null);
-      if (!voterAddress) {
-        alert('Wallet not available.');
-        return;
-      }
+      revertOptimistic(support);
+      setIsVoting(false);
+      return;
+    }
 
-      // ensure chain_proposal_id present
-      const chainProposalIdRaw = proposal.chain_proposal_id ?? null;
-      if (!chainProposalIdRaw) {
-        alert('This proposal does not have an on-chain proposal id yet.');
-        return;
-      }
+    // record pending vote
+    setPendingVotes((p) => ({ ...p, [tx.hash]: { txHash: tx.hash, support, timestamp: Date.now() } }));
 
-      // ensure token balance gating
-      if (!hasRequiredBalance) {
-        alert('You need at least 10 NKT tokens in your wallet to vote.');
-        return;
-      }
+    // wait for confirmation
+    const receipt = await tx.wait();
+    setPendingVotes((p) => {
+      const copy = { ...p }; delete copy[tx.hash]; return copy;
+    });
 
-      // Prepare contract & call
-      const govContract = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, signer);
-     
-	 
-	 
+    if (!receipt || (receipt as any).status === 0) {
+      revertOptimistic(support);
+      alert('Vote transaction failed or reverted on-chain.');
+      setIsVoting(false);
+      return;
+    }
 
+    // notify backend
+    try {
+      if (support === 1) await voteUpMutation({ variables: { id: queryVariables } });
+      else await voteDownMutation({ variables: { id: queryVariables } });
+    } catch (gqlErr) {
+      console.warn('Backend vote mutation failed: ', gqlErr);
+      alert('Vote confirmed on-chain — backend update failed or is pending. It will be reconciled shortly.');
+    } finally {
+      setIsVoting(false);
+    }
 
-// convert chain_proposal_id (string decimal) -> bigint
-let proposalIdBn: bigint;
-try {
-proposalIdBn = BigInt(chainProposalIdRaw);
-} catch (err) {
-try {
-proposalIdBn = BigInt(String(chainProposalIdRaw));
-} catch {
-alert('Invalid on-chain proposal id.');
-return;
-}
-}
-
-
-setIsVoting(true);
-applyOptimistic(support);
-
-
-const tx = await govContract.castVote(proposalIdBn, support);
-if (!tx || !tx.hash) throw new Error('Failed to obtain tx hash from wallet.');
-
-
-setPendingVotes((p) => ({ ...p, [tx.hash]: { txHash: tx.hash, support, timestamp: Date.now() } }));
-
-
-const receipt = await tx.wait();
-
-
-setPendingVotes((p) => {
-const copy = { ...p };
-delete copy[tx.hash];
-return copy;
-});
-
-
-if (!receipt || (receipt as any).status === 0) {
-revertOptimistic(support);
-alert('Vote transaction failed or reverted on-chain.');
-setIsVoting(false);
-return;
-}
-
-
-try {
-if (support === 1) await voteUpMutation({ variables: { id: queryVariables } });
-else await voteDownMutation({ variables: { id: queryVariables } });
-} catch (gqlErr) {
-console.warn('Backend vote mutation failed: ', gqlErr);
-alert('Vote confirmed on-chain — backend update failed or is pending. It will be reconciled shortly.');
-} finally {
-setIsVoting(false);
-}
-} catch (err: any) {
-console.error('Voting error:', err);
-alert(err?.message ?? String(err));
-setIsVoting(false);
-}
+  } catch (err: any) {
+    console.error('Voting error:', err);
+    alert(err?.message ?? String(err));
+    setIsVoting(false);
+  }
 };
 
 
-const handleVoteUp = async () => handleVote(1);
-const handleVoteDown = async () => handleVote(0);
+
+
+
+
+
+
+
+	const handleVoteUp = async () => handleVote(1);
+	const handleVoteDown = async () => handleVote(0);
 
 
 

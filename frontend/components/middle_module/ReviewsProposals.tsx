@@ -162,6 +162,60 @@ const ReviewsProposals: React.FC<ReviewsProposalsProps> = () => {
 
 
 
+    const [proposalState, setProposalState] = useState<number | null>(null);
+
+  // human readable proposals on chain state
+  function proposalStateName(n: number | null) {
+    if (n === null) return 'unknown';
+    switch (n) {
+      case 0: return 'Pending';
+      case 1: return 'Active';
+      case 2: return 'Canceled';
+      case 3: return 'Defeated';
+      case 4: return 'Succeeded';
+      case 5: return 'Queued';
+      case 6: return 'Expired';
+      case 7: return 'Executed';
+      default: return `state:${n}`;
+    }
+  }
+
+
+
+  useEffect(() => {
+  let mounted = true;
+  async function fetchProposalState() {
+    if (!proposal?.chain_proposal_id || !GOVERNOR_ADDRESS) {
+      if (mounted) setProposalState(null);
+      return;
+    }
+    try {
+      const anyWindow = (window as any);
+      if (!anyWindow?.ethereum) { if (mounted) setProposalState(null); return; }
+      const provider = new BrowserProvider(anyWindow.ethereum);
+      const gov = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, provider);
+      const s = await gov.state(BigInt(proposal.chain_proposal_id));
+      if (!mounted) return;
+      setProposalState(typeof s === 'bigint' ? Number(s) : Number(s ?? -1));
+    } catch (e) {
+      console.warn('[vote] could not read proposal state:', e);
+      if (mounted) setProposalState(null);
+    }
+  }
+  fetchProposalState();
+  return () => { mounted = false; };
+}, [proposal?.chain_proposal_id, GOVERNOR_ADDRESS]);
+
+
+
+
+
+
+
+
+
+
+
   // GraphQL mutations (existing backend)
   const [voteUpMutation] = useMutation(MUTATION_PROPOSALS_VOTE_UP, {
     onCompleted: (data) => {
@@ -273,7 +327,19 @@ const ReviewsProposals: React.FC<ReviewsProposalsProps> = () => {
 
 
 
-	const poll = setInterval(fetchBalance, 10000);
+	// const poll = setInterval(fetchBalance, 10000);
+  let lastBalStr = '';
+  const poll = setInterval(async () => {
+    await fetchBalance();
+    // optional: log only if changed
+    const bStr = tokenBalance ? tokenBalance.toString() : 'null';
+    if (bStr !== lastBalStr) {
+      console.log("[balance] decimalsNum, balBigInt, required", tokenDecimals, tokenBalance, parseUnits('10', tokenDecimals ?? 18));
+      lastBalStr = bStr;
+    }
+  }, 30000);
+
+
 	return () => {
 	mounted = false;
 	clearInterval(poll);

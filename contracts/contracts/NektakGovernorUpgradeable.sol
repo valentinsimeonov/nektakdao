@@ -31,13 +31,36 @@ contract NektakGovernorUpgradeable is
         address payable timelockAddr
     ) public initializer {
         __Governor_init("Nektak Governor");
-        __GovernorSettings_init(1, 5, 0);
+        __GovernorSettings_init(1, 40, 0);
         __GovernorCountingSimple_init();
         __GovernorVotes_init(IVotes(tokenAddr));
         __GovernorVotesQuorumFraction_init(4);
         __GovernorTimelockControl_init(TimelockControllerUpgradeable(timelockAddr));
         __UUPSUpgradeable_init();
     }
+
+
+/*
+
+__GovernorSettings_init( votingDelay, votingPeriod, proposalThreshold ) parameters are:
+
+votingDelay — number of blocks before voting starts (after a proposal is created).
+
+votingPeriod — number of blocks that voting remains open.
+
+proposalThreshold — minimum votes required to create a proposal.
+
+
+
+TODO 
+
+For production (example, 1 week at ~2s blocks -> ~302,400 blocks):
+*/
+
+
+
+
+
 
     // === Required Overrides (from Diamond Inheritance) ===
     

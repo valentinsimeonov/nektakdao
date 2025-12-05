@@ -244,7 +244,7 @@ Now we are building the Technical Floor(Backend) of the Building(App).
 
     4. Creating DAO politicians. There are already enough Politicians in the world, we do not need more of them, and aespecially inventing a new class of politicians(DAO Politicians)
 
-    5. NO Delegate. You vote if you know about the Subject. If not, you educate yourself and then Vote, or you simply do not vote as you don;t know enough about the subject.
+    5. NO Delegate. You vote if you know about the Subject. If not, you educate yourself and then Vote, or you simply do not vote as you don;t know enough about the subject. Technically speacking: Memers will need and can only delegate their vote to themselves(they will need to do it only once).
 
     2. IF the Proposal is not in line with the Community Charter(Values, Morals) then we block the respective Wallet Addres(we can tell the Wallet Address becuase it is recorded on chain, by using the Transcation Hash)
 

@@ -35,10 +35,8 @@
 
 
 import './Reviews.css';
-// import Loading from "../loading";
-import React, { useRef, useEffect, useState, ChangeEvent, KeyboardEvent } from 'react';
+import React, { useRef, useEffect, useState, ChangeEvent, KeyboardEvent, useCallback } from 'react';
 import Image from 'next/image';
-// import Link from 'next/link'; 
 
 import {useSelector, useDispatch} from 'react-redux';
 import { RootState, ProposalData } from '../../store/types';
@@ -57,18 +55,19 @@ const ERC20_ABI = [
   'function balanceOf(address) view returns (uint256)',
   'function decimals() view returns (uint8)',
   'function delegates(address) view returns (address)',
-  'function getVotes(address) view returns (uint256)',   // returns bigint
+  'function getVotes(address) view returns (uint256)',
+  'function getPastVotes(address,uint256) view returns (uint256)',
   'function delegate(address)',
 ];
 
 const GOVERNOR_ABI_VOTE = [
-  'function castVote(uint256 proposalId, uint8 support) returns (uint256)',
-  'function state(uint256) view returns (uint8)',        // OZ: Pending=0, Active=1, Canceled=2, Defeated=3, Succeeded=4, Queued=5, Expired=6, Executed=7
-  'function hasVoted(uint256, address) view returns (bool)',
-  'event VoteCast(address indexed voter, uint256 proposalId, uint8 support, uint256 weight)',
+'function castVote(uint256 proposalId, uint8 support) returns (uint256)',
+'function state(uint256) view returns (uint8)',
+'function hasVoted(uint256, address) view returns (bool)',
+'function proposalSnapshot(uint256) view returns (uint256)',
+'function proposalDeadline(uint256) view returns (uint256)',
+'event VoteCast(address indexed voter, uint256 proposalId, uint8 support, uint256 weight)'
 ];
-
-
 
 
 
@@ -104,12 +103,11 @@ interface PendingVote {
 
 
 
-interface ReviewsProposalsProps {
-
-  }
+  interface PendingVote { txHash: string; support: 0 | 1 | 2; timestamp: number; }
 
 
-const ReviewsProposals: React.FC<ReviewsProposalsProps> = () => {
+
+const ReviewsProposals: React.FC = () => {
 
 
 	const proposalsSelectedButton = useSelector((state: RootState) => state.proposals.proposalsSelectedButton);
@@ -182,29 +180,29 @@ const ReviewsProposals: React.FC<ReviewsProposalsProps> = () => {
 
 
 
-  useEffect(() => {
-  let mounted = true;
-  async function fetchProposalState() {
-    if (!proposal?.chain_proposal_id || !GOVERNOR_ADDRESS) {
-      if (mounted) setProposalState(null);
-      return;
-    }
-    try {
-      const anyWindow = (window as any);
-      if (!anyWindow?.ethereum) { if (mounted) setProposalState(null); return; }
-      const provider = new BrowserProvider(anyWindow.ethereum);
-      const gov = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, provider);
-      const s = await gov.state(BigInt(proposal.chain_proposal_id));
-      if (!mounted) return;
-      setProposalState(typeof s === 'bigint' ? Number(s) : Number(s ?? -1));
-    } catch (e) {
-      console.warn('[vote] could not read proposal state:', e);
-      if (mounted) setProposalState(null);
-    }
-  }
-  fetchProposalState();
-  return () => { mounted = false; };
-}, [proposal?.chain_proposal_id, GOVERNOR_ADDRESS]);
+//   useEffect(() => {
+//   let mounted = true;
+//   async function fetchProposalState() {
+//     if (!proposal?.chain_proposal_id || !GOVERNOR_ADDRESS) {
+//       if (mounted) setProposalState(null);
+//       return;
+//     }
+//     try {
+//       const anyWindow = (window as any);
+//       if (!anyWindow?.ethereum) { if (mounted) setProposalState(null); return; }
+//       const provider = new BrowserProvider(anyWindow.ethereum);
+//       const gov = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, provider);
+//       const s = await gov.state(BigInt(proposal.chain_proposal_id));
+//       if (!mounted) return;
+//       setProposalState(typeof s === 'bigint' ? Number(s) : Number(s ?? -1));
+//     } catch (e) {
+//       console.warn('[vote] could not read proposal state:', e);
+//       if (mounted) setProposalState(null);
+//     }
+//   }
+//   fetchProposalState();
+//   return () => { mounted = false; };
+// }, [proposal?.chain_proposal_id, GOVERNOR_ADDRESS]);
 
 
 
@@ -247,6 +245,30 @@ const ReviewsProposals: React.FC<ReviewsProposalsProps> = () => {
   const [optimisticDelta, setOptimisticDelta] = useState<{ up: number; down: number }>({ up: 0, down: 0 });
 
 
+
+
+
+
+  // On-chain proposal metadata for UI
+// const [proposalState, setProposalState] = useState<number | null>(null);
+const [snapshotBlock, setSnapshotBlock] = useState<number | null>(null);
+const [deadlineBlock, setDeadlineBlock] = useState<number | null>(null);
+const [snapshotTs, setSnapshotTs] = useState<number | null>(null);
+const [deadlineTs, setDeadlineTs] = useState<number | null>(null);
+const [pastVotesAtSnapshot, setPastVotesAtSnapshot] = useState<bigint | null>(null);
+const [delegatedAddress, setDelegatedAddress] = useState<string | null>(null);
+
+
+
+
+
+
+
+// Modal State
+const [showDelegateModal, setShowDelegateModal] = useState(false);
+const [delegateModalPending, setDelegateModalPending] = useState(false);
+const [delegateTxHash, setDelegateTxHash] = useState<string | null>(null);
+const [isDelegating, setIsDelegating] = useState(false);
 
 
 
@@ -365,6 +387,139 @@ const ReviewsProposals: React.FC<ReviewsProposalsProps> = () => {
 
 
 
+
+
+
+
+
+
+// Fetch proposal snapshot/deadline/state and voting info for the connected signer
+useEffect(() => {
+let mounted = true;
+async function fetchProposalMeta() {
+if (!proposal?.chain_proposal_id || !GOVERNOR_ADDRESS || !TOKEN_ADDRESS) {
+if (mounted) { setProposalState(null); setSnapshotBlock(null); setDeadlineBlock(null); setSnapshotTs(null); setDeadlineTs(null); setPastVotesAtSnapshot(null); setDelegatedAddress(null); }
+return;
+}
+
+try {
+const anyWindow = (window as any);
+if (!anyWindow?.ethereum) { if (mounted) setProposalState(null); return; }
+const provider = new BrowserProvider(anyWindow.ethereum);
+const gov = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, provider);
+const token = new Contract(TOKEN_ADDRESS, ERC20_ABI, provider);
+
+
+const pid = BigInt(proposal.chain_proposal_id);
+// read state, snapshot, deadline
+const [sRaw, snapshotRaw, deadlineRaw] = await Promise.all([
+gov.state(pid).catch(() => null),
+gov.proposalSnapshot(pid).catch(() => null),
+gov.proposalDeadline(pid).catch(() => null),
+]);
+if (!mounted) return;
+const s = sRaw == null ? null : (typeof sRaw === 'bigint' ? Number(sRaw) : Number(sRaw));
+setProposalState(s);
+const snap = snapshotRaw == null ? null : Number(snapshotRaw);
+const dead = deadlineRaw == null ? null : Number(deadlineRaw);
+setSnapshotBlock(snap); setDeadlineBlock(dead);
+
+
+
+// try to get timestamp for snapshot/deadline blocks (best-effort)
+try {
+if (snap != null) {
+const b = await provider.getBlock(snap).catch(() => null);
+if (mounted) setSnapshotTs(b?.timestamp ?? null);
+}
+if (dead != null) {
+const b2 = await provider.getBlock(dead).catch(() => null);
+if (mounted) setDeadlineTs(b2?.timestamp ?? null);
+}
+} catch (_) {}
+
+
+// if signer is present, get address and check delegation/pastVotes at snapshot
+const signer = await provider.getSigner().catch(() => null);
+const voterAddress = signer ? await signer.getAddress().catch(() => null) : null;
+if (voterAddress) {
+const [deleg, pastVotesRaw] = await Promise.all([
+token.delegates(voterAddress).catch(() => null),
+// only call getPastVotes if we have a snapshot block
+(snap != null ? token.getPastVotes(voterAddress, snap).catch(() => BigInt(0)) : Promise.resolve(BigInt(0))),
+]);
+
+if (!mounted) return;
+setDelegatedAddress(deleg ?? null);
+const pv = typeof pastVotesRaw === 'bigint' ? pastVotesRaw : BigInt(String(pastVotesRaw ?? 0));
+setPastVotesAtSnapshot(pv);
+} else {
+setDelegatedAddress(null); setPastVotesAtSnapshot(null);
+}
+} catch (e) {
+console.warn('[vote] could not read proposal meta:', e);
+if (mounted) { setProposalState(null); setSnapshotBlock(null); setDeadlineBlock(null); setSnapshotTs(null); setDeadlineTs(null); setPastVotesAtSnapshot(null); setDelegatedAddress(null); }
+}
+}
+fetchProposalMeta();
+const poll = setInterval(fetchProposalMeta, 20000);
+return () => { mounted = false; clearInterval(poll); };
+}, [proposal?.chain_proposal_id, GOVERNOR_ADDRESS, TOKEN_ADDRESS]);
+
+
+
+
+
+
+
+  // Self-delegate flow
+const selfDelegate = useCallback(async () => {
+  setShowDelegateModal(false);          // hide modal when user confirms
+  setDelegateModalPending(true);
+  setIsDelegating(true);
+
+  try {
+    const signer = await getSignerFromWindow();
+    if (!signer) { alert('Connect wallet to delegate'); return; }
+    const voter = await signer.getAddress().catch(() => null);
+    if (!voter) { alert('Cannot determine your address'); return; }
+
+    // Use token interface with delegate
+    const tokenWithSigner = new Contract(TOKEN_ADDRESS, ['function delegate(address)'], signer);
+
+    // Send tx
+    const tx = await tokenWithSigner.delegate(voter);
+    setDelegateTxHash(tx.hash);
+    alert('Delegate tx submitted — please confirm in your wallet. Waiting for confirmation...');
+    await tx.wait();
+
+    alert('Delegation confirmed. Your votes will be counted for future snapshots.');
+    // refresh delegation/pastVotes (best-effort)
+    try {
+      const provider = new BrowserProvider((window as any).ethereum);
+      const token = new Contract(TOKEN_ADDRESS, ERC20_ABI, provider);
+      const deleg = await token.delegates(voter).catch(() => null);
+      setDelegatedAddress(deleg ?? null);
+      // Past votes won't change until next snapshot; keep previous value
+      setPastVotesAtSnapshot((pv) => pv);
+    } catch (_) { /* best-effort */ }
+  } catch (err: any) {
+    console.error('Delegation failed', err);
+    alert('Delegation failed: ' + (err?.message ?? String(err)));
+  } finally {
+    setDelegateModalPending(false);
+    setIsDelegating(false);
+  }
+}, [setDelegatedAddress, setPastVotesAtSnapshot]);
+
+  
+
+
+
+
+
+
+  
 	  
 
 
@@ -391,153 +546,233 @@ const ReviewsProposals: React.FC<ReviewsProposalsProps> = () => {
   // support: 1 => For (Vote Up), 0 => Against (Vote Down)
 
 
-const handleVote = async (support: 0 | 1) => {
-  console.log("[vote] triggered", { support, proposalId: proposal?.chain_proposal_id, hasRequiredBalance, isCheckingBalance });
+// const handleVote = async (support: 0 | 1) => {
+//   console.log("[vote] triggered", { support, proposalId: proposal?.chain_proposal_id, hasRequiredBalance, isCheckingBalance });
 
-  try {
-    if (!proposal) { alert('No proposal selected.'); return; }
-    if (!GOVERNOR_ADDRESS) { alert('Governance contract not configured in frontend.'); return; }
-    if (!TOKEN_ADDRESS) { alert('Token contract not configured in frontend.'); return; }
+//   try {
+//     if (!proposal) { alert('No proposal selected.'); return; }
+//     if (!GOVERNOR_ADDRESS) { alert('Governance contract not configured in frontend.'); return; }
+//     if (!TOKEN_ADDRESS) { alert('Token contract not configured in frontend.'); return; }
 
-    const signer = await getSignerFromWindow();
-    if (!signer) { alert('Please connect your wallet in the browser to vote.'); return; }
-    const voterAddress = await signer.getAddress().catch(() => null);
-    if (!voterAddress) { alert('Wallet not available.'); return; }
+//     const signer = await getSignerFromWindow();
+//     if (!signer) { alert('Please connect your wallet in the browser to vote.'); return; }
+//     const voterAddress = await signer.getAddress().catch(() => null);
+//     if (!voterAddress) { alert('Wallet not available.'); return; }
 
-    // Ensure chain_proposal_id present and convert to bigint
-    const chainProposalIdRaw = proposal.chain_proposal_id ?? null;
-    if (!chainProposalIdRaw) { alert('This proposal does not have an on-chain proposal id yet.'); return; }
+//     // Ensure chain_proposal_id present and convert to bigint
+//     const chainProposalIdRaw = proposal.chain_proposal_id ?? null;
+//     if (!chainProposalIdRaw) { alert('This proposal does not have an on-chain proposal id yet.'); return; }
 
-    let proposalIdBn: bigint;
-    try {
-      proposalIdBn = BigInt(chainProposalIdRaw);
-    } catch (e) {
-      try { proposalIdBn = BigInt(String(chainProposalIdRaw)); }
-      catch { alert('Invalid on-chain proposal id.'); return; }
-    }
+//     let proposalIdBn: bigint;
+//     try {
+//       proposalIdBn = BigInt(chainProposalIdRaw);
+//     } catch (e) {
+//       try { proposalIdBn = BigInt(String(chainProposalIdRaw)); }
+//       catch { alert('Invalid on-chain proposal id.'); return; }
+//     }
 
-    // Prepare provider/contract objects (read-only first)
-    const provider = (signer as any).provider ?? new BrowserProvider((window as any).ethereum);
-    const tokenContract = new Contract(TOKEN_ADDRESS, ERC20_ABI, provider);
-    const govContract = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, provider);
+//     // Prepare provider/contract objects (read-only first)
+//     const provider = (signer as any).provider ?? new BrowserProvider((window as any).ethereum);
+//     const tokenContract = new Contract(TOKEN_ADDRESS, ERC20_ABI, provider);
+//     const govContract = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, provider);
 
-    // --- Pre-check 1: proposal state ---
-    let stateNum: number | null = null;
-    try {
-      const s = await govContract.state(proposalIdBn);
-      stateNum = typeof s === 'bigint' ? Number(s) : Number(s ?? -1);
-      console.log('[vote] proposal state', stateNum);
-    } catch (e) {
-      console.warn('[vote] failed to read proposal state:', e);
-    }
-    if (stateNum !== null && stateNum !== 1) {
-      alert(`Proposal not active (state=${stateNum}). You can only vote while the proposal is Active.`);
-      return;
-    }
+//     // --- Pre-check 1: proposal state ---
+//     let stateNum: number | null = null;
+//     try {
+//       const s = await govContract.state(proposalIdBn);
+//       stateNum = typeof s === 'bigint' ? Number(s) : Number(s ?? -1);
+//       console.log('[vote] proposal state', stateNum);
+//     } catch (e) {
+//       console.warn('[vote] failed to read proposal state:', e);
+//     }
+//     if (stateNum !== null && stateNum !== 1) {
+//       alert(`Proposal not active (state=${stateNum}). You can only vote while the proposal is Active.`);
+//       return;
+//     }
 
-    // --- Pre-check 2: has user already voted? ---
-    try {
-      const hv = await govContract.hasVoted(proposalIdBn, voterAddress);
-      console.log('[vote] hasVoted', hv);
-      if (hv === true) {
-        alert('You have already voted on this proposal (on-chain).');
-        return;
-      }
-    } catch (e) {
-      console.warn('[vote] hasVoted check failed:', e);
-    }
+//     // --- Pre-check 2: has user already voted? ---
+//     try {
+//       const hv = await govContract.hasVoted(proposalIdBn, voterAddress);
+//       console.log('[vote] hasVoted', hv);
+//       if (hv === true) {
+//         alert('You have already voted on this proposal (on-chain).');
+//         return;
+//       }
+//     } catch (e) {
+//       console.warn('[vote] hasVoted check failed:', e);
+//     }
 
-    // --- Pre-check 3: voting power / delegation (ERC20Votes) ---
-    try {
-      const delegated = await tokenContract.delegates(voterAddress).catch(() => null);
-      const votesRaw = await tokenContract.getVotes(voterAddress).catch(() => BigInt(0));
-      // normalize to bigint
-      const votes = typeof votesRaw === 'bigint' ? votesRaw : BigInt(String(votesRaw ?? 0));
-      console.log('[vote] delegates, votes', delegated, votes);
-      if (votes === BigInt(0)) {
-        alert('You have no delegated voting power. If you hold tokens, delegate to yourself first (token.delegate(yourAddress)).');
-        return;
-      }
-    } catch (e) {
-      console.warn('[vote] getVotes/delegates failed:', e);
-    }
+//     // --- Pre-check 3: voting power / delegation (ERC20Votes) ---
+//     try {
+//       const delegated = await tokenContract.delegates(voterAddress).catch(() => null);
+//       const votesRaw = await tokenContract.getVotes(voterAddress).catch(() => BigInt(0));
+//       // normalize to bigint
+//       const votes = typeof votesRaw === 'bigint' ? votesRaw : BigInt(String(votesRaw ?? 0));
+//       console.log('[vote] delegates, votes', delegated, votes);
+//       if (votes === BigInt(0)) {
+//         alert('You have no delegated voting power. If you hold tokens, delegate to yourself first (token.delegate(yourAddress)).');
+//         return;
+//       }
+//     } catch (e) {
+//       console.warn('[vote] getVotes/delegates failed:', e);
+//     }
 
-    // Use signer for the Tx
-    const govWithSigner = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, signer);
+//     // Use signer for the Tx
+//     const govWithSigner = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, signer);
 
-    setIsVoting(true);
-    applyOptimistic(support);
+//     setIsVoting(true);
+//     applyOptimistic(support);
 
-    // Send transaction (this will open MetaMask)
-    let tx: any = null;
-    try {
-      // castVote typing sometimes fights TS; cast to any to call (safe at runtime).
-      tx = await (govWithSigner as any).castVote(proposalIdBn, support);
-      console.log('[vote] tx submitted', tx.hash);
-    } catch (txErr: any) {
-      console.error('[vote] castVote threw', txErr);
-      // try to extract revert data
-      const hex = txErr?.data ?? txErr?.error?.data ?? txErr?.transaction?.data ?? null;
-      if (hex && (govWithSigner as any).interface) {
-        try {
-          const parsed = (govWithSigner as any).interface.parseError(hex);
-          const msg = parsed?.name ? `${parsed.name}(${JSON.stringify(parsed.args)})` : String(parsed);
-          alert('Transaction reverted: ' + msg);
-        } catch (_) {
-          alert('Transaction failed: ' + (txErr?.message ?? String(txErr)));
-        }
-      } else {
-        alert('Transaction failed: ' + (txErr?.message ?? String(txErr)));
-      }
-      revertOptimistic(support);
-      setIsVoting(false);
-      return;
-    }
+//     // Send transaction (this will open MetaMask)
+//     let tx: any = null;
+//     try {
+//       // castVote typing sometimes fights TS; cast to any to call (safe at runtime).
+//       tx = await (govWithSigner as any).castVote(proposalIdBn, support);
+//       console.log('[vote] tx submitted', tx.hash);
+//     } catch (txErr: any) {
+//       console.error('[vote] castVote threw', txErr);
+//       // try to extract revert data
+//       const hex = txErr?.data ?? txErr?.error?.data ?? txErr?.transaction?.data ?? null;
+//       if (hex && (govWithSigner as any).interface) {
+//         try {
+//           const parsed = (govWithSigner as any).interface.parseError(hex);
+//           const msg = parsed?.name ? `${parsed.name}(${JSON.stringify(parsed.args)})` : String(parsed);
+//           alert('Transaction reverted: ' + msg);
+//         } catch (_) {
+//           alert('Transaction failed: ' + (txErr?.message ?? String(txErr)));
+//         }
+//       } else {
+//         alert('Transaction failed: ' + (txErr?.message ?? String(txErr)));
+//       }
+//       revertOptimistic(support);
+//       setIsVoting(false);
+//       return;
+//     }
 
-    // record pending vote
-    setPendingVotes((p) => ({ ...p, [tx.hash]: { txHash: tx.hash, support, timestamp: Date.now() } }));
+//     // record pending vote
+//     setPendingVotes((p) => ({ ...p, [tx.hash]: { txHash: tx.hash, support, timestamp: Date.now() } }));
 
-    // wait for confirmation
-    const receipt = await tx.wait();
-    setPendingVotes((p) => {
-      const copy = { ...p }; delete copy[tx.hash]; return copy;
-    });
+//     // wait for confirmation
+//     const receipt = await tx.wait();
+//     setPendingVotes((p) => {
+//       const copy = { ...p }; delete copy[tx.hash]; return copy;
+//     });
 
-    if (!receipt || (receipt as any).status === 0) {
-      revertOptimistic(support);
-      alert('Vote transaction failed or reverted on-chain.');
-      setIsVoting(false);
-      return;
-    }
+//     if (!receipt || (receipt as any).status === 0) {
+//       revertOptimistic(support);
+//       alert('Vote transaction failed or reverted on-chain.');
+//       setIsVoting(false);
+//       return;
+//     }
 
-    // notify backend
-    try {
-      if (support === 1) await voteUpMutation({ variables: { id: queryVariables } });
-      else await voteDownMutation({ variables: { id: queryVariables } });
-    } catch (gqlErr) {
-      console.warn('Backend vote mutation failed: ', gqlErr);
-      alert('Vote confirmed on-chain — backend update failed or is pending. It will be reconciled shortly.');
-    } finally {
-      setIsVoting(false);
-    }
+//     // notify backend
+//     try {
+//       if (support === 1) await voteUpMutation({ variables: { id: queryVariables } });
+//       else await voteDownMutation({ variables: { id: queryVariables } });
+//     } catch (gqlErr) {
+//       console.warn('Backend vote mutation failed: ', gqlErr);
+//       alert('Vote confirmed on-chain — backend update failed or is pending. It will be reconciled shortly.');
+//     } finally {
+//       setIsVoting(false);
+//     }
 
-  } catch (err: any) {
-    console.error('Voting error:', err);
-    alert(err?.message ?? String(err));
-    setIsVoting(false);
-  }
+//   } catch (err: any) {
+//     console.error('Voting error:', err);
+//     alert(err?.message ?? String(err));
+//     setIsVoting(false);
+//   }
+// };
+
+
+
+
+
+
+
+// Vote handler (same as before but now also checks pastVotesAtSnapshot and proposalState)
+const handleVote = useCallback(async (support: 0 | 1) => {
+console.log('[vote] triggered', { support, proposalId: proposal?.chain_proposal_id, hasRequiredBalance, isCheckingBalance });
+try {
+if (!proposal) { alert('No proposal selected.'); return; }
+if (!GOVERNOR_ADDRESS || !TOKEN_ADDRESS) { alert('Contracts not configured'); return; }
+const signer = await getSignerFromWindow();
+if (!signer) { alert('Please connect your wallet to vote.'); return; }
+const voter = await signer.getAddress().catch(() => null);
+if (!voter) { alert('Wallet not available'); return; }
+
+
+const pid = BigInt(proposal.chain_proposal_id);
+const provider = new BrowserProvider((window as any).ethereum);
+const gov = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, provider);
+const token = new Contract(TOKEN_ADDRESS, ERC20_ABI, provider);
+
+
+// check proposal state (active)
+const sRaw = await gov.state(pid).catch(() => null);
+const s = sRaw == null ? null : (typeof sRaw === 'bigint' ? Number(sRaw) : Number(sRaw));
+if (s !== 1) { alert(`Proposal not active (state=${s}).`); return; }
+
+
+// ensure user had voting power at snapshot
+if (snapshotBlock != null) {
+const pv = await token.getPastVotes(voter, snapshotBlock).catch(() => BigInt(0));
+const pvBig = typeof pv === 'bigint' ? pv : BigInt(String(pv ?? 0));
+if (pvBig === BigInt(0)) {
+alert('You had 0 voting power at the proposal snapshot. Delegate to yourself BEFORE the snapshot to vote on similar future proposals.');
+return;
+}
+}
+
+
+// proceed to cast vote with signer
+const govWithSigner = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, signer);
+setIsVoting(true); applyOptimistic(support);
+let tx: any = null;
+try {
+tx = await (govWithSigner as any).castVote(pid, support);
+} catch (txErr: any) {
+console.error('[vote] castVote threw', txErr);
+alert('Transaction error: ' + (txErr?.message ?? String(txErr)));
+revertOptimistic(support);
+setIsVoting(false);
+return;
+}
+setPendingVotes(p => ({ ...p, [tx.hash]: { txHash: tx.hash, support, timestamp: Date.now() } }));
+const receipt = await tx.wait();
+setPendingVotes(p => { const c = { ...p }; delete c[tx.hash]; return c; });
+if (!receipt || (receipt as any).status === 0) { revertOptimistic(support); alert('Vote tx failed'); setIsVoting(false); return; }
+
+
+// notify backend
+try {
+if (support === 1) await voteUpMutation({ variables: { id: queryVariables } });
+else await voteDownMutation({ variables: { id: queryVariables } });
+} catch (gqlErr) { console.warn('Backend update failed', gqlErr); }
+setIsVoting(false);
+} catch (err: any) {
+console.error('Voting error', err); alert(err?.message ?? String(err)); setIsVoting(false);
+}
+}, [proposal, hasRequiredBalance, isCheckingBalance, snapshotBlock]);
+
+
+const handleVoteUp = () => handleVote(1);
+const handleVoteDown = () => handleVote(0);
+
+
+// UI helpers: readable time
+const toDateTime = (ts: number | null) => ts ? new Date(ts * 1000).toLocaleString() : 'n/a';
+
+
+
+
+const canVote = () => {
+// must have >= 10 NKT, proposal active, and had pastVotes at snapshot
+if (!hasRequiredBalance || isCheckingBalance || isVoting) return false;
+if (proposalState !== 1) return false;
+if (snapshotBlock != null && pastVotesAtSnapshot != null && pastVotesAtSnapshot === BigInt(0)) return false;
+return true;
 };
 
-
-
-
-
-
-
-
-
-	const handleVoteUp = async () => handleVote(1);
-	const handleVoteDown = async () => handleVote(0);
 
 
 
@@ -580,55 +815,32 @@ const handleVote = async (support: 0 | 1) => {
 
 					<div className='ProposalsReviewsVoteButtonsrow'>
 
-							<button
-							className="ProposalsReviewsVoteUpButton"
-							onClick={handleVoteUp}
-							disabled={isVoting || isCheckingBalance || !hasRequiredBalance}
-							title={
-								!hasRequiredBalance
-								? 'You need at least 10 NKT to vote.'
-								: isVoting
-								? 'Vote transaction in progress'
-								: undefined
-							}
-							>
+            <button className='ProposalsReviewsVoteUpButton' onClick={handleVoteUp} disabled={!canVote()} title={!hasRequiredBalance ? 'You need at least 10 NKT' : proposalState !== 1 ? `Proposal not active (${proposalState})` : (snapshotBlock && pastVotesAtSnapshot === BigInt(0)) ? 'You had 0 voting power at snapshot' : undefined}>
+            <div className='ProposalsReviewsIconColumn'><Image src='/Voting/VoteUp.png' alt='img' width={200} height={360} className='ProposalsReviewsIconColumnimg'/></div>
+            <div className='ProposalsReviewsNameColumn'><span className='ProposalsReviewsUpDownTitle'>Vote Up</span></div>
+            </button>
+
+
+            <button className='ProposalsReviewsVoteUpButton' onClick={handleVoteDown} disabled={!canVote()} title={!hasRequiredBalance ? 'You need at least 10 NKT' : proposalState !== 1 ? `Proposal not active (${proposalState})` : (snapshotBlock && pastVotesAtSnapshot === BigInt(0)) ? 'You had 0 voting power at snapshot' : undefined}>
+            <div className='ProposalsReviewsIconColumn'><Image src='/Voting/VoteDown.png' alt='img' width={200} height={360} className='ProposalsReviewsIconColumnimg'/></div>
+            <div className='ProposalsReviewsNameColumn'><span className='ProposalsReviewsUpDownTitle'>Vote Down</span></div>
+            </button>
 
 
 
-							<div className='ProposalsReviewsIconColumn'>
-								<Image src='/Voting/VoteUp.png' alt='img' width={200} height={360} className='ProposalsReviewsIconColumnimg'/>
-							</div>
-							
-							<div className='ProposalsReviewsNameColumn'>
-								<span className='ProposalsReviewsUpDownTitle'>
-									Vote Up
-								</span>
-							</div>
-						</button>
-
-						<button
-						className="ProposalsReviewsVoteUpButton"
-						onClick={handleVoteDown}
-						disabled={isVoting || isCheckingBalance || !hasRequiredBalance}
-						title={
-							!hasRequiredBalance
-							? 'You need at least 10 NKT to vote.'
-							: isVoting
-							? 'Vote transaction in progress'
-							: undefined
-						}
-						>
-							<div className='ProposalsReviewsIconColumn'>
-								<Image src='/Voting/VoteDown.png' alt='img' width={200} height={360} className='ProposalsReviewsIconColumnimg'/>
-							</div>
-							
-							<div className='ProposalsReviewsNameColumn'>
-								<span className='ProposalsReviewsUpDownTitle'>
-									Vote Down
-								</span>
-							</div>
-						</button>
 					</div>
+
+
+
+
+
+
+
+
+
+
+
+
 
 				</div>
 
@@ -656,6 +868,111 @@ const handleVote = async (support: 0 | 1) => {
 						<div>Balance gate: You need ≥ 10 NKT to vote</div>
 						)}
 					</div>
+
+
+
+
+
+{/* Proposal on-chain metadata */}
+<div style={{ marginTop: 8, fontSize: 12, color: '#9ca3af' }}>
+<div>Proposal state: <strong>{proposalState == null ? 'unknown' : proposalStateName(proposalState)}</strong></div>
+<div>Snapshot block: {snapshotBlock ?? 'n/a'} {snapshotTs ? `(${toDateTime(snapshotTs)})` : ''}</div>
+<div>Deadline block: {deadlineBlock ?? 'n/a'} {deadlineTs ? `(${toDateTime(deadlineTs)})` : ''}</div>
+<div>Your delegated to: {delegatedAddress ?? 'n/a'}</div>
+<div>Your voting power at snapshot: {pastVotesAtSnapshot == null ? 'n/a' : pastVotesAtSnapshot.toString()}</div>
+</div>
+
+
+
+
+
+
+
+
+{/* Self-delegate UI */}
+<div style={{ marginTop: 8 }}>
+  <button
+    onClick={() => setShowDelegateModal(true)}
+    disabled={isDelegating || !TOKEN_ADDRESS}
+    style={{ padding: '6px 10px', borderRadius: 6 }}
+  >
+    {isDelegating || delegateModalPending ? 'Delegating…' :
+      (delegatedAddress === (typeof window !== 'undefined' && (window as any).ethereum ? ((window as any).ethereum.selectedAddress ?? null) : null)
+        ? 'Delegated to you'
+        : 'Self-delegate (delegate to yourself)')}
+  </button>
+
+  <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 6 }}>
+    Note: Delegation is a one-time tx. Delegation only affects proposals whose snapshot occurs <strong>after</strong> the delegation is mined.
+  </div>
+
+  {/* Modal overlay */}
+  {showDelegateModal && (
+    <div
+      role="dialog"
+      aria-modal="true"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1200,
+        background: 'rgba(2,6,23,0.6)'
+      }}
+    >
+      <div style={{
+        width: 420,
+        maxWidth: '92%',
+        background: '#0f172a',
+        borderRadius: 8,
+        padding: 18,
+        boxShadow: '0 10px 30px rgba(2,6,23,0.6)',
+        color: '#e6edf3'
+      }}>
+        <h3 style={{ marginTop: 0 }}>Confirm self-delegation</h3>
+        <p style={{ color: '#cbd5e1', marginBottom: 12 }}>
+          Delegation gives your ERC20Votes token voting power to <strong>your own address</strong>. This is required for proposals that take snapshots after delegation.
+          Delegation is a single on-chain transaction and does not transfer tokens. You only need to delegate once (before the snapshot) — future proposals will use delegated voting power.
+        </p>
+
+        <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 12 }}>
+          <div><strong>Gas</strong>: you will pay gas to confirm the delegation transaction.</div>
+          <div><strong>Effect</strong>: takes effect when the delegation tx is mined; only applies to snapshots that occur after mining.</div>
+        </div>
+
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+          <button onClick={() => setShowDelegateModal(false)} style={{ padding: '8px 12px', borderRadius: 6, background: '#111827', color: '#cbd5e1', border: '1px solid #1f2937' }}>
+            Cancel
+          </button>
+          <button
+            onClick={async () => {
+              await selfDelegate();
+            }}
+            disabled={delegateModalPending}
+            style={{ padding: '8px 12px', borderRadius: 6, background: '#0ea5a4', color: '#042027', fontWeight: 600 }}
+          >
+            {delegateModalPending ? 'Delegating…' : 'Confirm & Delegate'}
+          </button>
+        </div>
+
+        {/* Optional: show in-modal pending tx hash */}
+        {delegateTxHash && (
+          <div style={{ marginTop: 10, fontSize: 12, color: '#a3e3d9' }}>
+            Last tx: <a href={`https://block explorer/tx/${delegateTxHash}`} target="_blank" rel="noreferrer" style={{ color: '#bff0e8' }}>{delegateTxHash.slice(0, 8)}…</a>
+          </div>
+        )}
+      </div>
+    </div>
+  )}
+</div>
+
+
+
+
+
+
+
 
 					{Object.keys(pendingVotes).length > 0 && (
 						<div style={{ marginTop: 8, fontSize: 12, color: '#ffd580' }}>

@@ -31,7 +31,7 @@ contract NektakGovernorUpgradeable is
         address payable timelockAddr
     ) public initializer {
         __Governor_init("Nektak Governor");
-        __GovernorSettings_init(1, 40, 0);
+        __GovernorSettings_init(1, 42000, 0);
         __GovernorCountingSimple_init();
         __GovernorVotes_init(IVotes(tokenAddr));
         __GovernorVotesQuorumFraction_init(4);

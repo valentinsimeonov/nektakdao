@@ -1,6 +1,6 @@
 {
   "network": "base_sepolia",
-  "timestamp": "2025-10-31T18:50:22.463Z",
+  "timestamp": "2025-12-06T16:54:49.683Z",
   "deployer": "0x9623B00BdBC5dA9C8d9Fa2a352E96B3EEd569eC0",
   "contracts": {
     "Timelock": {
@@ -15,7 +15,7 @@
   },
   "Governor": {
     "proxy": "0x90382F047bbc21d95736b96e803b53843087AB8a",
-    "implementation": "0x312d61b01d9526f2ae928991fD1c5F5016d8914a"
+    "implementation": "0x442B5944ce9391eDEBD1b2EB55eB075A2FF4cC0c",
+    "lastUpgradeSalt": "0xc7f114f57717998688646cad1227635ab10de7be7b985cfed3b99e1f859a754b"
   }
 }
-

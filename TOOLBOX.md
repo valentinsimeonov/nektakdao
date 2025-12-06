@@ -2,6 +2,23 @@
 
 
 
+## Contracts - Deploy to Mainnet
+
+!!! When we Deploy on Mainnet we will use deployGovernor script to first deploy the Governor Contract and then whenever we need to Upgrade the Governor Contract we will use upgradeGovernor script
+
+
+
+npx hardhat run scripts/upgradeGovernor.ts --network base_sepolia
+
+
+
+
+
+
+
+
+
+
 
 Left Module - fields
 

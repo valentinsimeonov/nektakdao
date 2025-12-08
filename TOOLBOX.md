@@ -2,6 +2,93 @@
 
 
 
+
+### New Con tracts Deploym,ents
+
+
+#### Timelock
+
+  node@a069db7b554a:/project/contracts$ npx hardhat run scripts/deployTimelockUpgradeable.ts --network base_sepolia
+  WARNING: You are currently using Node.js v18.20.4, which is not supported by Hardhat. This can lead to unexpected behavior. See https://v2.hardhat.org/nodejs-versions
+
+
+  Downloading compiler 0.8.24
+  Compiled 62 Solidity files successfully (evm target: cancun).
+  ============================================================
+  STEP 1: Deploy TimelockController (Manual UUPS)
+  ============================================================
+  Network: base_sepolia
+  Deployer: 0xf482a77F3Ce18018416D14Ae7947905568941C88
+  Balance: 0.818147865543640068 ETH
+
+  Timelock Config:
+    Min Delay: 1 seconds
+    Initial Proposers: [ '0xf482a77f3ce18018416d14ae7947905568941c88' ]
+    Executors: [ '0xf482a77f3ce18018416d14ae7947905568941c88' ]
+    Admin: 0xf482a77f3ce18018416d14ae7947905568941c88
+
+  ⏳ Deploying Timelock Implementation...
+  Implementation deployed at: 0xA73b84045613A859f6A85416cfDF7891a510263d
+  Deploying ERC1967Proxy (explicit tx & receipt check)...
+  Proxy deploy tx hash: 0x422a30fb9aa0fab247350990683f79dca70262768d8fde06b707fcc17fcbd627
+  Proxy deployed at: 0x1F447e23d4ce53a30F24e811056FE58449294785
+  Proxy code length: 328 
+
+  DEBUG: proxy: 0x1F447e23d4ce53a30F24e811056FE58449294785
+  DEBUG: impl : 0xA73b84045613A859f6A85416cfDF7891a510263d
+  DEBUG: code at proxy length: 328 
+  DEBUG: code at impl  length: 18018 
+  DEBUG: impl slot raw: 0x000000000000000000000000a73b84045613a859f6a85416cfdf7891a510263d
+  DEBUG: expected impl slot: 0x000000000000000000000000a73b84045613a859f6a85416cfdf7891a510263d
+  DEBUG: impl slot matches impl address: true
+  DEBUG: raw call result for getMinDelay: 0x0000000000000000000000000000000000000000000000000000000000000001
+  DEBUG: decoded getMinDelay: 1
+  DEBUG: no deploy tx hash available on contract instance
+  Verifying deployment...
+    Min Delay: 1 seconds
+    Deployer has PROPOSER_ROLE: true
+    Anyone can execute: false
+
+  Saved to: /project/contracts/deployments/base_sepolia.json
+  ============================================================
+  STEP 1 COMPLETE
+  ============================================================
+  Summary:
+    Timelock Proxy: 0x1F447e23d4ce53a30F24e811056FE58449294785
+    Implementation: 0xA73b84045613A859f6A85416cfDF7891a510263d
+    Min Delay: 1 seconds
+
+    Next: Run deploy-2-token.ts
+
+  node@a069db7b554a:/project/contracts$ 
+
+
+
+
+### Token
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Contracts - Deploy to Mainnet
 
 !!! When we Deploy on Mainnet we will use deployGovernor script to first deploy the Governor Contract and then whenever we need to Upgrade the Governor Contract we will use upgradeGovernor script

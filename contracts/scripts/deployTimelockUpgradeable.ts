@@ -1,3 +1,4 @@
+
 // // contracts/scripts/deployTimelockUpgradeable.ts
 
 
@@ -6,8 +7,9 @@ import hre from "hardhat";
 const { ethers } = hre;
 import fs from "fs";
 import path from "path";
+import * as dotenv from "dotenv";
 import { TimelockControllerUpgradeableUUPS } from "../typechain";
-
+dotenv.config();
 
 
 const OUTPUT_DIR = path.join(__dirname, "..", "deployments");
@@ -65,20 +67,40 @@ async function main() {
   console.log("Balance:", ethers.formatEther(await ethers.provider.getBalance(deployer.address)), "ETH");
   console.log();
 
+
+
+
   // Timelock parameters
-  const MIN_DELAY = process.env.TIMELOCK_MIN_DELAY 
-    ? parseInt(process.env.TIMELOCK_MIN_DELAY) 
+  const MIN_DELAY = process.env.TIMELOCK_MIN_DELAY
+    ? parseInt(process.env.TIMELOCK_MIN_DELAY)
     : 1;
-  
-  const proposers = [deployer.address];
-  const executors = [ethers.ZeroAddress];
-  const admin = deployer.address;
+
+  // helper to parse comma-separated address lists from env (public addresses, not private keys)
+  function splitAddrs(envVar?: string) {
+    if (!envVar || envVar.trim() === "") return [];
+    return envVar.split(",").map(s => s.trim()).filter(Boolean);
+  }
+
+  const envProposers = splitAddrs(process.env.TIMELOCK_PROPOSERS);
+  const envExecutors = splitAddrs(process.env.TIMELOCK_EXECUTORS);
+
+  const proposers = envProposers.length > 0 ? envProposers : [deployer.address];
+  const executors = envExecutors.length > 0 ? envExecutors : [ethers.ZeroAddress];
+
+  // allow explicit timelock admin override via TIMELOCK_ADMIN_ADDRESS; fallback to deployer
+  const admin = process.env.TIMELOCK_ADMIN_ADDRESS && process.env.TIMELOCK_ADMIN_ADDRESS !== ""
+    ? process.env.TIMELOCK_ADMIN_ADDRESS
+    : deployer.address;
 
   console.log("Timelock Config:");
   console.log("  Min Delay:", MIN_DELAY, "seconds");
-  console.log("  Initial Proposer:", deployer.address);
-  console.log("  Executors: [anyone]");
+  console.log("  Initial Proposers:", proposers);
+  console.log("  Executors:", executors);
+  console.log("  Admin:", admin);
   console.log();
+
+
+
 
   // Step 1: Deploy Implementation
   console.log("⏳ Deploying Timelock Implementation...");
@@ -97,14 +119,77 @@ async function main() {
     [MIN_DELAY, proposers, executors, admin]
   );
 
+
+
+
+
+
+
+
+
   // Step 3: Deploy ERC1967Proxy
-  console.log(" Deploying ERC1967Proxy...");
+  console.log(" Deploying ERC1967Proxy (explicit tx & receipt check)...");
   const ProxyFactory = await ethers.getContractFactory("ERC1967ProxyWrapper", deployer);
-  const proxy = await ProxyFactory.deploy(implAddress, initData);
-  await proxy.waitForDeployment();
-  const proxyAddress = await proxy.getAddress();
+
+
+
+  // create deploy transaction payload and send explicitly so we get a receipt and can verify code
+  // NOTE: getDeployTransaction returns a Promise in some setups — await it.
+  const deployTxPayload = await ProxyFactory.getDeployTransaction(implAddress, initData);
+  const populated = await deployer.populateTransaction(deployTxPayload as any);
+  // try to set a safe gas limit if provider can estimate (ethers v6 returns bigint)
+  try {
+    const gasEstimate: bigint = await ethers.provider.estimateGas({ ...populated, from: deployer.address }) as bigint;
+    // use bigint arithmetic (no .mul/.div on bigint)
+    populated.gasLimit = (gasEstimate * 120n / 100n) as any; // add 20% headroom, cast for TS
+  } catch (e) {
+    // ignore if estimate fails; RPCs vary
+  }
+  const sent = await deployer.sendTransaction(populated as any);
+
+
+
+
+
+
+  console.log(" Proxy deploy tx hash:", sent.hash);
+  // wait for the mined tx via the TransactionResponse.wait() method
+  const receipt = await sent.wait();
+  if (!receipt || receipt.status === 0) {
+    console.error("Proxy deployment transaction failed or reverted. Receipt:", receipt);
+    throw new Error("Proxy deployment reverted - aborting.");
+  }
+  const proxyAddress = receipt.contractAddress;
+  if (!proxyAddress) {
+    console.error("Proxy deployment receipt has no contractAddress. Receipt:", receipt);
+    throw new Error("Proxy missing contractAddress - aborting.");
+  }
   console.log(" Proxy deployed at:", proxyAddress);
+  // Some RPCs take a moment to make the new contract code available — poll briefly
+  let code = await ethers.provider.getCode(proxyAddress);
+  let attempts = 0;
+  while ((code === "0x" || code === "0x0") && attempts < 10) {
+    await new Promise((r) => setTimeout(r, 1000));
+    code = await ethers.provider.getCode(proxyAddress);
+    attempts++;
+  }
+  console.log(" Proxy code length:", code.length, code === "0x" ? "(no code yet)" : "");
   console.log();
+
+
+
+
+
+
+
+  // attach a convenience contract instance for later debug/usage
+  var proxy = ProxyFactory.attach(proxyAddress);
+
+
+
+
+
+
 
 
 
@@ -207,10 +292,25 @@ await debugProxy(proxyAddress, implAddress, proxy);
 
   // Step 4: Get contract instance at proxy address
   // const timelock = TimelockFactory.attach(proxyAddress) as any;
+
+
 const timelock = TimelockFactory.attach(proxyAddress) as TimelockControllerUpgradeableUUPS;
-  // Verify the deployment
+  // Verify the deployment by calling through the proxy
   console.log(" Verifying deployment...");
-  const minDelay = await timelock.getMinDelay();
+  let minDelay;
+  try {
+    minDelay = await timelock.getMinDelay();
+  } catch (e) {
+    console.error("Failed to call getMinDelay() on the deployed proxy. This usually means the proxy has no code or wasn't initialized correctly.");
+    throw e;
+  }
+
+
+
+
+
+
+
   console.log("   Min Delay:", minDelay.toString(), "seconds");
   
   const PROPOSER_ROLE = await timelock.PROPOSER_ROLE();

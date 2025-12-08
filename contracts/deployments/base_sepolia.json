@@ -1,17 +1,17 @@
 {
   "network": "base_sepolia",
-  "timestamp": "2025-12-06T16:54:49.683Z",
-  "deployer": "0x9623B00BdBC5dA9C8d9Fa2a352E96B3EEd569eC0",
+  "timestamp": "2025-12-08T21:29:33.996Z",
+  "deployer": "0xf482a77F3Ce18018416D14Ae7947905568941C88",
   "contracts": {
     "Timelock": {
-      "address": "0x6EEE9840017D4fc58C8c9D657E65fe010D815484",
-      "implementation": "0x9645e485b04246163684Bff3dcfBF8295917712B",
+      "address": "0x1F447e23d4ce53a30F24e811056FE58449294785",
+      "implementation": "0xA73b84045613A859f6A85416cfDF7891a510263d",
       "minDelay": 1
     }
   },
   "Token": {
-    "proxy": "0xea5810e02ED8e6dd6835d076408a6FFB772d9F57",
-    "implementation": "0x02a2A3680171de8deA9e6CdfA39715B3004eaE05"
+    "proxy": "0x222e5373A1D9ff0A6bCf9798046f5E8A9C05db8D",
+    "implementation": "0xc5981C92766D75F7c53428854E0d6C0A534f5ced"
   },
   "Governor": {
     "proxy": "0x90382F047bbc21d95736b96e803b53843087AB8a",

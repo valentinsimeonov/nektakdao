@@ -36,7 +36,7 @@ npx hardhat run scripts/debugReadRoles.ts --network base_sepolia
 Mint and Send to Wallet
 
 
-npx hardhat run scripts/mintTokensToWallet.ts --network base_sepolia
+npx hardhat run scripts/scheduleAndExecuteMintViaTimelock.ts --network base_sepolia
 
 
 

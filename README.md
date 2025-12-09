@@ -341,19 +341,83 @@ Now we are building the Technical Floor(Backend) of the Building(App).
     Continue
 
 
-#### 1. Frontend
+### 1. Reasearch Voting System
 
-    Vote
+    Data Flow
+
+    1. Frontend receives All the Proposals and Displays the All the Proposals Data for the Users to see, including chain_proposal_id(the chain_proposal_id is being received  from the Backend along witht all the other Proposal Data. 
+    2. Users want to Vote, they click on the Vote Up or Vote Down Button
+    3. Frontend checks if Wallet is Connected
+    4. Frontend allows the User to Vote if the User has 10 NKT Tokens in their Wallet
+    5. User Delkegates the Vote to Himself
+    6. Users Sign the Voting Transaction with their Wallet and pays the Gas fee (basically they have Voted on Chain)
+    7.Frontend sends the Voting information to the Backend
+    8. Backend receives the Voting Information and Verifies on Chain if the information is Valid/True
+    9. If the Info is True that the Frontend has sent to the Backend then the Backend persists the Info in the Database
+    10. Backend propgates the Voting information for the Respective Proposal to the Frontend 
+    11.User Sees that the Proposal on which the User voted has now the User's Vote
+
+
+### 2. Frontend
+
+    Voting System
+
+    1. Frontend receives All the Proposals and Displays the All the Proposals Data for the Users to see, including chain_proposal_id(the chain_proposal_id is being received  from the Backend along witht all the other Proposal Data. 
+    2. Users want to Vote, they click on the Vote Up or Vote Down Button
+    3. Frontend checks if Wallet is Connected
+    4. Frontend allows the User to Vote if the User has 10 NKT Tokens in their Wallet
+    5. User Delkegates the Vote to Himself
+    6. Users Sign the Voting Transaction with their Wallet and pays the Gas fee (basically they have Voted on Chain)
 
 
 ### 2. Contracts
     
     Add Voting
+    Make Voting Period Larger
+    Redeploy New Improved Contracts for Upgrade
 
 
-### 3. Backend
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Sprint 7 - DEV Version
+
+### 0. Contracts Security Course - Patrick Collins
+    Continue
+
+
+#### 2. Frontend
+
+    7.Frontend sends the Voting information to the Backend
+
+
+### 1. Backend
     
     Logic for Voting
+
+    8. Backend receives the Voting Information and Verifies on Chain if the information is Valid/True
+    9. If the Info is True that the Frontend has sent to the Backend then the Backend persists the Info in the Database
+    10. Backend propgates the Voting information for the Respective Proposal to the Frontend 
+    11.User Sees that the Proposal on which the User voted has now the User's Vote
+
+
+
+
+
 
 
 
@@ -384,12 +448,6 @@ Now we are building the Technical Floor(Backend) of the Building(App).
     Cycles - Deploy VotingPowerAggregator (IVotes) that sums token and workTokens and applies the formula with the Cycle Multiplier and the Work for DAO metric
 
 
-
-
-
-
-
-
 #### Voting System - Phase 1 - Core Voting - Implementation
 
     0. Frotend shows already Created Proposals
@@ -401,23 +459,11 @@ Now we are building the Technical Floor(Backend) of the Building(App).
     6. Backend persists data from Frontend
 
 
-
-
-
-
-
-
-
-
-
-
 What we need right now:
 
 In order for the Backend to send the chain_proposal_id to the Frontend, the Backend needs to retrieve the chain_proposal_id  from On-chain from the receipt.
 This step needs to happen before Step 1(above), it happens after the User has Created the Proposal and the Frontend sends the Proposal Data to the Backend in order for the Backend to Verify the Data.
 After the Backend verifies the newly Created Proposal Data, then it can parse the receipt or other fields that he already has (and has used for verifieying the Newly Created Proposal) in order to retrieve the chain_proposal_id  and save it in the Database.
-
-
 
 
 
@@ -427,14 +473,13 @@ Data Flow
 2. Users want to Vote, they click on the Vote Up or Vote Down Button
 3. Frontend checks if Wallet is Connected
 4. Frontend allows the User to Vote if the User has 10 NKT Tokens in their Wallet
-5. Users Sign the Voting Transaction with their Wallet and pays the Gas fee (basically they have Voted on Chain)
-6.Frontend sends the Voting information to the Backend
-7. Backend receives the Voting Information and Verifies on Chain if the information is Valid/True
-8. If the Info is True that the Frontend has sent to the Backend then the Backend persists the Info in the Database
-9. Backend propgates the Voting information for the Respective Proposal to the Frontend 
-10 .User Sees that the Proposal on which the User voted has now the User's Vote
-
-
+5. User Delkegates the Vote to Himself
+6. Users Sign the Voting Transaction with their Wallet and pays the Gas fee (basically they have Voted on Chain)
+7.Frontend sends the Voting information to the Backend
+8. Backend receives the Voting Information and Verifies on Chain if the information is Valid/True
+9. If the Info is True that the Frontend has sent to the Backend then the Backend persists the Info in the Database
+10. Backend propgates the Voting information for the Respective Proposal to the Frontend 
+11.User Sees that the Proposal on which the User voted has now the User's Vote
 
 
 
@@ -453,6 +498,15 @@ Frontend sends the Voting information to the Backend
  Backend receives the Voting Information and Verifies on Chain if the information is Valid/True
 If the Info is True that the Frontend has sent to the Backend then the Backend persists the Info in the Database
 Backend propgates the Voting information for the Respective Proposal to the Frontend 
+
+
+
+
+
+
+
+
+
 
 
 
@@ -484,8 +538,7 @@ Backend propgates the Voting information for the Respective Proposal to the Fron
 
 ### Backlog - Frontend, Backend
 
-    Create Proposals
-    Implement Avatar/Logo for Proposals
+    Create Proposals - Implement Avatar/Logo for Proposals
 
 
 

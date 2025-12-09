@@ -1,21 +1,20 @@
 {
   "network": "base_sepolia",
-  "timestamp": "2025-12-09T00:21:06.330Z",
+  "timestamp": "2025-12-09T14:30:46.131Z",
   "deployer": "0xf482a77F3Ce18018416D14Ae7947905568941C88",
   "contracts": {
     "Timelock": {
-      "address": "0x1F447e23d4ce53a30F24e811056FE58449294785",
-      "implementation": "0xA73b84045613A859f6A85416cfDF7891a510263d",
+      "address": "0xff35A3825792d8A298EB07406446ed4cA0f5e7df",
+      "implementation": "0xdCb9B19C151218C081AA5259e324BAF12B6e3877",
       "minDelay": 1
     }
   },
   "Token": {
-    "proxy": "0x58D25E961571f3c5906a3F89d126C356bDCD0AD4",
-    "implementation": "0x5b2db482C4E4c52278821691Cbb0AE06eC1ad600"
+    "proxy": "0x6B4373e3986Ed349a44Ab4818E9A8A946A8CdAeA",
+    "implementation": "0x8fdCe04b55b0331719698dc9E019d4456A151c4d"
   },
   "Governor": {
-    "proxy": "0x90382F047bbc21d95736b96e803b53843087AB8a",
-    "implementation": "0x442B5944ce9391eDEBD1b2EB55eB075A2FF4cC0c",
-    "lastUpgradeSalt": "0xc7f114f57717998688646cad1227635ab10de7be7b985cfed3b99e1f859a754b"
+    "proxy": "0xC3De615c585cA068A5030858CBb8C817b81Ab8FB",
+    "implementation": "0x15B38D56f930Cf8f9881e9987fB31C20Dea962aD"
   }
 }

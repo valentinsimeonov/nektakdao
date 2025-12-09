@@ -49,17 +49,19 @@ async function main() {
 
 
 
-  // 3) Deploy ERC1967ProxyWrapper (try constructor initializer first, fallback to no-init + manual init)
+  // 3) Deploy ERC1967ProxyWrapper — try constructor initializer first, fallback to manual init.
   console.log("Deploying ERC1967ProxyWrapper (try constructor init)...");
   const ProxyFactory = await ethers.getContractFactory("ERC1967ProxyWrapper", deployer);
   let proxy: any;
   let proxyAddr: string;
   try {
+    // Preferred: deploy with initializer calldata (constructor will delegatecall initialize)
     proxy = await ProxyFactory.deploy(implAddr, initCalldata);
     await proxy.waitForDeployment();
     proxyAddr = await proxy.getAddress();
     console.log(" Token proxy (deployed with initializer):", proxyAddr);
   } catch (ctorErr) {
+    // If constructor delegatecall fails on some RPCs, fallback: deploy without init then call initialize().
     console.warn("Proxy constructor delegatecall with initializer failed; deploying without init and will attempt manual initialize. error:", (ctorErr as any).message ?? ctorErr);
     proxy = await ProxyFactory.deploy(implAddr, "0x");
     await proxy.waitForDeployment();
@@ -67,7 +69,7 @@ async function main() {
     console.log(" Token proxy (deployed without initializer):", proxyAddr);
   }
 
-
+  // --- After deploy: we'll probe the proxy to verify the implementation slot and initialization ---
 
 
 

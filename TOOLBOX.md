@@ -3,6 +3,280 @@
 
 
 
+## Order for Deploying - FRESH - Contracts
+
+
+npx hardhat clean && npx hardhat compile --show-stack-traces
+
+
+
+npx hardhat run scripts/deployTimelockUpgradeable.ts --network base_sepolia
+
+
+npx hardhat run scripts/deployTokenUpgradeable.ts --network base_sepolia
+
+npx hardhat run scripts/transferTokenOwnershipToTimelock.ts --network base_sepolia ---- Only fi not Succeeded with deployTokenUpgradeable.ts !!!!!!!!!!!
+
+
+
+npx hardhat run scripts/deployGovernorUpgradeable.ts --network base_sepolia
+
+npx hardhat run scripts/grantExecutorToAnyone.ts --network base_sepolia
+
+
+Check
+
+
+npx hardhat run scripts/debugReadToken.ts --network base_sepolia
+
+
+npx hardhat run scripts/debugReadRoles.ts --network base_sepolia
+
+
+Mint and Send to Wallet
+
+
+npx hardhat run scripts/mintTokensToWallet.ts --network base_sepolia
+
+
+
+
+
+
+
+### LATEST - FRESH Contracts Deployments
+
+
+#### Timelock
+
+    node@7ea90fb260bb:/project/contracts$ npx hardhat run scripts/deployTimelockUpgradeable.ts --network base_sepolia
+    WARNING: You are currently using Node.js v18.20.4, which is not supported by Hardhat. This can lead to unexpected behavior. See https://v2.hardhat.org/nodejs-versions
+
+
+    ============================================================
+    STEP 1: Deploy TimelockController (Manual UUPS)
+    ============================================================
+    Network: base_sepolia
+    Deployer: 0xf482a77F3Ce18018416D14Ae7947905568941C88
+    Balance: 0.818115284587772468 ETH
+
+    Timelock Config:
+      Min Delay: 1 seconds
+      Initial Proposers: [ '0xf482a77f3ce18018416d14ae7947905568941c88' ]
+      Executors: [ '0xf482a77f3ce18018416d14ae7947905568941c88' ]
+      Admin: 0xf482a77f3ce18018416d14ae7947905568941c88
+
+    ⏳ Deploying Timelock Implementation...
+    Implementation deployed at: 0xdCb9B19C151218C081AA5259e324BAF12B6e3877
+    Deploying ERC1967Proxy (explicit tx & receipt check)...
+    Proxy deploy tx hash: 0x890043b6a830ad3c61d88aa74034e6f9f45976d24f7def2f2234dbfc4db6fb0a
+    Proxy deployed at: 0xff35A3825792d8A298EB07406446ed4cA0f5e7df
+    Proxy code length: 328 
+
+    DEBUG: proxy: 0xff35A3825792d8A298EB07406446ed4cA0f5e7df
+    DEBUG: impl : 0xdCb9B19C151218C081AA5259e324BAF12B6e3877
+    DEBUG: code at proxy length: 328 
+    DEBUG: code at impl  length: 18018 
+    DEBUG: impl slot raw: 0x000000000000000000000000dcb9b19c151218c081aa5259e324baf12b6e3877
+    DEBUG: expected impl slot: 0x000000000000000000000000dcb9b19c151218c081aa5259e324baf12b6e3877
+    DEBUG: impl slot matches impl address: true
+    DEBUG: raw call result for getMinDelay: 0x0000000000000000000000000000000000000000000000000000000000000001
+    DEBUG: decoded getMinDelay: 1
+    DEBUG: no deploy tx hash available on contract instance
+    Verifying deployment...
+      Min Delay: 1 seconds
+      Deployer has PROPOSER_ROLE: true
+      Anyone can execute: false
+
+    Saved to: /project/contracts/deployments/base_sepolia.json
+    ============================================================
+    STEP 1 COMPLETE
+    ============================================================
+    Summary:
+      Timelock Proxy: 0xff35A3825792d8A298EB07406446ed4cA0f5e7df
+      Implementation: 0xdCb9B19C151218C081AA5259e324BAF12B6e3877
+      Min Delay: 1 seconds
+
+      Next: Run deploy-2-token.ts
+
+    node@7ea90fb260bb:/project/contracts$ 
+
+
+
+
+
+#### Token
+
+    node@5e48c8f3fc02:/project/contracts$ npx hardhat run scripts/deployTokenUpgradeable.ts --network base_sepolia
+    WARNING: You are currently using Node.js v18.20.4, which is not supported by Hardhat. This can lead to unexpected behavior. See https://v2.hardhat.org/nodejs-versions
+
+
+    Downloading compiler 0.8.24
+    Compiled 62 Solidity files successfully (evm target: cancun).
+    Deploying token on base_sepolia from 0xf482a77F3Ce18018416D14Ae7947905568941C88
+    Balance: 0.818112476318937578 ETH
+    Deploying token implementation...
+    Token implementation: 0x8fdCe04b55b0331719698dc9E019d4456A151c4d
+    Deploying ERC1967ProxyWrapper (try constructor init)...
+    Token proxy (deployed with initializer): 0x6B4373e3986Ed349a44Ab4818E9A8A946A8CdAeA
+    DEBUG: impl slot raw: 0x0000000000000000000000008fdce04b55b0331719698dc9e019d4456a151c4d
+    DEBUG: expected impl slot: 0x0000000000000000000000008fdce04b55b0331719698dc9e019d4456a151c4d
+    Verified name/symbol (probe): Nektak Token / NKT
+    Found TIMELOCK_PROXY_ADDRESS in env: 0xff35A3825792d8A298EB07406446ed4cA0f5e7df
+    Attempting to transfer token ownership to timelock: 0xff35A3825792d8A298EB07406446ed4cA0f5e7df
+    Transferred token ownership to timelock: 0x0ed64ea3457077fc88065b398196f07ef623294236929c3691230210f6ddfc90
+    Implementation (used): 0x8fdCe04b55b0331719698dc9E019d4456A151c4d
+    Saved /project/contracts/deployments/base_sepolia.json
+    Done.
+    node@5e48c8f3fc02:/project/contracts$ 
+
+
+
+#### Governor
+
+
+	node@90fa9c33696b:/project/contracts$ npx hardhat run scripts/deployGovernorUpgradeable.ts --network base_sepolia
+	WARNING: You are currently using Node.js v18.20.4, which is not supported by Hardhat. This can lead to unexpected behavior. See https://v2.hardhat.org/nodejs-versions
+
+
+	Downloading compiler 0.8.24
+	Compiled 62 Solidity files successfully (evm target: cancun).
+	Network: base_sepolia chainId: 84532
+	Deploying governor from: 0xf482a77F3Ce18018416D14Ae7947905568941C88
+	Using TIMELOCK_PROXY_ADDRESS from .env
+	Using token: 0x6B4373e3986Ed349a44Ab4818E9A8A946A8CdAeA
+	Using timelock: 0xff35A3825792d8A298EB07406446ed4cA0f5e7df
+	Deploying Governor implementation...
+	Governor implementation: 0x15B38D56f930Cf8f9881e9987fB31C20Dea962aD
+	Deploying proxy (with initializer)...
+	Governor proxy deployed at: 0xC3De615c585cA068A5030858CBb8C817b81Ab8FB
+	Saved governor to: /project/contracts/deployments/base_sepolia.json
+	Granting PROPOSER_ROLE to governor on timelock...
+	Granted PROPOSER_ROLE to governor: 0xC3De615c585cA068A5030858CBb8C817b81Ab8FB
+	Governor deploy + configuration complete.
+	node@90fa9c33696b:/project/contracts$ 
+
+
+
+
+
+#### Phase 2 - PROD Version
+
+
+	When we go to PROD version from DEV version → production config, We will need to make a  script to remove zero-address executor and assign executive role only to the governor plus raise timelock delay.
+
+
+	!! When we Deploy on Mainnet we will use deployGovernor script to first deploy the Governor Contract and then whenever we need to Upgrade the Governor Contract we will use upgradeGovernor script
+	npx hardhat run scripts/upgradeGovernor.ts --network base_sepolia
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===================================================
+
+
+
+## OLD ---- Old deployments fo contracts
+
+
+===================================================
+===================================================
+===================================================
+===================================================
+===================================================
+===================================================
+===================================================
+===================================================
+===================================================
+===================================================
+===================================================
+
+
+
 ### New Con tracts Deploym,ents
 
 
@@ -89,13 +363,10 @@
 
 
 
-## Contracts - Deploy to Mainnet
 
-!!! When we Deploy on Mainnet we will use deployGovernor script to first deploy the Governor Contract and then whenever we need to Upgrade the Governor Contract we will use upgradeGovernor script
 
 
 
-npx hardhat run scripts/upgradeGovernor.ts --network base_sepolia
 
 
 
@@ -106,113 +377,6 @@ npx hardhat run scripts/upgradeGovernor.ts --network base_sepolia
 
 
 
-
-Left Module - fields
-
-Votes Up: Int
-Votes Down: Int
-
-Created: Date
-Status: DURING VOTING | EXECUTING | FEEDBACK
-
-
-
-DropDown:
-
-
-tx_hash : 0x495bsfgDRG5eyh55464dfgfg098rSD
-chain: chain not chain_id
-confirmed: proposal.confirmed
-Technical Status: CONFIRMED | AWAYTING CONFIRMATIONS
-
-Voting Start Block:
-Voting End Block:
-Block number Created:
-Voting Ends: Date
-Executing Ends: Date
-
-
-
-
-
-
-Right Module - fields
-
-
-title 
-description 
-mission 
-budget 
-implement 
-
-
-Votes Up: Int
-Votes Down: Int
-category
-
-
-
-Created: Date
-Status: DURING VOTING | EXECUTING | FEEDBACK
-
-tx_hash : 0x495bsfgDRG5eyh55464dfgfg098rSD
-chain: chain not chain_id
-confirmed: proposal.confirmed
-Technical Status: CONFIRMED | AWAYTING CONFIRMATIONS
-
-Voting Start Block:
-Voting End Block:
-Block number Created:
-Voting Ends: Date
-Executing Ends: Date
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-npx hardhat clean && npx hardhat compile --show-stack-traces
-
-
-
-
-
-
-
-npx hardhat run scripts/deployTimelockUpgradeable.ts --network base_sepolia
-
-
-npx hardhat run scripts/deployTokenUpgradeable.ts --network base_sepolia
-
-
-npx hardhat run scripts/deployGovernorUpgradeable.ts --network base_sepolia
-
-npx hardhat run scripts/mintTokensToWallet.ts --network base_sepolia
 
 
 

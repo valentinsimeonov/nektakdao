@@ -44,15 +44,35 @@ async function main() {
   // 2) Prepare initializer calldata
   const initCalldata = TokenFactory.interface.encodeFunctionData("initialize", [TOKEN_NAME, TOKEN_SYMBOL]);
 
-  // 3) Deploy ERC1967ProxyWrapper (make sure you have ERC1967ProxyWrapper.sol in contracts/)
-  console.log("Deploying ERC1967ProxyWrapper with initializer...");
-  const ProxyFactory = await ethers.getContractFactory("ERC1967ProxyWrapper", deployer);
 
-  // Try constructor delegatecall with initCalldata first (common case)
-  let proxy = await ProxyFactory.deploy(implAddr, initCalldata);
-  await proxy.waitForDeployment();
-  const proxyAddr = await proxy.getAddress();
-  console.log(" Token proxy:", proxyAddr);
+
+
+
+
+  // 3) Deploy ERC1967ProxyWrapper (try constructor initializer first, fallback to no-init + manual init)
+  console.log("Deploying ERC1967ProxyWrapper (try constructor init)...");
+  const ProxyFactory = await ethers.getContractFactory("ERC1967ProxyWrapper", deployer);
+  let proxy: any;
+  let proxyAddr: string;
+  try {
+    proxy = await ProxyFactory.deploy(implAddr, initCalldata);
+    await proxy.waitForDeployment();
+    proxyAddr = await proxy.getAddress();
+    console.log(" Token proxy (deployed with initializer):", proxyAddr);
+  } catch (ctorErr) {
+    console.warn("Proxy constructor delegatecall with initializer failed; deploying without init and will attempt manual initialize. error:", (ctorErr as any).message ?? ctorErr);
+    proxy = await ProxyFactory.deploy(implAddr, "0x");
+    await proxy.waitForDeployment();
+    proxyAddr = await proxy.getAddress();
+    console.log(" Token proxy (deployed without initializer):", proxyAddr);
+  }
+
+
+
+
+
+
+
 
   // --- Verify proxy wiring (EIP-1967 implementation slot) and probe initialization ---
   const IMPLEMENTATION_SLOT =
@@ -101,15 +121,97 @@ async function main() {
   }
 
   if (probedName && probedSymbol) {
+
+
     console.log(" Verified name/symbol (probe):", String(probedName), "/", String(probedSymbol));
   } else {
-    console.warn("Could not read name/symbol from proxy via a read probe. The proxy may not have been initialized by constructor.");
-    console.warn("To initialize manually (if safe), run:");
-    console.warn(
-      `  npx hardhat run --network ${networkName} -e \"const hre=require('hardhat');(async()=>{ const provider = hre.ethers.provider; const deployer = new hre.ethers.Wallet(process.env.DEPLOYER_PRIVATE_KEY, provider); const Token = await hre.ethers.getContractFactory('NektakTokenUpgradeable', deployer); const t = Token.attach('${proxyAddr}'); const tx = await t.initialize('${TOKEN_NAME}','${TOKEN_SYMBOL}'); console.log(tx.hash); })()\"`
-    );
-    console.warn("If manual initialize reverts with 'already initialized', then initialization already ran but the probe failed — check proxy/impl slot and your ABI.");
-  }
+
+    console.warn("Could not read name/symbol from proxy via a read probe. Attempting manual initialize() now...");
+
+    // Manual initialize: call initialize() through the attached token ABI.
+    const tokenAtProxy = TokenFactory.attach(proxyAddr).connect(deployer) as any;
+    try {
+      // safe gasLimit fallback
+      const initTx = await tokenAtProxy.initialize(TOKEN_NAME, TOKEN_SYMBOL, { gasLimit: 900_000 }).catch((e: any) => { throw e; });
+      console.log(" initialize tx hash:", initTx.hash);
+      await initTx.wait();
+      console.log(" initialize() completed");
+
+
+
+      // DEBUG: print expected initializer values
+console.log("DEBUG: expected TOKEN_NAME:", TOKEN_NAME);
+console.log("DEBUG: expected TOKEN_SYMBOL:", TOKEN_SYMBOL);
+
+
+
+      // re-probe name/symbol to confirm — use the contract ABI through deployer (more reliable)
+      try {
+        const tokenAtProxyAfter = TokenFactory.attach(proxyAddr).connect(deployer) as any;
+        
+        
+        probedName = (await tokenAtProxyAfter.name()).toString();
+        probedSymbol = (await tokenAtProxyAfter.symbol()).toString();
+        let currentOwner: string | undefined;
+        try { currentOwner = await tokenAtProxyAfter.owner(); } catch { currentOwner = undefined; }
+        console.log(" Verified after init (via signer):", `"${probedName}"`, "/", `"${probedSymbol}"`);
+        console.log(" Token owner (via signer):", currentOwner ?? "(owner() read failed)");
+        // If values are empty, also print low-level hex returned by provider.call (raw)
+        if ((!probedName || probedName.trim() === "") || (!probedSymbol || probedSymbol.trim() === "")) {
+          try {
+            const nameRaw2 = await ethers.provider.call({ to: proxyAddr, data: nameCalldata });
+            const symRaw2 = await ethers.provider.call({ to: proxyAddr, data: symbolCalldata });
+            console.log(" DEBUG: raw name call hex:", nameRaw2);
+            console.log(" DEBUG: raw symbol call hex:", symRaw2);
+          } catch (callErr) {
+            console.warn(" DEBUG: provider.call probe failed:", (callErr as any).message ?? callErr);
+          }
+          // Print initialize tx receipt and proxy low-level info for deeper inspection
+          try {
+            const receipt = await ethers.provider.getTransactionReceipt(initTx.hash);
+            console.log(" DEBUG: initialize tx receipt status:", receipt?.status, "txHash:", initTx.hash);
+          } catch (rErr) {
+            console.warn(" DEBUG: could not fetch init tx receipt:", (rErr as any).message ?? rErr);
+          }
+          try {
+            const code = await ethers.provider.getCode(proxyAddr);
+            console.log(" DEBUG: proxy code length:", code.length, " (0x...?)");
+            const implSlot = await ethers.provider.send("eth_getStorageAt", [proxyAddr, IMPLEMENTATION_SLOT, "latest"]);
+            console.log(" DEBUG: implementation slot raw:", implSlot);
+          } catch (lowErr) {
+            console.warn(" DEBUG: low-level proxy inspection failed:", (lowErr as any).message ?? lowErr);
+          }
+        }
+     
+     
+      } catch (reprobeErr) {
+        console.warn("Re-probe via signer failed:", (reprobeErr as any).message ?? reprobeErr);
+        // fallback: attempt low-level provider.call once
+        try {
+          const nameRaw2 = await ethers.provider.call({ to: proxyAddr, data: nameCalldata });
+          const symRaw2 = await ethers.provider.call({ to: proxyAddr, data: symbolCalldata });
+          if (nameRaw2 && nameRaw2 !== "0x") probedName = TokenFactory.interface.decodeFunctionResult("name", nameRaw2)[0];
+          if (symRaw2 && symRaw2 !== "0x") probedSymbol = TokenFactory.interface.decodeFunctionResult("symbol", symRaw2)[0];
+          if (probedName && probedSymbol) console.log(" Verified after init (provider fallback):", probedName, "/", probedSymbol);
+        } catch {}
+      }
+
+
+
+
+    } catch (e: any) {
+      const msg = (e && e.error && e.error.message) ? e.error.message : (e && e.message) ? e.message : String(e);
+      if (msg.includes("already initialized") || msg.includes("initialized")) {
+        console.log("initialize() reverted with already-initialized — treating as OK.");
+      } else {
+        console.warn("Manual initialize failed:", msg);
+        console.warn("You can inspect the proxy and/or retry manual initialize with a different gasLimit.");
+      }
+    }
+   }
+
+
+
 
   // --- NEW: attempt to transfer ownership to timelock proxy if available ---
   // Look for TIMELOCK_PROXY_ADDRESS in env first; fallback to deployments/<network>.json

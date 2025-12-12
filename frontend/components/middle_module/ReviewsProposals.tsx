@@ -1,39 +1,5 @@
 //ReviewsProposals.tsx
 
-
-// - Uses ethers BrowserProvider to obtain signer (compatible with the existing CreateProposals approach).
-// - Checks ERC20 balance >= 10 tokens (reads decimals at runtime).
-// - Sends castVote(proposalId, support) on governor contract and uses optimistic UI while waiting.
-// - After on-chain confirmation, calls existing GraphQL mutation (voteUp / voteDown) to notify backend.
-
-
-
-
-/**
- *
- * on-chain Governor reported states for proposals. OpenZeppelin Governor state mapping is:
-
-0 = Pending
-
-1 = Active ← only here can users vote
-
-2 = Canceled
-
-3 = Defeated
-
-4 = Succeeded
-
-5 = Queued
-
-6 = Expired
-
-7 = Executed
-
- * 
- * 
-**/
-
-
 import './Reviews.css';
 import React, { useRef, useEffect, useState, ChangeEvent, KeyboardEvent, useCallback } from 'react';
 import Image from 'next/image';
@@ -91,6 +57,28 @@ async function getSignerFromWindow() {
   }
 }
 
+
+/* Helper to stringify BigInts in receipt objects for JSON sending */
+function stringifyBigInts(obj: any): any {
+  if (obj === null || obj === undefined) return obj;
+  if (typeof obj === 'bigint') return obj.toString();
+  if (Array.isArray(obj)) return obj.map((v) => stringifyBigInts(v));
+  if (typeof obj === 'object') {
+    const out: any = {};
+    for (const k of Object.keys(obj)) {
+      try {
+        out[k] = stringifyBigInts((obj as any)[k]);
+      } catch {
+        out[k] = String((obj as any)[k]);
+      }
+    }
+    return out;
+  }
+  return obj;
+}
+
+
+
 interface PendingVote {
   txHash: string;
   support: 0 | 1 | 2;
@@ -111,22 +99,14 @@ const ReviewsProposals: React.FC = () => {
 
 
 	const proposalsSelectedButton = useSelector((state: RootState) => state.proposals.proposalsSelectedButton);
-
 	const dispatch = useDispatch();
 	const [proposalData, setProposalData] = useState<ProposalData[]>([]);
-
-
 	const proposalsLeftModuleLayer = useSelector((state: RootState) => state.proposals.proposalsLeftModuleLayer);
-
 	const selectedDashboard = useSelector((state: RootState) => state.navbar.selectedDashboard);
-	
 	const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-	
 	const [location, setLocation] = useState("");
 	
 
-
-	
 		const queryVariables =
 		 selectedDashboard === "proposals" ? proposalsSelectedButton
 		: "";
@@ -151,13 +131,7 @@ const ReviewsProposals: React.FC = () => {
 	  }, [queryData]);
 	
 
-
-
-
 	  const proposal = proposalData[0];
-
-
-
 
 
     const [proposalState, setProposalState] = useState<number | null>(null);
@@ -179,58 +153,31 @@ const ReviewsProposals: React.FC = () => {
   }
 
 
-
-//   useEffect(() => {
-//   let mounted = true;
-//   async function fetchProposalState() {
-//     if (!proposal?.chain_proposal_id || !GOVERNOR_ADDRESS) {
-//       if (mounted) setProposalState(null);
-//       return;
-//     }
-//     try {
-//       const anyWindow = (window as any);
-//       if (!anyWindow?.ethereum) { if (mounted) setProposalState(null); return; }
-//       const provider = new BrowserProvider(anyWindow.ethereum);
-//       const gov = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, provider);
-//       const s = await gov.state(BigInt(proposal.chain_proposal_id));
-//       if (!mounted) return;
-//       setProposalState(typeof s === 'bigint' ? Number(s) : Number(s ?? -1));
-//     } catch (e) {
-//       console.warn('[vote] could not read proposal state:', e);
-//       if (mounted) setProposalState(null);
-//     }
-//   }
-//   fetchProposalState();
-//   return () => { mounted = false; };
-// }, [proposal?.chain_proposal_id, GOVERNOR_ADDRESS]);
-
-
-
-
-
-
-
-
-
-
-
   // GraphQL mutations (existing backend)
   const [voteUpMutation] = useMutation(MUTATION_PROPOSALS_VOTE_UP, {
     onCompleted: (data) => {
       // backend returns updated votes; try to apply if shape matches
       if (data?.voteUp) {
-        // `voteUp` maybe the updated proposal object
-        setProposalData(Array.isArray(data.voteUp) ? data.voteUp : [data.voteUp]);
+        const payload = data.voteUp;
+        // If backend returns the proposal object, update proposalData
+        if (Array.isArray(payload)) setProposalData(payload);
+        else if (payload && payload.id) setProposalData([payload as any]);
+        // fallback: if returns votes, apply local optimistic adjustments handled elsewhere
       }
     },
   });
+
+
   const [voteDownMutation] = useMutation(MUTATION_PROPOSALS_VOTE_DOWN, {
     onCompleted: (data) => {
       if (data?.voteDown) {
-        setProposalData(Array.isArray(data.voteDown) ? data.voteDown : [data.voteDown]);
+        const payload = data.voteDown;
+        if (Array.isArray(payload)) setProposalData(payload);
+        else if (payload && payload.id) setProposalData([payload as any]);
       }
     },
   });
+
 
 
 
@@ -246,9 +193,6 @@ const ReviewsProposals: React.FC = () => {
 
 
 
-
-
-
   // On-chain proposal metadata for UI
 // const [proposalState, setProposalState] = useState<number | null>(null);
 const [snapshotBlock, setSnapshotBlock] = useState<number | null>(null);
@@ -257,8 +201,6 @@ const [snapshotTs, setSnapshotTs] = useState<number | null>(null);
 const [deadlineTs, setDeadlineTs] = useState<number | null>(null);
 const [pastVotesAtSnapshot, setPastVotesAtSnapshot] = useState<bigint | null>(null);
 const [delegatedAddress, setDelegatedAddress] = useState<string | null>(null);
-
-
 
 
 
@@ -543,236 +485,119 @@ const selfDelegate = useCallback(async () => {
 
 		
 
-  // support: 1 => For (Vote Up), 0 => Against (Vote Down)
 
+ const handleVote = useCallback(async (support: 0 | 1) => {
+    console.log('[vote] triggered', { support, proposalId: proposal?.chain_proposal_id, hasRequiredBalance, isCheckingBalance });
+    try {
+      if (!proposal) { alert('No proposal selected.'); return; }
+      if (!GOVERNOR_ADDRESS || !TOKEN_ADDRESS) { alert('Contracts not configured'); return; }
+      const signer = await getSignerFromWindow();
+      if (!signer) { alert('Please connect your wallet to vote.'); return; }
+      const voter = await signer.getAddress().catch(() => null);
+      if (!voter) { alert('Wallet not available'); return; }
 
-// const handleVote = async (support: 0 | 1) => {
-//   console.log("[vote] triggered", { support, proposalId: proposal?.chain_proposal_id, hasRequiredBalance, isCheckingBalance });
+      const pid = BigInt(proposal.chain_proposal_id);
+      const provider = new BrowserProvider((window as any).ethereum);
+      const gov = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, provider);
+      const token = new Contract(TOKEN_ADDRESS, ERC20_ABI, provider);
 
-//   try {
-//     if (!proposal) { alert('No proposal selected.'); return; }
-//     if (!GOVERNOR_ADDRESS) { alert('Governance contract not configured in frontend.'); return; }
-//     if (!TOKEN_ADDRESS) { alert('Token contract not configured in frontend.'); return; }
+      // check proposal state (active)
+      const sRaw = await gov.state(pid).catch(() => null);
+      const s = sRaw == null ? null : (typeof sRaw === 'bigint' ? Number(sRaw) : Number(sRaw));
+      if (s !== 1) { alert(`Proposal not active (state=${s}).`); return; }
 
-//     const signer = await getSignerFromWindow();
-//     if (!signer) { alert('Please connect your wallet in the browser to vote.'); return; }
-//     const voterAddress = await signer.getAddress().catch(() => null);
-//     if (!voterAddress) { alert('Wallet not available.'); return; }
+      // ensure user had voting power at snapshot
+      if (snapshotBlock != null) {
+        const pv = await token.getPastVotes(voter, snapshotBlock).catch(() => BigInt(0));
+        const pvBig = typeof pv === 'bigint' ? pv : BigInt(String(pv ?? 0));
+        if (pvBig === BigInt(0)) {
+          alert('You had 0 voting power at the proposal snapshot. Delegate to yourself BEFORE the snapshot to vote on similar future proposals.');
+          return;
+        }
+      }
 
-//     // Ensure chain_proposal_id present and convert to bigint
-//     const chainProposalIdRaw = proposal.chain_proposal_id ?? null;
-//     if (!chainProposalIdRaw) { alert('This proposal does not have an on-chain proposal id yet.'); return; }
+      // cast vote on-chain
+      const govWithSigner = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, signer);
+      setIsVoting(true);
+      applyOptimistic(support);
+      let tx: any = null;
+      try {
+        tx = await (govWithSigner as any).castVote(pid, support);
+      } catch (txErr: any) {
+        console.error('[vote] castVote threw', txErr);
+        alert('Transaction error: ' + (txErr?.message ?? String(txErr)));
+        revertOptimistic(support);
+        setIsVoting(false);
+        return;
+      }
+      setPendingVotes(p => ({ ...p, [tx.hash]: { txHash: tx.hash, support, timestamp: Date.now() } }));
 
-//     let proposalIdBn: bigint;
-//     try {
-//       proposalIdBn = BigInt(chainProposalIdRaw);
-//     } catch (e) {
-//       try { proposalIdBn = BigInt(String(chainProposalIdRaw)); }
-//       catch { alert('Invalid on-chain proposal id.'); return; }
-//     }
+      // wait for on-chain confirmation
+      const receipt = await tx.wait();
+      setPendingVotes(p => { const c = { ...p }; delete c[tx.hash]; return c; });
+      if (!receipt || (receipt as any).status === 0) {
+        revertOptimistic(support);
+        alert('Vote tx failed');
+        setIsVoting(false);
+        return;
+      }
 
-//     // Prepare provider/contract objects (read-only first)
-//     const provider = (signer as any).provider ?? new BrowserProvider((window as any).ethereum);
-//     const tokenContract = new Contract(TOKEN_ADDRESS, ERC20_ABI, provider);
-//     const govContract = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, provider);
+      // Build payload to send to backend (includes tx hash & receipt)
+      const net = await provider.getNetwork().catch(() => ({ name: 'unknown', chainId: null }));
+      const rawReceiptSafe = JSON.stringify(stringifyBigInts(receipt));
+      const mutationVars = {
+        id: queryVariables, // internal proposal id (your backend resolves this to the proposal row)
+        tx_hash: tx.hash,
+        chain_proposal_id: proposal.chain_proposal_id ?? null,
+        voter_address: voter,
+        support: support === 1 ? 1 : 0,
+        governor_address: GOVERNOR_ADDRESS || null,
+        chain: net.name ?? null,
+        chain_id: typeof net.chainId === 'number' ? net.chainId : null,
+        block_number: typeof receipt.blockNumber === 'number' ? receipt.blockNumber : (receipt.blockNumber ? Number(receipt.blockNumber) : null),
+        raw_receipt: rawReceiptSafe,
+        created_at: new Date().toISOString(),
+      };
 
-//     // --- Pre-check 1: proposal state ---
-//     let stateNum: number | null = null;
-//     try {
-//       const s = await govContract.state(proposalIdBn);
-//       stateNum = typeof s === 'bigint' ? Number(s) : Number(s ?? -1);
-//       console.log('[vote] proposal state', stateNum);
-//     } catch (e) {
-//       console.warn('[vote] failed to read proposal state:', e);
-//     }
-//     if (stateNum !== null && stateNum !== 1) {
-//       alert(`Proposal not active (state=${stateNum}). You can only vote while the proposal is Active.`);
-//       return;
-//     }
+      // notify backend — choose appropriate mutation based on support
+      try {
+        if (support === 1) {
+          await voteUpMutation({ variables: mutationVars });
+        } else {
+          await voteDownMutation({ variables: mutationVars });
+        }
+      } catch (gqlErr) {
+        console.warn('Backend update failed', gqlErr);
+        // backend failure shouldn't revert on-chain vote; notify user
+        alert('Vote confirmed on-chain — backend update failed or is pending. It will be reconciled shortly.');
+      }
 
-//     // --- Pre-check 2: has user already voted? ---
-//     try {
-//       const hv = await govContract.hasVoted(proposalIdBn, voterAddress);
-//       console.log('[vote] hasVoted', hv);
-//       if (hv === true) {
-//         alert('You have already voted on this proposal (on-chain).');
-//         return;
-//       }
-//     } catch (e) {
-//       console.warn('[vote] hasVoted check failed:', e);
-//     }
-
-//     // --- Pre-check 3: voting power / delegation (ERC20Votes) ---
-//     try {
-//       const delegated = await tokenContract.delegates(voterAddress).catch(() => null);
-//       const votesRaw = await tokenContract.getVotes(voterAddress).catch(() => BigInt(0));
-//       // normalize to bigint
-//       const votes = typeof votesRaw === 'bigint' ? votesRaw : BigInt(String(votesRaw ?? 0));
-//       console.log('[vote] delegates, votes', delegated, votes);
-//       if (votes === BigInt(0)) {
-//         alert('You have no delegated voting power. If you hold tokens, delegate to yourself first (token.delegate(yourAddress)).');
-//         return;
-//       }
-//     } catch (e) {
-//       console.warn('[vote] getVotes/delegates failed:', e);
-//     }
-
-//     // Use signer for the Tx
-//     const govWithSigner = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, signer);
-
-//     setIsVoting(true);
-//     applyOptimistic(support);
-
-//     // Send transaction (this will open MetaMask)
-//     let tx: any = null;
-//     try {
-//       // castVote typing sometimes fights TS; cast to any to call (safe at runtime).
-//       tx = await (govWithSigner as any).castVote(proposalIdBn, support);
-//       console.log('[vote] tx submitted', tx.hash);
-//     } catch (txErr: any) {
-//       console.error('[vote] castVote threw', txErr);
-//       // try to extract revert data
-//       const hex = txErr?.data ?? txErr?.error?.data ?? txErr?.transaction?.data ?? null;
-//       if (hex && (govWithSigner as any).interface) {
-//         try {
-//           const parsed = (govWithSigner as any).interface.parseError(hex);
-//           const msg = parsed?.name ? `${parsed.name}(${JSON.stringify(parsed.args)})` : String(parsed);
-//           alert('Transaction reverted: ' + msg);
-//         } catch (_) {
-//           alert('Transaction failed: ' + (txErr?.message ?? String(txErr)));
-//         }
-//       } else {
-//         alert('Transaction failed: ' + (txErr?.message ?? String(txErr)));
-//       }
-//       revertOptimistic(support);
-//       setIsVoting(false);
-//       return;
-//     }
-
-//     // record pending vote
-//     setPendingVotes((p) => ({ ...p, [tx.hash]: { txHash: tx.hash, support, timestamp: Date.now() } }));
-
-//     // wait for confirmation
-//     const receipt = await tx.wait();
-//     setPendingVotes((p) => {
-//       const copy = { ...p }; delete copy[tx.hash]; return copy;
-//     });
-
-//     if (!receipt || (receipt as any).status === 0) {
-//       revertOptimistic(support);
-//       alert('Vote transaction failed or reverted on-chain.');
-//       setIsVoting(false);
-//       return;
-//     }
-
-//     // notify backend
-//     try {
-//       if (support === 1) await voteUpMutation({ variables: { id: queryVariables } });
-//       else await voteDownMutation({ variables: { id: queryVariables } });
-//     } catch (gqlErr) {
-//       console.warn('Backend vote mutation failed: ', gqlErr);
-//       alert('Vote confirmed on-chain — backend update failed or is pending. It will be reconciled shortly.');
-//     } finally {
-//       setIsVoting(false);
-//     }
-
-//   } catch (err: any) {
-//     console.error('Voting error:', err);
-//     alert(err?.message ?? String(err));
-//     setIsVoting(false);
-//   }
-// };
+      setIsVoting(false);
+    } catch (err: any) {
+      console.error('Voting error', err);
+      alert(err?.message ?? String(err));
+      setIsVoting(false);
+    }
+  }, [proposal, hasRequiredBalance, isCheckingBalance, snapshotBlock, queryVariables, voteUpMutation, voteDownMutation]);
 
 
 
+  const handleVoteUp = () => handleVote(1);
+  const handleVoteDown = () => handleVote(0);
 
 
+  
+  const canVote = () => {
+    if (!hasRequiredBalance || isCheckingBalance || isVoting) return false;
+    if (proposalState !== 1) return false;
+    if (snapshotBlock != null && pastVotesAtSnapshot != null && pastVotesAtSnapshot === BigInt(0)) return false;
+    return true;
+  };
 
-
-// Vote handler (same as before but now also checks pastVotesAtSnapshot and proposalState)
-const handleVote = useCallback(async (support: 0 | 1) => {
-console.log('[vote] triggered', { support, proposalId: proposal?.chain_proposal_id, hasRequiredBalance, isCheckingBalance });
-try {
-if (!proposal) { alert('No proposal selected.'); return; }
-if (!GOVERNOR_ADDRESS || !TOKEN_ADDRESS) { alert('Contracts not configured'); return; }
-const signer = await getSignerFromWindow();
-if (!signer) { alert('Please connect your wallet to vote.'); return; }
-const voter = await signer.getAddress().catch(() => null);
-if (!voter) { alert('Wallet not available'); return; }
-
-
-const pid = BigInt(proposal.chain_proposal_id);
-const provider = new BrowserProvider((window as any).ethereum);
-const gov = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, provider);
-const token = new Contract(TOKEN_ADDRESS, ERC20_ABI, provider);
-
-
-// check proposal state (active)
-const sRaw = await gov.state(pid).catch(() => null);
-const s = sRaw == null ? null : (typeof sRaw === 'bigint' ? Number(sRaw) : Number(sRaw));
-if (s !== 1) { alert(`Proposal not active (state=${s}).`); return; }
-
-
-// ensure user had voting power at snapshot
-if (snapshotBlock != null) {
-const pv = await token.getPastVotes(voter, snapshotBlock).catch(() => BigInt(0));
-const pvBig = typeof pv === 'bigint' ? pv : BigInt(String(pv ?? 0));
-if (pvBig === BigInt(0)) {
-alert('You had 0 voting power at the proposal snapshot. Delegate to yourself BEFORE the snapshot to vote on similar future proposals.');
-return;
-}
-}
-
-
-// proceed to cast vote with signer
-const govWithSigner = new Contract(GOVERNOR_ADDRESS, GOVERNOR_ABI_VOTE, signer);
-setIsVoting(true); applyOptimistic(support);
-let tx: any = null;
-try {
-tx = await (govWithSigner as any).castVote(pid, support);
-} catch (txErr: any) {
-console.error('[vote] castVote threw', txErr);
-alert('Transaction error: ' + (txErr?.message ?? String(txErr)));
-revertOptimistic(support);
-setIsVoting(false);
-return;
-}
-setPendingVotes(p => ({ ...p, [tx.hash]: { txHash: tx.hash, support, timestamp: Date.now() } }));
-const receipt = await tx.wait();
-setPendingVotes(p => { const c = { ...p }; delete c[tx.hash]; return c; });
-if (!receipt || (receipt as any).status === 0) { revertOptimistic(support); alert('Vote tx failed'); setIsVoting(false); return; }
-
-
-// notify backend
-try {
-if (support === 1) await voteUpMutation({ variables: { id: queryVariables } });
-else await voteDownMutation({ variables: { id: queryVariables } });
-} catch (gqlErr) { console.warn('Backend update failed', gqlErr); }
-setIsVoting(false);
-} catch (err: any) {
-console.error('Voting error', err); alert(err?.message ?? String(err)); setIsVoting(false);
-}
-}, [proposal, hasRequiredBalance, isCheckingBalance, snapshotBlock]);
-
-
-const handleVoteUp = () => handleVote(1);
-const handleVoteDown = () => handleVote(0);
 
 
 // UI helpers: readable time
 const toDateTime = (ts: number | null) => ts ? new Date(ts * 1000).toLocaleString() : 'n/a';
-
-
-
-
-const canVote = () => {
-// must have >= 10 NKT, proposal active, and had pastVotes at snapshot
-if (!hasRequiredBalance || isCheckingBalance || isVoting) return false;
-if (proposalState !== 1) return false;
-if (snapshotBlock != null && pastVotesAtSnapshot != null && pastVotesAtSnapshot === BigInt(0)) return false;
-return true;
-};
-
 
 
 
@@ -829,16 +654,6 @@ return true;
 
 
 					</div>
-
-
-
-
-
-
-
-
-
-
 
 
 

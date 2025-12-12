@@ -125,31 +125,75 @@ const MUTATION_CREATE_PROPOSAL = gql`
 
 
 
-
-
 const MUTATION_PROPOSALS_VOTE_UP = gql`
-  mutation voteUp ($id: String!){
-    voteUp( id: $id){
+  mutation voteUp(
+    $id: String!,
+    $tx_hash: String!,
+    $chain_proposal_id: String,
+    $voter_address: String!,
+    $support: Int!,
+    $governor_address: String,
+    $chain: String,
+    $chain_id: Int,
+    $block_number: Int,
+    $raw_receipt: String,
+    $created_at: String
+  ){
+    voteUp(
+      id: $id,
+      tx_hash: $tx_hash,
+      chain_proposal_id: $chain_proposal_id,
+      voter_address: $voter_address,
+      support: $support,
+      governor_address: $governor_address,
+      chain: $chain,
+      chain_id: $chain_id,
+      block_number: $block_number,
+      raw_receipt: $raw_receipt,
+      created_at: $created_at
+    ){
       votes_up
       votes_down
-
+      id
+      status
     }
   }
 `;
-
 
 const MUTATION_PROPOSALS_VOTE_DOWN = gql`
-  mutation voteDown ($id: String!){
-    voteDown( id: $id){
+  mutation voteDown(
+    $id: String!,
+    $tx_hash: String!,
+    $chain_proposal_id: String,
+    $voter_address: String!,
+    $support: Int!,
+    $governor_address: String,
+    $chain: String,
+    $chain_id: Int,
+    $block_number: Int,
+    $raw_receipt: String,
+    $created_at: String
+  ){
+    voteDown(
+      id: $id,
+      tx_hash: $tx_hash,
+      chain_proposal_id: $chain_proposal_id,
+      voter_address: $voter_address,
+      support: $support,
+      governor_address: $governor_address,
+      chain: $chain,
+      chain_id: $chain_id,
+      block_number: $block_number,
+      raw_receipt: $raw_receipt,
+      created_at: $created_at
+    ){
       votes_up
       votes_down
-
+      id
+      status
     }
   }
 `;
-
-
-
 
 
 

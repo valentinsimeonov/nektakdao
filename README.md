@@ -426,6 +426,15 @@ Now we are building the Technical Floor(Backend) of the Building(App).
 
 
 
+
+
+
+
+
+
+
+
+
 ### Research Plan - Contracts, Backend, Frontend
 
 #### Voting System - High Level
